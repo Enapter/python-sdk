@@ -110,7 +110,7 @@ class Client(async_.Routine):
             # FIXME: A cancelled `asyncio_mqtt.Client.connect` leaks resources.
             # This sleep is a dirty and unreliable hack to let the stuff settle
             # down and thus suppress the exception.
-            await asyncio.sleep(1)
+            await asyncio.sleep(0)
             raise
 
     @staticmethod

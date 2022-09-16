@@ -3,7 +3,7 @@ import logging
 import sys
 
 
-def new(name="main", level="INFO"):
+def new(name="enapter", level="INFO"):
     logger = logging.getLogger(name)
 
     logger.setLevel(level)
