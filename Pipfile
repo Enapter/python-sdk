@@ -5,3 +5,9 @@ name = "pypi"
 
 [packages]
 enapter = {editable = true, path = "."}
+
+[dev-packages]
+black = "*"
+isort = "*"
+pyflakes = "*"
+pytest = "*"
