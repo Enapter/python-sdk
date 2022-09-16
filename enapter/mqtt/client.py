@@ -1,0 +1,134 @@
+import asyncio
+import contextlib
+import ssl
+import tempfile
+
+import asyncio_mqtt
+
+from .. import async_
+from .device_channel import DeviceChannel
+
+
+class Client(async_.Routine):
+    def __init__(self, logger, config):
+        self._logger = logger.named("mqtt")
+        self._config = config
+        self._tls_context = self._new_tls_context(config)
+        self._lock = asyncio.Lock()
+        self._client = None
+        self._client_ready = asyncio.Event()
+
+    def config(self):
+        return self._config
+
+    def device_channel(self, hardware_id, channel_id):
+        return DeviceChannel(
+            client=self,
+            logger=self._logger,
+            hardware_id=hardware_id,
+            channel_id=channel_id,
+        )
+
+    async def publish(self, *args, **kwargs):
+        client = None
+
+        while True:
+            await self._client_ready.wait()
+            async with self._lock:
+                if self._client_ready.is_set():
+                    client = self._client
+                    break
+
+        await client.publish(*args, **kwargs)
+
+    @async_.generator
+    async def subscribe(self, topic):
+        while True:
+            client = None
+
+            while True:
+                await self._client_ready.wait()
+                async with self._lock:
+                    if self._client_ready.is_set():
+                        client = self._client
+                        break
+
+            try:
+                async with client.filtered_messages(topic) as messages:
+                    await client.subscribe(topic)
+                    async for msg in messages:
+                        yield msg
+
+            except asyncio_mqtt.MqttError as e:
+                self._logger.error(e)
+                retry_interval = 5
+                await asyncio.sleep(retry_interval)
+
+    async def _run(self):
+        self._logger.info(
+            "starting: host=%s, port=%s", self._config.host, self._config.port
+        )
+
+        self._started.set()
+
+        while True:
+            try:
+                async with self._connect() as client:
+                    async with self._lock:
+                        self._client = client
+                        self._client_ready.set()
+                        self._logger.info("client ready")
+
+                    async with client.unfiltered_messages() as messages:
+                        async for message in messages:
+                            self._logger.warn(
+                                "received unfiltered message: %s", message.topic
+                            )
+            except asyncio_mqtt.MqttError as e:
+                self._logger.error(e)
+                retry_interval = 5
+                await asyncio.sleep(retry_interval)
+            finally:
+                async with self._lock:
+                    self._client_ready.clear()
+                    self._client = None
+                    self._logger.info("client not ready")
+
+    @contextlib.asynccontextmanager
+    async def _connect(self):
+        try:
+            async with asyncio_mqtt.Client(
+                hostname=self._config.host,
+                port=self._config.port,
+                username=self._config.user,
+                password=self._config.password,
+                logger=self._logger.named("paho"),
+                tls_context=self._tls_context,
+            ) as client:
+                yield client
+        except asyncio.CancelledError:
+            # FIXME: A cancelled `asyncio_mqtt.Client.connect` leaks resources.
+            # This sleep is a dirty and unreliable hack to let the stuff settle
+            # down and thus suppress the exception.
+            await asyncio.sleep(1)
+            raise
+
+    @staticmethod
+    def _new_tls_context(config):
+        if not config.tls_enabled:
+            return None
+
+        ctx = ssl.create_default_context(cadata=config.tls_ca_cert)
+
+        with contextlib.ExitStack() as stack:
+            certfile = stack.enter_context(tempfile.NamedTemporaryFile())
+            certfile.write(config.tls_cert.encode())
+            certfile.flush()
+
+            keyfile = stack.enter_context(tempfile.NamedTemporaryFile())
+            keyfile.write(config.tls_secret_key.encode())
+            keyfile.flush()
+
+            ctx.load_cert_chain(certfile.name, keyfile=keyfile.name)
+
+        return ctx
