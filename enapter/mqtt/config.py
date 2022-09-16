@@ -4,30 +4,19 @@ import os
 class Config:
     @classmethod
     def from_env(cls, prefix="ENAPTER_", env=os.environ):
-        not_specified = object()
-
-        def get(var, default=not_specified):
-            try:
-                return env[prefix + "MQTT_" + var]
-            except KeyError:
-                if default is not_specified:
-                    raise
-                return default
-
-        def get_pem(*args, **kwargs):
-            value = get(*args, **kwargs)
-            if value is not None:
-                value = value.replace("\\n", "\n")
-            return value
+        def pem(value):
+            if value is None:
+                return value
+            return value.replace("\\n", "\n")
 
         return cls(
-            host=get("HOST"),
-            port=int(get("PORT")),
-            user=get("USER", default=None),
-            password=get("PASSWORD", default=None),
-            tls_secret_key=get_pem("TLS_SECRET_KEY", default=None),
-            tls_cert=get_pem("TLS_CERT", default=None),
-            tls_ca_cert=get_pem("TLS_CA_CERT", default=None),
+            host=env[prefix + "MQTT_HOST"],
+            port=int(env[prefix + "MQTT_PORT"]),
+            user=env.get(prefix + "MQTT_USER", default=None),
+            password=env.get(prefix + "MQTT_PASSWORD", default=None),
+            tls_secret_key=pem(env.get(prefix + "MQTT_TLS_SECRET_KEY", default=None)),
+            tls_cert=pem(env.get(prefix + "MQTT_TLS_CERT", default=None)),
+            tls_ca_cert=pem(env.get(prefix + "MQTT_TLS_CA_CERT", default=None)),
         )
 
     def __init__(
