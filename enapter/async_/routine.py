@@ -6,7 +6,7 @@ import contextlib
 class Routine(abc.ABC):
     @abc.abstractmethod
     async def _run(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     async def __aenter__(self):
         await self.start()
@@ -62,7 +62,7 @@ class Routine(abc.ABC):
         except asyncio.CancelledError:
             pass
         except:
-            if self._cancel_parent_task_on_exception:
+            if self._started.is_set() and self._cancel_parent_task_on_exception:
                 self._parent_task.cancel()
             raise
         finally:
