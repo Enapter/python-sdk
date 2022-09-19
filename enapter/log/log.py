@@ -6,6 +6,9 @@ import sys
 def new(name="enapter", level="INFO"):
     logger = logging.getLogger(name)
 
+    if logger.handlers:
+        return
+
     logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
