@@ -2,6 +2,8 @@ name: Publish
 
 on:
   push:
+    tags:
+      - v*
 
 jobs:
   Publish:
@@ -18,13 +20,7 @@ jobs:
       - name: Install dependencies
         run: make install-deps
 
-      - name: Publish to Test PyPI
-        run: make upload-to-test-pypi
-        env:
-          TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
-
       - name: Publish to PyPI
-        if: startsWith(github.ref, 'refs/tags/v')
         run: make upload-to-pypi
         env:
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
