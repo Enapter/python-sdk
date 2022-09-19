@@ -9,7 +9,7 @@ def main():
         description="Enapter Python SDK",
         packages=setuptools.find_packages(),
         include_package_data=True,
-        url="https://github.com/Enapter/enapter-python-sdk",
+        url="https://github.com/Enapter/python-sdk",
         author="Roman Novatorov",
         author_email="rnovatorov@enapter.com",
         install_requires=[
