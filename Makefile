@@ -20,7 +20,7 @@ lint:
 
 .PHONY: test
 test:
-	pipenv run pytest
+	pipenv run pytest tests
 
 .PHONY: get-pipenv
 get-pipenv:
