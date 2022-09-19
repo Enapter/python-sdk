@@ -1,3 +1,10 @@
+"""
+Run stand-alone VUCM::
+
+    $ export ENAPTER_VUCM_BLOB=<...>
+    $ python examples/vucm.py
+"""
+
 import asyncio
 import random
 
