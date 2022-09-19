@@ -4,7 +4,7 @@ import random
 import enapter
 
 
-class Test(enapter.vucm.Device):
+class Example(enapter.vucm.Device):
     async def cmd_ping(self):
         return "pong"
 
@@ -43,4 +43,4 @@ class Test(enapter.vucm.Device):
 
 
 if __name__ == "__main__":
-    asyncio.run(enapter.vucm.run(Test))
+    asyncio.run(enapter.vucm.run(Example))
