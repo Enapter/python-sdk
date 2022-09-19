@@ -6,9 +6,23 @@ Run stand-alone VUCM::
 """
 
 import asyncio
+import functools
 import random
 
 import enapter
+
+
+def every(interval):
+    def decorator(f):
+        @functools.wraps(f)
+        async def wrapper(*args, **kwargs):
+            while True:
+                await f(*args, **kwargs)
+                await asyncio.sleep(interval)
+
+        return wrapper
+
+    return decorator
 
 
 class Example(enapter.vucm.Device):
@@ -16,35 +30,26 @@ class Example(enapter.vucm.Device):
         return "pong"
 
     async def cmd_raise_alert(self):
-        self._alert = True
+        self.alerts.add("high_voltage")
 
     async def cmd_withdraw_alert(self):
-        self._alert = False
+        self.alerts.remove("high_voltage")
 
     async def _create_tasks(self):
-        self._alert = False
         return {
-            self._telemetry_publisher(),
-            self._properties_publisher(),
+            self.telemetry_publisher(),
+            self.properties_publisher(),
         }
 
-    async def _telemetry_publisher(self):
+    async def telemetry_publisher(self):
         while True:
-            await self._channel.publish_telemetry(
-                {
-                    "voltage": random.random(),
-                    "alerts": ["high_voltage"] if self._alert else [],
-                }
-            )
+            await self.send_telemetry({"voltage": random.random()})
             await asyncio.sleep(1)
 
-    async def _properties_publisher(self):
+    async def properties_publisher(self):
         while True:
-            await self._channel.publish_properties(
-                {
-                    "serial_number": "0x0042",
-                    "model": "Test VUCM",
-                }
+            await self.send_properties(
+                {"serial_number": "0x0042", "model": "Test VUCM"}
             )
             await asyncio.sleep(10)
 

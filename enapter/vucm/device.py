@@ -1,17 +1,33 @@
 import abc
 import asyncio
 import traceback
-from typing import Set
+from typing import Optional, Set
 
-from .. import async_, mqtt
+from .. import async_, mqtt, types
+from .logger import Logger
 
 
 class Device(async_.Routine):
+    def __init__(self, channel, cmd_prefix="cmd_") -> None:
+        self.__channel = channel
+        self.__cmd_prefix = cmd_prefix
 
-    CMD_PREFIX = "cmd_"
+        self.log = Logger(channel=channel)
+        self.alerts: Set[str] = set()
 
-    def __init__(self, channel):
-        self._channel = channel
+    async def send_telemetry(self, telemetry: Optional[types.JSON] = None) -> None:
+        if telemetry is None:
+            telemetry = {}
+
+        telemetry.setdefault("alerts", list(self.alerts))
+
+        await self.__channel.publish_telemetry(telemetry)
+
+    async def send_properties(self, properties: Optional[types.JSON] = None) -> None:
+        if properties is None:
+            properties = {}
+
+        await self.__channel.publish_properties(properties)
 
     @abc.abstractmethod
     async def _create_tasks(self) -> Set[asyncio.Task]:
@@ -51,21 +67,21 @@ class Device(async_.Routine):
             pass
         except Exception as e:
             try:
-                await self._channel.publish_logs(f"{task!r} failed: {e!r}", "error")
+                await self.__channel.publish_logs(f"{task!r} failed: {e!r}", "error")
             except:
                 pass
             raise
 
     async def __process_command_requests(self):
-        async with self._channel.subscribe_to_command_requests() as reqs:
+        async with self.__channel.subscribe_to_command_requests() as reqs:
             async for req in reqs:
                 state, payload = await self.__execute_command(req)
                 resp = req.new_response(state, payload)
-                await self._channel.publish_command_response(resp)
+                await self.__channel.publish_command_response(resp)
 
     async def __execute_command(self, req):
         try:
-            cmd = getattr(self, self.CMD_PREFIX + req.name)
+            cmd = getattr(self, self.__cmd_prefix + req.name)
         except AttributeError:
             return mqtt.CommandState.ERROR, {"reason": "unknown command"}
 
