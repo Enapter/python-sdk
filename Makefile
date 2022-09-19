@@ -21,3 +21,7 @@ lint:
 .PHONY: test
 test:
 	pipenv run pytest
+
+.PHONY: get-pipenv
+get-pipenv:
+	curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
