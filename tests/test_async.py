@@ -1,7 +1,8 @@
 import asyncio
 
-import enapter
 import pytest
+
+import enapter
 
 
 class TestRoutine:
