@@ -20,7 +20,7 @@ lint:
 
 .PHONY: test
 test:
-	pipenv run pytest tests
+	pipenv run pytest --cov --cov-report term-missing tests
 
 .PHONY: get-pipenv
 get-pipenv:
