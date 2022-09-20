@@ -1,3 +1,4 @@
+import enum
 import json
 import time
 
@@ -30,7 +31,7 @@ class DeviceChannel:
     async def publish_logs(self, msg, severity, persist=False, **kwargs):
         logs = {
             "message": msg,
-            "severity": severity,
+            "severity": severity.value,
         }
         if persist:
             logs["persist"] = True
@@ -56,3 +57,11 @@ class DeviceChannel:
             await self._client.publish(topic, payload, **kwargs)
         except Exception as e:
             self._logger.error("failed to publish %s: %r", path, e)
+
+
+class DeviceLogSeverity(enum.Enum):
+
+    DEBUG = "debug"
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"

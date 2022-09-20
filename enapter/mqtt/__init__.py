@@ -1,7 +1,7 @@
 from .client import Client
 from .command import CommandRequest, CommandResponse, CommandState
 from .config import Config
-from .device_channel import DeviceChannel
+from .device_channel import DeviceChannel, DeviceLogSeverity
 
 __all__ = [
     "Client",
@@ -10,4 +10,5 @@ __all__ = [
     "CommandState",
     "Config",
     "DeviceChannel",
+    "DeviceLogSeverity",
 ]
