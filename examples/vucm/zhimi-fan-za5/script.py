@@ -19,20 +19,13 @@ async def main():
 class ZhimiFanZA5(enapter.vucm.Device):
     def __init__(self, ip, token, **kwargs):
         super().__init__(**kwargs)
-
         self.fan = miio.FanZA5(ip=ip, token=token)
 
     async def cmd_power(self, on: bool = False):
         return await self.exec(self.fan.on if on else self.fan.off)
 
     async def cmd_mode(self, mode: str):
-        if mode == "normal":
-            miio_mode = miio.fan_common.OperationMode.Normal
-        elif mode == "nature":
-            miio_mode = miio.fan_common.OperationMode.Nature
-        else:
-            raise ValueError(f"unexpected mode: {mode}")
-
+        miio_mode = miio.fan_common.OperationMode(mode)
         return await self.exec(self.fan.set_mode, miio_mode)
 
     async def cmd_buzzer(self, on: bool = False):
