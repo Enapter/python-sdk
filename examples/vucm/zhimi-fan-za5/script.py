@@ -23,7 +23,7 @@ class ZhimiFanZA5(enapter.vucm.Device):
         self.fan = miio.FanZA5(ip=ip, token=token)
 
     async def cmd_power(self, on: bool = False):
-        await self.exec(self.fan.on if on else self.fan.off)
+        return await self.exec(self.fan.on if on else self.fan.off)
 
     async def cmd_mode(self, mode: str):
         if mode == "normal":
@@ -36,10 +36,10 @@ class ZhimiFanZA5(enapter.vucm.Device):
         return await self.exec(self.fan.set_mode, miio_mode)
 
     async def cmd_buzzer(self, on: bool = False):
-        await self.exec(self.fan.set_buzzer, on)
+        return await self.exec(self.fan.set_buzzer, on)
 
     async def cmd_speed(self, speed: int):
-        await self.exec(self.fan.set_speed, speed)
+        return await self.exec(self.fan.set_speed, speed)
 
     async def task_telemetry_sender(self):
         while True:
