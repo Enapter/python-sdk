@@ -11,12 +11,6 @@ class UCM(Device):
             )
         )
 
-    async def _create_tasks(self):
-        return {
-            self._telemetry_publisher(),
-            self._properties_publisher(),
-        }
-
     async def cmd_reboot(self):
         await asyncio.sleep(0)
         raise NotImplementedError
@@ -25,17 +19,12 @@ class UCM(Device):
         await asyncio.sleep(0)
         raise NotImplementedError
 
-    async def _telemetry_publisher(self):
+    async def task_telemetry_publisher(self):
         while True:
-            await self._channel.publish_telemetry({"alerts": []})
+            await self.send_telemetry()
             await asyncio.sleep(1)
 
-    async def _properties_publisher(self):
+    async def task_properties_publisher(self):
         while True:
-            await self._channel.publish_properties(
-                {
-                    "virtual": True,
-                    "lua_api_ver": 1,
-                }
-            )
+            await self.send_properties({"virtual": True, "lua_api_ver": 1})
             await asyncio.sleep(10)
