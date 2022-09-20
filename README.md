@@ -5,6 +5,8 @@
 
 Enapter software development kit for Python.
 
+:warning: This project is work in progress. The API is not stable and may change at any time. :warning:
+
 ## Installation
 
 Stable from PyPI:
