@@ -9,13 +9,14 @@ class Config:
     @classmethod
     def from_env(cls, prefix="ENAPTER_", env=os.environ):
         log_level = os.environ.get(prefix + "LOG_LEVEL", "INFO")
+        start_ucm = os.environ.get(prefix + "VUCM_START_UCM", "1") != "0"
 
         try:
             blob = os.environ[prefix + "VUCM_BLOB"]
         except KeyError:
             pass
         else:
-            return cls.from_blob(log_level=log_level, blob=blob)
+            return cls.from_blob(log_level=log_level, blob=blob, start_ucm=start_ucm)
 
         hardware_id = os.environ[prefix + "VUCM_HARDWARE_ID"]
         channel_id = os.environ[prefix + "VUCM_CHANNEL_ID"]
@@ -27,10 +28,11 @@ class Config:
             hardware_id=hardware_id,
             channel_id=channel_id,
             mqtt_config=mqtt_config,
+            start_ucm=start_ucm,
         )
 
     @classmethod
-    def from_blob(cls, log_level, blob):
+    def from_blob(cls, log_level, blob, start_ucm=True):
         payload = json.loads(base64.b64decode(blob))
 
         mqtt_config = mqtt.Config(
@@ -46,10 +48,12 @@ class Config:
             hardware_id=payload["ucm_id"],
             channel_id=payload["channel_id"],
             mqtt_config=mqtt_config,
+            start_ucm=start_ucm,
         )
 
-    def __init__(self, log_level, hardware_id, channel_id, mqtt_config):
+    def __init__(self, log_level, hardware_id, channel_id, mqtt_config, start_ucm=True):
         self.log_level = log_level
         self.hardware_id = hardware_id
         self.channel_id = channel_id
         self.mqtt = mqtt_config
+        self.start_ucm = start_ucm
