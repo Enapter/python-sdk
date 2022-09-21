@@ -19,14 +19,18 @@ class App(async_.Routine):
 
     async def _run(self):
         logger = log.new(level=self._config.log_level)
+        tasks = set()
 
         mqtt_client = await self._stack.enter_async_context(
             mqtt.Client(logger=logger, config=self._config.mqtt)
         )
+        tasks.add(mqtt_client.task())
 
-        ucm = await self._stack.enter_async_context(
-            UCM(mqtt_client=mqtt_client, hardware_id=self._config.hardware_id)
-        )
+        if self._config.start_ucm:
+            ucm = await self._stack.enter_async_context(
+                UCM(mqtt_client=mqtt_client, hardware_id=self._config.hardware_id)
+            )
+            tasks.add(ucm.task())
 
         device = await self._stack.enter_async_context(
             self._device_factory(
@@ -36,10 +40,8 @@ class App(async_.Routine):
                 )
             )
         )
+        tasks.add(device.task())
 
         self._started.set()
 
-        await asyncio.wait(
-            {mqtt_client.task(), ucm.task(), device.task()},
-            return_when=asyncio.FIRST_COMPLETED,
-        )
+        await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
