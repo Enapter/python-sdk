@@ -1,0 +1,22 @@
+blueprint_spec: "device/1.0"
+
+display_name: "Wttr.in HTTP Client"
+
+communication_module:
+  product: ENP-VIRTUAL
+
+command_groups: {}
+
+properties: {}
+
+alerts:
+  http_error:
+    display_name: HTTP request failed
+    severity: error
+
+telemetry:
+  temperature:
+    display_name: Temperature
+    type: float
+
+commands: {}
