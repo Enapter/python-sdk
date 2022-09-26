@@ -16,7 +16,12 @@ class Config:
         except KeyError:
             pass
         else:
-            return cls.from_blob(log_level=log_level, blob=blob, start_ucm=start_ucm)
+            config = cls.from_blob(log_level=log_level, blob=blob, start_ucm=start_ucm)
+            try:
+                config.channel_id = os.environ[prefix + "VUCM_CHANNEL_ID"]
+            except KeyError:
+                pass
+            return config
 
         hardware_id = os.environ[prefix + "VUCM_HARDWARE_ID"]
         channel_id = os.environ[prefix + "VUCM_CHANNEL_ID"]
