@@ -1,0 +1,67 @@
+blueprint_spec: "device/1.0"
+
+display_name: "RL-6 Simulator"
+
+communication_module:
+  product: ENP-VIRTUAL
+
+command_groups:
+  manage:
+    display_name: Manage Loads
+
+properties: {}
+
+alerts: {}
+
+telemetry:
+  r1:
+    display_name: R1 state
+    type: boolean
+  r2:
+    display_name: R2 state
+    type: boolean
+  r3:
+    display_name: R3 state
+    type: boolean
+  r4:
+    display_name: R4 state
+    type: boolean
+  r5:
+    display_name: R5 state
+    type: boolean
+  r6:
+    display_name: R6 state
+    type: boolean
+
+commands:
+  enable_load:
+    display_name: Enable Load
+    group: manage
+    arguments:
+      load:
+        display_name: Load
+        type: string
+        enum:
+          - r1
+          - r2
+          - r3
+          - r4
+          - r5
+          - r6
+  disable_load:
+    display_name: Disable Load
+    group: manage
+    arguments:
+      load:
+        display_name: Load
+        type: string
+        enum:
+          - r1
+          - r2
+          - r3
+          - r4
+          - r5
+          - r6
+
+.cloud:
+  mqtt_channel_id: rl6

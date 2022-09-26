@@ -19,6 +19,8 @@ class Device(async_.Routine):
     async def send_telemetry(self, telemetry: Optional[types.JSON] = None) -> None:
         if telemetry is None:
             telemetry = {}
+        else:
+            telemetry = telemetry.copy()
 
         telemetry.setdefault("alerts", list(self.alerts))
 
@@ -27,6 +29,8 @@ class Device(async_.Routine):
     async def send_properties(self, properties: Optional[types.JSON] = None) -> None:
         if properties is None:
             properties = {}
+        else:
+            properties = properties.copy()
 
         await self.__channel.publish_properties(properties)
 
