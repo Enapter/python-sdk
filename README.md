@@ -25,3 +25,14 @@ pip install git+https://github.com/Enapter/python-sdk#egg=enapter
 ## Usage
 
 Checkout [examples](examples).
+
+## Writing your own UCM
+
+### Sending telemetry and properties
+You should define method with `task_` prefix to do periodic job. Typically telemetry sends every 1 seconds and properties every 10 seconds. So, the simplest way to implement this — define two task methods. Refer to wttr-in example for working sorce code.
+
+### Handle commands
+You should define method with name `cmd_<command_name_in_manfiest>` with defined arguments. The zhimi-fan-za5 example has a different types of command.
+
+### Sending alerts
+The alerts are stored in `self.alerts` set object. They should be updated before every `send_telemetry` call, because alerts are sending with telemetry.
