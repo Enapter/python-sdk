@@ -24,6 +24,15 @@ class WttrIn(enapter.vucm.Device):
         self.client = client
         self.location = location
 
+    async def task_properties_sender(self):
+        while True:
+            await self.send_properties(
+                {
+                    "location": self.location,
+                }
+            )
+            await asyncio.sleep(10)
+
     async def task_telemetry_sender(self):
         while True:
             try:

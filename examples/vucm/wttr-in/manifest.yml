@@ -7,7 +7,10 @@ communication_module:
 
 command_groups: {}
 
-properties: {}
+properties:
+  location:
+    display_name: Location
+    type: string
 
 alerts:
   http_error:
