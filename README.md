@@ -67,3 +67,41 @@ alerts using `alerts.clear`.
 
 Alerts are sent only as part of telemetry, so in order to report device alert,
 use `send_telemetry` with any payload.
+
+## Running your own VUCM via Docker
+
+A simple Dockerfile can be:
+```
+FROM python:3.10-alpine3.16
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN python -m venv .venv
+RUN .venv/bin/pip install -r requirements.txt
+
+COPY script.py script.py
+
+CMD [".venv/bin/python", "script.py"]
+```
+
+### Note about Enapter Gateway
+
+If you are using [Enapter Gateway](https://handbook.enapter.com/software/gateway_software/), you should use debian base Docker image and run [`avahi`](https://wiki.debian.org/Avahi) to resolve gateway host name:
+```diff
+-FROM python:3.10-alpine3.16
++FROM python:3.10-buster
+
+WORKDIR /app
++
++RUN curl -sSfL https://raw.githubusercontent.com/Enapter/python-sdk/main/extenstions/avahi-debian/install.sh | sh -s
++ENTRYPOINT ["bash", "./entrypoint.sh"]
+
+COPY requirements.txt requirements.txt
+RUN python -m venv .venv
+RUN .venv/bin/pip install -r requirements.txt
+
+COPY script.py script.py
+
+CMD [".venv/bin/python", "script.py"]
+```
