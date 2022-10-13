@@ -5,14 +5,16 @@ import tempfile
 
 import asyncio_mqtt
 
-from .. import async_
+from .. import async_, mdns
 from .device_channel import DeviceChannel
 
 
 class Client(async_.Routine):
-    def __init__(self, logger, config):
+    def __init__(self, logger, config, mdns_resolver_factory=mdns.Resolver):
         self._logger = logger.named("mqtt")
         self._config = config
+        self._mdns_resolver = None
+        self._mdns_resolver_factory = mdns_resolver_factory
         self._tls_context = self._new_tls_context(config)
         self._lock = asyncio.Lock()
         self._client = None
@@ -96,9 +98,11 @@ class Client(async_.Routine):
 
     @contextlib.asynccontextmanager
     async def _connect(self):
+        host = await self._maybe_resolve_host()
+
         try:
             async with asyncio_mqtt.Client(
-                hostname=self._config.host,
+                hostname=host,
                 port=self._config.port,
                 username=self._config.user,
                 password=self._config.password,
@@ -115,7 +119,11 @@ class Client(async_.Routine):
         if not config.tls_enabled:
             return None
 
-        ctx = ssl.create_default_context(cadata=config.tls_ca_cert)
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+        ctx.verify_mode = ssl.CERT_REQUIRED
+        ctx.check_hostname = False
+        ctx.load_verify_locations(None, None, config.tls_ca_cert)
 
         with contextlib.ExitStack() as stack:
             certfile = stack.enter_context(tempfile.NamedTemporaryFile())
@@ -129,3 +137,15 @@ class Client(async_.Routine):
             ctx.load_cert_chain(certfile.name, keyfile=keyfile.name)
 
         return ctx
+
+    async def _maybe_resolve_host(self):
+        if not self._config.host.endswith(".local"):
+            return self._config.host
+
+        if self._mdns_resolver is None:
+            self._mdns_resolver = self._mdns_resolver_factory()
+
+        host = await self._mdns_resolver.resolve(self._config.host)
+        self._logger.info("mDNS host resolved: %s", host)
+
+        return host
