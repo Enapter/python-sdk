@@ -1,6 +1,6 @@
 import asyncio
 
-from .. import async_, log, mqtt
+from .. import async_, mqtt
 from .config import Config
 from .ucm import UCM
 
@@ -18,11 +18,10 @@ class App(async_.Routine):
         self._device_factory = device_factory
 
     async def _run(self):
-        logger = log.new(level=self._config.log_level)
         tasks = set()
 
         mqtt_client = await self._stack.enter_async_context(
-            mqtt.Client(logger=logger, config=self._config.mqtt)
+            mqtt.Client(config=self._config.mqtt)
         )
         tasks.add(mqtt_client.task())
 

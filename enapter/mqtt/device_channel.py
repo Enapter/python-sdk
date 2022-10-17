@@ -1,15 +1,21 @@
 import enum
 import json
+import logging
 import time
 
 from .. import async_
 from .command import CommandRequest
 
+LOGGER = logging.getLogger(__package__)
+LOGGER.info("info check")
+
 
 class DeviceChannel:
-    def __init__(self, client, logger, hardware_id, channel_id):
+    def __init__(self, client, hardware_id, channel_id):
         self._client = client
-        self._logger = logger.named(f"device.{hardware_id}.{channel_id}")
+        self._logger = logging.LoggerAdapter(
+            LOGGER, extra={"hardware_id": hardware_id, "channel_id": channel_id}
+        )
         self._hardware_id = hardware_id
         self._channel_id = channel_id
 
