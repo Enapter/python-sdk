@@ -71,13 +71,14 @@ use `send_telemetry` with any payload.
 ## Running your own VUCM via Docker
 
 A simple Dockerfile can be:
+
 ```
 FROM python:3.10-alpine3.16
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
 RUN python -m venv .venv
+COPY requirements.txt requirements.txt
 RUN .venv/bin/pip install -r requirements.txt
 
 COPY script.py script.py
@@ -85,23 +86,10 @@ COPY script.py script.py
 CMD [".venv/bin/python", "script.py"]
 ```
 
-### Note about Enapter Gateway
+:information_source: If you are using [Enapter
+Gateway](https://handbook.enapter.com/software/gateway_software/), you should
+connect your containers to `host` network :information_source::
 
-If you are using [Enapter Gateway](https://handbook.enapter.com/software/gateway_software/), you should use debian base Docker image and run [`avahi`](https://wiki.debian.org/Avahi) to resolve gateway host name:
-```diff
--FROM python:3.10-alpine3.16
-+FROM python:3.10-buster
-
-WORKDIR /app
-+
-+RUN curl -sSfL https://raw.githubusercontent.com/Enapter/python-sdk/main/extenstions/avahi-debian/install.sh | sh -s
-+ENTRYPOINT ["bash", "./entrypoint.sh"]
-
-COPY requirements.txt requirements.txt
-RUN python -m venv .venv
-RUN .venv/bin/pip install -r requirements.txt
-
-COPY script.py script.py
-
-CMD [".venv/bin/python", "script.py"]
+```bash
+docker run --network host ...
 ```

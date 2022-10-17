@@ -15,6 +15,7 @@ def main():
         install_requires=[
             "aiohttp==3.8.*",
             "asyncio-mqtt==0.12.*",
+            "dnspython==2.2.*",
         ],
     )
 
