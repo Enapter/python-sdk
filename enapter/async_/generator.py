@@ -4,8 +4,12 @@ import functools
 
 def generator(func):
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    @contextlib.asynccontextmanager
+    async def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
-        return contextlib.aclosing(gen)
+        try:
+            yield gen
+        finally:
+            await gen.aclose()
 
     return wrapper
