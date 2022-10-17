@@ -6,6 +6,7 @@ def main():
         name="enapter",
         version=read_version(),
         long_description=read_file("README.md"),
+        long_description_content_type="text/markdown",
         description="Enapter Python SDK",
         packages=setuptools.find_packages(),
         include_package_data=True,
