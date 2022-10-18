@@ -6,6 +6,8 @@ from .ucm import UCM
 
 
 async def run(device_factory):
+    log.configure(level=log.LEVEL or "info")
+
     config = Config.from_env()
 
     async with App(config=config, device_factory=device_factory) as app:
@@ -18,11 +20,10 @@ class App(async_.Routine):
         self._device_factory = device_factory
 
     async def _run(self):
-        logger = log.new(level=self._config.log_level)
         tasks = set()
 
         mqtt_client = await self._stack.enter_async_context(
-            mqtt.Client(logger=logger, config=self._config.mqtt)
+            mqtt.Client(config=self._config.mqtt)
         )
         tasks.add(mqtt_client.task())
 
