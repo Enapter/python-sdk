@@ -1,17 +1,25 @@
 import enum
 import json
+import logging
 import time
 
 from .. import async_
 from .command import CommandRequest
 
+LOGGER = logging.getLogger(__name__)
+
 
 class DeviceChannel:
-    def __init__(self, client, logger, hardware_id, channel_id):
+    def __init__(self, client, hardware_id, channel_id):
         self._client = client
-        self._logger = logger.named(f"device.{hardware_id}.{channel_id}")
+        self._logger = self._new_logger(hardware_id, channel_id)
         self._hardware_id = hardware_id
         self._channel_id = channel_id
+
+    @staticmethod
+    def _new_logger(hardware_id, channel_id):
+        extra = {"hardware_id": hardware_id, "channel_id": channel_id}
+        return logging.LoggerAdapter(LOGGER, extra=extra)
 
     @async_.generator
     async def subscribe_to_command_requests(self):
