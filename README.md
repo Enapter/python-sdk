@@ -93,3 +93,6 @@ connect your containers to `host` network :information_source::
 ```bash
 docker run --network host ...
 ```
+
+:warning: Host networking is not supported on Mac and Windows, so Docker VUCMs
+are at the moment only available on Linux.
