@@ -17,6 +17,7 @@ def main():
             "aiohttp==3.8.*",
             "asyncio-mqtt==0.12.*",
             "dnspython==2.2.*",
+            "json-log-formatter==0.5.*",
         ],
     )
 
