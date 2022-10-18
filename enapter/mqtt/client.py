@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import logging
 import ssl
 import tempfile
 
@@ -8,10 +9,12 @@ import asyncio_mqtt
 from .. import async_, mdns
 from .device_channel import DeviceChannel
 
+LOGGER = logging.getLogger(__name__)
+
 
 class Client(async_.Routine):
-    def __init__(self, logger, config, mdns_resolver_factory=mdns.Resolver):
-        self._logger = logger.named("mqtt")
+    def __init__(self, config, mdns_resolver_factory=mdns.Resolver):
+        self._logger = self._new_logger(config)
         self._config = config
         self._mdns_resolver = None
         self._mdns_resolver_factory = mdns_resolver_factory
@@ -20,15 +23,17 @@ class Client(async_.Routine):
         self._client = None
         self._client_ready = asyncio.Event()
 
+    @staticmethod
+    def _new_logger(config):
+        extra = {"host": config.host, "port": config.port}
+        return logging.LoggerAdapter(LOGGER, extra=extra)
+
     def config(self):
         return self._config
 
     def device_channel(self, hardware_id, channel_id):
         return DeviceChannel(
-            client=self,
-            logger=self._logger,
-            hardware_id=hardware_id,
-            channel_id=channel_id,
+            client=self, hardware_id=hardware_id, channel_id=channel_id
         )
 
     async def publish(self, *args, **kwargs):
@@ -106,7 +111,7 @@ class Client(async_.Routine):
                 port=self._config.port,
                 username=self._config.user,
                 password=self._config.password,
-                logger=self._logger.named("paho"),
+                logger=self._logger,
                 tls_context=self._tls_context,
             ) as client:
                 yield client
