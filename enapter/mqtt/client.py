@@ -13,11 +13,10 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Client(async_.Routine):
-    def __init__(self, config, mdns_resolver_factory=mdns.Resolver):
+    def __init__(self, config):
         self._logger = self._new_logger(config)
         self._config = config
-        self._mdns_resolver = None
-        self._mdns_resolver_factory = mdns_resolver_factory
+        self._mdns_resolver = mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
         self._lock = asyncio.Lock()
         self._client = None
@@ -103,7 +102,7 @@ class Client(async_.Routine):
 
     @contextlib.asynccontextmanager
     async def _connect(self):
-        host = await self._maybe_resolve_host()
+        host = await self._maybe_resolve_mdns(self._config.host)
 
         try:
             async with asyncio_mqtt.Client(
@@ -143,14 +142,19 @@ class Client(async_.Routine):
 
         return ctx
 
-    async def _maybe_resolve_host(self):
-        if not self._config.host.endswith(".local"):
-            return self._config.host
+    async def _maybe_resolve_mdns(self, host):
+        if not host.endswith(".local"):
+            return host
 
-        if self._mdns_resolver is None:
-            self._mdns_resolver = self._mdns_resolver_factory()
+        while True:
+            try:
+                ip = await self._mdns_resolver.resolve(host)
+            except Exception as e:
+                self._logger.error("failed to resolve mDNS host: %s", e)
+                retry_interval = 5
+                await asyncio.sleep(retry_interval)
+                continue
 
-        host = await self._mdns_resolver.resolve(self._config.host)
-        self._logger.info("mDNS host resolved: %s", host)
+        self._logger.info("mDNS host resolved: %s", ip)
 
-        return host
+        return ip
