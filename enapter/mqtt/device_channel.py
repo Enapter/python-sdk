@@ -16,6 +16,14 @@ class DeviceChannel:
         self._hardware_id = hardware_id
         self._channel_id = channel_id
 
+    @property
+    def hardware_id(self):
+        return self._hardware_id
+
+    @property
+    def channel_id(self):
+        return self._channel_id
+
     @staticmethod
     def _new_logger(hardware_id, channel_id):
         extra = {"hardware_id": hardware_id, "channel_id": channel_id}
