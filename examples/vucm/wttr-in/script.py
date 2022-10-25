@@ -2,7 +2,6 @@ import asyncio
 import functools
 import os
 
-import aiohttp
 import python_weather
 
 import enapter
@@ -43,11 +42,10 @@ class WttrIn(enapter.vucm.Device):
                     }
                 )
                 self.alerts.clear()
-            except aiohttp.ClientError as e:
-                self.alerts.add("http_error")
+            except Exception as e:
+                self.alerts.add("wttr_in_error")
                 await self.log.error(f"failed to get weather: {e}")
-            finally:
-                await asyncio.sleep(10)
+            await asyncio.sleep(1)
 
 
 if __name__ == "__main__":

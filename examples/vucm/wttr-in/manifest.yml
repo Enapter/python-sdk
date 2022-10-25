@@ -13,8 +13,8 @@ properties:
     type: string
 
 alerts:
-  http_error:
-    display_name: HTTP request failed
+  wttr_in_error:
+    display_name: wttr.in request failed
     severity: error
 
 telemetry:
