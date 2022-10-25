@@ -68,7 +68,7 @@ class Device(async_.Routine):
             pass
         except Exception as e:
             try:
-                await self.__channel.publish_logs(f"{task!r} failed: {e!r}", "error")
+                await self.log.error(f"device task {task.get_name()!r} failed: {e!r}")
             except:
                 pass
             raise
