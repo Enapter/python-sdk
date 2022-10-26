@@ -71,9 +71,7 @@ class Client(async_.Routine):
                 await asyncio.sleep(retry_interval)
 
     async def _run(self):
-        self._logger.info(
-            "starting: host=%s, port=%s", self._config.host, self._config.port
-        )
+        self._logger.info("starting")
 
         self._started.set()
 
