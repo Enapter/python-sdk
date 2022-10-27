@@ -87,12 +87,10 @@ CMD [".venv/bin/python", "script.py"]
 ```
 
 :information_source: If you are using [Enapter
-Gateway](https://handbook.enapter.com/software/gateway_software/), you should
-connect your containers to `host` network :information_source::
+Gateway](https://handbook.enapter.com/software/gateway_software/) and running
+Linux, you should connect your containers to `host` network
+:information_source::
 
 ```bash
 docker run --network host ...
 ```
-
-:warning: Host networking is not supported on Mac and Windows, so Docker VUCMs
-are at the moment only available on Linux.
