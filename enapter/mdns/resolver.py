@@ -14,14 +14,16 @@ class Resolver:
     async def resolve(self, host):
         # TODO: Resolve concurrently.
         try:
-            return await self._resolve(self._dns_resolver, host)
+            ip = await self._resolve(self._dns_resolver, host)
+            self._logger.debug("%r resolved using DNS: %r", host, ip)
+            return ip
         except Exception as e:
             self._logger.debug(
-                "failed to resolve %r using DNS resolver, switching to mDNS: %r",
-                host,
-                e,
+                "switching to mDNS: failed to resolve %r using DNS: %r", host, e
             )
-            return await self._resolve(self._mdns_resolver, host)
+            ip = await self._resolve(self._mdns_resolver, host)
+            self._logger.info("%r resolved using mDNS: %r", host, ip)
+            return ip
 
     async def _resolve(self, resolver, host):
         answer = await resolver.resolve(host, "A")

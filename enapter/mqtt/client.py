@@ -146,13 +146,8 @@ class Client(async_.Routine):
 
         while True:
             try:
-                ip = await self._mdns_resolver.resolve(host)
+                return await self._mdns_resolver.resolve(host)
             except Exception as e:
                 self._logger.error("failed to resolve mDNS host %r: %s", host, e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
-                continue
-
-        self._logger.info("mDNS host resolved: %s", ip)
-
-        return ip
