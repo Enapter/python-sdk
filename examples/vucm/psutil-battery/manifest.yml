@@ -1,0 +1,37 @@
+blueprint_spec: "device/1.0"
+
+display_name: "Battery data gathered with psutil"
+
+communication_module:
+  product: ENP-VIRTUAL
+
+command_groups: {}
+
+properties:
+  battery_installed:
+    display_name: Battery installed
+    type: boolean
+    description: True if battery is installed.
+
+alerts:
+  gather_data_error:
+    display_name: Failed to gather battery data
+    severity: error
+
+telemetry:
+  charge_percent:
+    display_name: Charge percent
+    type: float
+    unit: "%"
+    description: Battery charge left as a percentage.
+  time_until_full_discharge:
+    display_name: Time until full discharge
+    type: integer
+    unit: s
+    description: A rough approximation of how many seconds are left before the battery discharges completely.
+  power_plugged:
+    display_name: Power plugged
+    type: boolean
+    description: True if the AC power cable is connected.
+
+commands: {}
