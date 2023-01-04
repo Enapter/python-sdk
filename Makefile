@@ -7,7 +7,7 @@ install-deps:
 
 .PHONY: update-deps
 update-deps:
-	pipenv update
+	pipenv update --dev
 
 .PHONY: check
 check: lint test
