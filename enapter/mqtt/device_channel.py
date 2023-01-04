@@ -59,10 +59,9 @@ class DeviceChannel:
         return self._client.subscribe(topic)
 
     async def _publish_json(self, path, json_object, **kwargs):
-        if "timestamp" in json_object:
-            raise ValueError("`timestamp` field is reserved")
+        if "timestamp" not in json_object:
+            json_object["timestamp"] = int(time.time())
 
-        json_object["timestamp"] = int(time.time())
         payload = json.dumps(json_object)
 
         await self._publish(path, payload, **kwargs)
