@@ -19,8 +19,11 @@ lint:
 	pipenv run pyflakes .
 
 .PHONY: test
-test:
-	pipenv run pytest -vv --cov --cov-report term-missing tests
+test: run-unit-tests
+
+.PHONY: run-unit-tests
+run-unit-tests:
+	pipenv run pytest -vv --cov --cov-report term-missing tests/unit
 
 .PHONY: get-pipenv
 get-pipenv:
