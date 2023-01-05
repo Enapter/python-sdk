@@ -14,7 +14,7 @@ def main():
         author="Roman Novatorov",
         author_email="rnovatorov@enapter.com",
         install_requires=[
-            "asyncio-mqtt==0.12.*",
+            "asyncio-mqtt==0.16.*",
             "dnspython==2.2.*",
             "json-log-formatter==0.5.*",
         ],

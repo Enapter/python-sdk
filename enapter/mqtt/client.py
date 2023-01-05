@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import contextlib
 import logging
 import ssl
@@ -18,9 +19,10 @@ class Client(async_.Routine):
         self._config = config
         self._mdns_resolver = mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
-        self._lock = asyncio.Lock()
         self._client = None
         self._client_ready = asyncio.Event()
+        self._subscribers = collections.defaultdict(int)
+        self._subscribers_changed = asyncio.Event()
 
     @staticmethod
     def _new_logger(config):
@@ -36,39 +38,45 @@ class Client(async_.Routine):
         )
 
     async def publish(self, *args, **kwargs):
-        client = None
-
-        while True:
-            await self._client_ready.wait()
-            async with self._lock:
-                if self._client_ready.is_set():
-                    client = self._client
-                    break
-
+        client = await self._wait_client()
         await client.publish(*args, **kwargs)
 
-    @async_.generator
+    @contextlib.asynccontextmanager
     async def subscribe(self, topic):
-        while True:
-            client = None
+        self._subscribers[topic] += 1
+        self._subscribers_changed.set()
+        self._logger.debug(f"going to subscribe to {topic}")
 
-            while True:
-                await self._client_ready.wait()
-                async with self._lock:
-                    if self._client_ready.is_set():
-                        client = self._client
-                        break
+        try:
+            async with self._consume(topic) as messages:
+                yield messages
+
+        finally:
+            self._subscribers[topic] -= 1
+            self._subscribers_changed.set()
+            self._logger.debug(f"going to unsubscribe from {topic}")
+
+    @async_.generator
+    async def _consume(self, topic):
+        while True:
+            client = await self._wait_client()
 
             try:
-                async with client.filtered_messages(topic) as messages:
-                    await client.subscribe(topic)
+                async with client.messages() as messages:
                     async for msg in messages:
-                        yield msg
+                        # FIXME: Each consumer processes all messages.
+                        if msg.topic.matches(topic):
+                            yield msg
 
             except asyncio_mqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
+
+    async def _wait_client(self):
+        await self._client_ready.wait()
+        assert self._client_ready.is_set()
+        return self._client
 
     async def _run(self):
         self._logger.info("starting")
@@ -78,25 +86,23 @@ class Client(async_.Routine):
         while True:
             try:
                 async with self._connect() as client:
-                    async with self._lock:
-                        self._client = client
-                        self._client_ready.set()
-                        self._logger.info("client ready")
+                    self._client = client
+                    self._client_ready.set()
+                    self._logger.info("client ready")
 
-                    async with client.unfiltered_messages() as messages:
-                        async for message in messages:
-                            self._logger.warn(
-                                "received unfiltered message: %s", message.topic
-                            )
+                    while True:
+                        await self._sync_subscriptions(client)
+                        await self._subscribers_changed.wait()
+                        self._subscribers_changed.clear()
+
             except asyncio_mqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
             finally:
-                async with self._lock:
-                    self._client_ready.clear()
-                    self._client = None
-                    self._logger.info("client not ready")
+                self._client_ready.clear()
+                self._client = None
+                self._logger.info("client not ready")
 
     @contextlib.asynccontextmanager
     async def _connect(self):
@@ -115,6 +121,21 @@ class Client(async_.Routine):
         except asyncio.CancelledError:
             # FIXME: A cancelled `asyncio_mqtt.Client.connect` leaks resources.
             raise
+
+    async def _sync_subscriptions(self, client):
+        subscribers = self._subscribers.copy()
+
+        actions = {}
+
+        for topic, count in list(subscribers.items()):
+            if count:
+                actions[topic] = client.subscribe
+            else:
+                actions[topic] = client.unsubscribe
+                del self._subscribers[topic]
+
+        for topic, action in actions.items():
+            await action(topic)
 
     @staticmethod
     def _new_tls_context(config):
