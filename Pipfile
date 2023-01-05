@@ -8,10 +8,11 @@ enapter = {editable = true, path = "."}
 
 [dev-packages]
 black = "*"
+docker = "*"
+faker = "*"
 isort = "*"
 pyflakes = "*"
 pytest = "*"
 pytest-asyncio = "*"
 pytest-cov = "*"
 twine = "*"
-faker = "*"
