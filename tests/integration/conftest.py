@@ -1,4 +1,5 @@
 import os
+import socket
 
 import docker
 import pytest
@@ -37,7 +38,7 @@ def fixture_mosquitto_container(docker_client):
         ["mosquitto", "-c", "/mosquitto-no-auth.conf"],
         name=name,
         network="bridge",
-        ports={MOSQUITTO_PORT: ("127.0.0.1", None)},  # map to random host port
+        ports={MOSQUITTO_PORT: ("127.0.0.1", random_unused_port())},
         detach=True,
         remove=True,
     )
@@ -46,6 +47,13 @@ def fixture_mosquitto_container(docker_client):
         yield mosquitto
     finally:
         mosquitto.stop()
+
+
+def random_unused_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("", 0))
+        addr = s.getsockname()
+        return addr[1]
 
 
 @pytest.fixture(name="docker_client", scope="session")
