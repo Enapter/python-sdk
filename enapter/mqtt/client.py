@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import contextlib
 import logging
 import ssl
@@ -20,6 +21,8 @@ class Client(async_.Routine):
         self._tls_context = self._new_tls_context(config)
         self._client = None
         self._client_ready = asyncio.Event()
+        self._subscribers = collections.defaultdict(int)
+        self._subscribers_changed = asyncio.Event()
 
     @staticmethod
     def _new_logger(config):
@@ -38,16 +41,32 @@ class Client(async_.Routine):
         client = await self._wait_client()
         await client.publish(*args, **kwargs)
 
-    @async_.generator
+    @contextlib.asynccontextmanager
     async def subscribe(self, topic):
+        self._subscribers[topic] += 1
+        self._subscribers_changed.set()
+        self._logger.debug(f"going to subscribe to {topic}")
+
+        try:
+            async with self._consume(topic) as messages:
+                yield messages
+
+        finally:
+            self._subscribers[topic] -= 1
+            self._subscribers_changed.set()
+            self._logger.debug(f"going to unsubscribe from {topic}")
+
+    @async_.generator
+    async def _consume(self, topic):
         while True:
             client = await self._wait_client()
 
             try:
-                async with client.filtered_messages(topic) as messages:
-                    await client.subscribe(topic)
+                async with client.messages() as messages:
                     async for msg in messages:
-                        yield msg
+                        # FIXME: Each consumer processes all messages.
+                        if msg.topic.matches(topic):
+                            yield msg
 
             except asyncio_mqtt.MqttError as e:
                 self._logger.error(e)
@@ -71,11 +90,11 @@ class Client(async_.Routine):
                     self._client_ready.set()
                     self._logger.info("client ready")
 
-                    async with client.unfiltered_messages() as messages:
-                        async for message in messages:
-                            self._logger.warn(
-                                "received unfiltered message: %s", message.topic
-                            )
+                    while True:
+                        await self._sync_subscriptions(client)
+                        await self._subscribers_changed.wait()
+                        self._subscribers_changed.clear()
+
             except asyncio_mqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
@@ -102,6 +121,21 @@ class Client(async_.Routine):
         except asyncio.CancelledError:
             # FIXME: A cancelled `asyncio_mqtt.Client.connect` leaks resources.
             raise
+
+    async def _sync_subscriptions(self, client):
+        subscribers = self._subscribers.copy()
+
+        actions = {}
+
+        for topic, count in list(subscribers.items()):
+            if count:
+                actions[topic] = client.subscribe
+            else:
+                actions[topic] = client.unsubscribe
+                del self._subscribers[topic]
+
+        for topic, action in actions.items():
+            await action(topic)
 
     @staticmethod
     def _new_tls_context(config):
