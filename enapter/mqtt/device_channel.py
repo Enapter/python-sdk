@@ -75,7 +75,6 @@ class DeviceChannel:
 
 
 class DeviceLogSeverity(enum.Enum):
-
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"

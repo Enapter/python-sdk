@@ -5,7 +5,7 @@ import logging
 import ssl
 import tempfile
 
-import asyncio_mqtt
+import aiomqtt
 
 from .. import async_, mdns
 from .device_channel import DeviceChannel
@@ -52,7 +52,7 @@ class Client(async_.Routine):
                             if msg.topic.matches(topic):
                                 yield msg
 
-            except asyncio_mqtt.MqttError as e:
+            except aiomqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
@@ -94,7 +94,7 @@ class Client(async_.Routine):
                     async with client.messages() as messages:
                         async for msg in messages:
                             pass
-            except asyncio_mqtt.MqttError as e:
+            except aiomqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
@@ -108,7 +108,7 @@ class Client(async_.Routine):
         host = await self._maybe_resolve_mdns(self._config.host)
 
         try:
-            async with asyncio_mqtt.Client(
+            async with aiomqtt.Client(
                 hostname=host,
                 port=self._config.port,
                 username=self._config.user,
@@ -118,7 +118,7 @@ class Client(async_.Routine):
             ) as client:
                 yield client
         except asyncio.CancelledError:
-            # FIXME: A cancelled `asyncio_mqtt.Client.connect` leaks resources.
+            # FIXME: A cancelled `aiomqtt.Client.connect` leaks resources.
             raise
 
     @staticmethod
