@@ -1,4 +1,4 @@
-# Eaton UPS Standalone UCM (SNMP) 
+# Eaton UPS Standalone UCM (SNMP)
 
 This example describes the implementation of the [Standalone UCM](https://handbook.enapter.com/software/virtual_ucm/) concept using the opensource [Enapter python-sdk](https://github.com/Enapter/python-sdk) for monitoring Eaton UPS using SNMP protocol.
 
@@ -16,7 +16,7 @@ SNMP Port: 161
 
 It is recommended to run this UCM using Docker and Docker Compose. This will ensure that environment is correct.
 
-The UPS must be reachable from the computer where the Docker Container will be running. You can check availability and settings  with `snmpget` command on Linux or Mac:
+The UPS must be reachable from the computer where the Docker Container will be running. You can check availability and settings with `snmpget` command on Linux or Mac:
 
 ```bash
 user@pc snmp-eaton-ups % snmpget -v1 -c public 192.168.192.192:161 1.3.6.1.2.1.33.1.1.1.0
@@ -33,7 +33,7 @@ More information you can find on [this page](https://developers.enapter.com/docs
 
 ## Step 2. Upload Blueprint into the Cloud
 
-The general case [Enapter Blueprint](https://marketplace.enapter.com/about) consists of two files - declaration in YAML format (manifest.yaml) and logic written in Lua. Howerver for this case the logic is written in Python as Lua implementation doesn't have SNMP integration. 
+The general case [Enapter Blueprint](https://marketplace.enapter.com/about) consists of two files - declaration in YAML format (manifest.yaml) and logic written in Lua. Howerver for this case the logic is written in Python as Lua implementation doesn't have SNMP integration.
 
 But for both cases we need to tell Enapter Cloud which telemetry we are going to send and store and how to name it.
 
@@ -60,21 +60,21 @@ Set environment variables according to your configuration settings. With dummy s
 version: "3"
 services:
   snmp-eaton-ups-ucm:
-  	build: .
+    build: .
     image: enapter-vucm-examples/snmp-eaton-ups:latest
     environment:
-      - 'ENAPTER_VUCM_BLOB=REALENAPTERVUCMBLOBMUSTBEHERE='
-      - 'ENAPTER_SNMP_HOST=192.168.192.192'
-      - 'ENAPTER_SNMP_PORT=161'
-      - 'ENAPTER_SNMP_COMMUNITY=public'
+      - "ENAPTER_VUCM_BLOB=REALENAPTERVUCMBLOBMUSTBEHERE="
+      - "ENAPTER_SNMP_HOST=192.168.192.192"
+      - "ENAPTER_SNMP_PORT=161"
+      - "ENAPTER_SNMP_COMMUNITY=public"
 ```
 
 ## Step 4. Build Docker Image with Standalone UCM
 
-> You can you can skip this step and go directly to th Step 5. 
+> You can you can skip this step and go directly to th Step 5.
 > Docker Compose will automatically build your image before starting container.
 
-Build your Docker image by running `bash docker_build.sh` command in directory with UCM. 
+Build your Docker image by running `bash docker_build.sh` command in directory with UCM.
 
 ```bash
 user@pc snmp-eaton-ups % bash docker_build.sh
