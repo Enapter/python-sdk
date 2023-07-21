@@ -63,10 +63,10 @@ services:
     build: .
     image: enapter-vucm-examples/snmp-eaton-ups:latest
     environment:
-      - "ENAPTER_VUCM_BLOB=REALENAPTERVUCMBLOBMUSTBEHERE="
-      - "ENAPTER_SNMP_HOST=192.168.192.192"
-      - "ENAPTER_SNMP_PORT=161"
-      - "ENAPTER_SNMP_COMMUNITY=public"
+      ENAPTER_VUCM_BLOB: "REALENAPTERVUCMBLOBMUSTBEHERE="
+      ENAPTER_SNMP_HOST: "192.168.192.192"
+      ENAPTER_SNMP_PORT: "161"
+      ENAPTER_SNMP_COMMUNITY: "public"
 ```
 
 ## Step 4. Build Docker Image with Standalone UCM
