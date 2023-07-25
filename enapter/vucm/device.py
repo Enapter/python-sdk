@@ -1,4 +1,6 @@
 import asyncio
+import concurrent
+import functools
 import traceback
 from typing import Optional, Set
 
@@ -7,11 +9,21 @@ from .logger import Logger
 
 
 class Device(async_.Routine):
-    def __init__(self, channel, cmd_prefix="cmd_", task_prefix="task_") -> None:
+    def __init__(
+        self,
+        channel,
+        cmd_prefix="cmd_",
+        task_prefix="task_",
+        thread_pool_executor=None,
+    ) -> None:
         self.__channel = channel
 
         self.__cmd_prefix = cmd_prefix
         self.__task_prefix = task_prefix
+
+        if thread_pool_executor is None:
+            thread_pool_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        self.__thread_pool_executor = thread_pool_executor
 
         self.log = Logger(channel=channel)
         self.alerts: Set[str] = set()
@@ -34,7 +46,15 @@ class Device(async_.Routine):
 
         await self.__channel.publish_properties(properties)
 
+    async def run_in_thread(self, func, *args, **kwargs):
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(
+            self.__thread_pool_executor, functools.partial(func, *args, **kwargs)
+        )
+
     async def _run(self):
+        self._stack.enter_context(self.__thread_pool_executor)
+
         tasks = set()
 
         for name in dir(self):
