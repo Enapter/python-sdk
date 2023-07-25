@@ -30,42 +30,58 @@ class EatonUPS(enapter.vucm.Device):
 
     async def task_get_telemetry_data(self):
         while True:
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.6.1.0")) is not None:
-                self.telemetry["temperature"] = int(value)
+            temperature = await self.snmp_get("1.3.6.1.4.1.534.1.6.1.0")
+            if temperature is not None:
+                self.telemetry["temperature"] = int(temperature)
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.2.4.0")) is not None:
-                self.telemetry["capacity"] = int(value)
+            capacity = await self.snmp_get("1.3.6.1.4.1.534.1.2.4.0")
+            if capacity is not None:
+                self.telemetry["capacity"] = int(capacity)
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.2.5.0")) is not None:
-                self.telemetry["status"] = str(value)
+            status = await self.snmp_get("1.3.6.1.4.1.534.1.2.5.0")
+            if status is not None:
+                self.telemetry["status"] = str(status)
 
-            if (value := self.snmp_get("1.3.6.1.2.1.33.1.3.3.1.2.1")) is not None:
-                self.telemetry["grid_freq"] = int(value) * 0.1
+            grid_freq = await self.snmp_get("1.3.6.1.2.1.33.1.3.3.1.2.1")
+            if grid_freq is not None:
+                self.telemetry["grid_freq"] = int(grid_freq) * 0.1
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.4.2.0")) is not None:
-                self.telemetry["ups_freq"] = int(value) * 0.1
+            ups_freq = await self.snmp_get("1.3.6.1.4.1.534.1.4.2.0")
+            if ups_freq is not None:
+                self.telemetry["ups_freq"] = int(ups_freq) * 0.1
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.3.4.1.2.1")) is not None:
-                self.telemetry["grid_v"] = int(value)
+            grid_v = await self.snmp_get("1.3.6.1.4.1.534.1.3.4.1.2.1")
+            if grid_v is not None:
+                self.telemetry["grid_v"] = int(grid_v)
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.4.1.0")) is not None:
-                self.telemetry["out_load"] = int(value)
+            out_load = await self.snmp_get("1.3.6.1.4.1.534.1.4.1.0")
+            if out_load is not None:
+                self.telemetry["out_load"] = int(out_load)
 
-            if (value := self.snmp_get("1.3.6.1.4.1.534.1.4.4.1.4.1")) is not None:
-                self.telemetry["ac_out_active_power"] = int(value)
+            ac_out_active_power = await self.snmp_get("1.3.6.1.4.1.534.1.4.4.1.4.1")
+            if ac_out_active_power is not None:
+                self.telemetry["ac_out_active_power"] = int(ac_out_active_power)
 
             await asyncio.sleep(10)
 
     async def task_get_properties_data(self):
         while True:
-            if (value := self.snmp_get("1.3.6.1.2.1.33.1.1.2.0")) is not None:
-                self.properties["model"] = str(value)
-            if (value := self.snmp_get("1.3.6.1.2.1.33.1.1.1.0")) is not None:
-                self.properties["manufacturer"] = str(value)
-            if (value := self.snmp_get("1.3.6.1.2.1.33.1.1.3.0")) is not None:
-                self.properties["fw_ver"] = str(value)
-            if (value := self.snmp_get("1.3.6.1.2.1.33.1.1.4.0")) is not None:
-                self.properties["agent_ver"] = str(value)
+            model = await self.snmp_get("1.3.6.1.2.1.33.1.1.2.0")
+            if model is not None:
+                self.properties["model"] = str(model)
+
+            manufacturer = await self.snmp_get("1.3.6.1.2.1.33.1.1.1.0")
+            if manufacturer is not None:
+                self.properties["manufacturer"] = str(manufacturer)
+
+            fw_ver = await self.snmp_get("1.3.6.1.2.1.33.1.1.3.0")
+            if fw_ver is not None:
+                self.properties["fw_ver"] = str(fw_ver)
+
+            agent_ver = await self.snmp_get("1.3.6.1.2.1.33.1.1.4.0")
+            if agent_ver is not None:
+                self.properties["agent_ver"] = str(agent_ver)
+
             await asyncio.sleep(60)
 
     async def task_telemetry_sender(self):
@@ -78,8 +94,13 @@ class EatonUPS(enapter.vucm.Device):
             await self.send_properties(self.properties)
             await asyncio.sleep(10)
 
-    def snmp_get(self, oid):
-        result = self.cmd_gen.getCmd(self.auth_data, self.transport_target, oid)
+    async def snmp_get(self, oid):
+        result = await self.run_in_thread(
+            self.cmd_gen.getCmd,
+            self.auth_data,
+            self.transport_target,
+            oid,
+        )
         (error_indication, error_status, error_index, var_binds) = result
 
         if error_indication:
