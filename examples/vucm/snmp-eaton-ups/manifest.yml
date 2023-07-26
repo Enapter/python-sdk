@@ -1,0 +1,97 @@
+blueprint_spec: "device/1.0"
+
+display_name: "Eaton UPS SNMP"
+icon: enapter-battery-storage
+license: MIT
+author: enapter
+support:
+  url: https://go.enapter.com/enapter-blueprint-support
+  email: support@enapter.com
+
+communication_module:
+  product: ENP-VIRTUAL
+
+properties:
+  manufacturer:
+    display_name: Manufacturer
+    type: string
+  model:
+    display_name: Model
+    type: string
+  fw_ver:
+    display_name: UPS Firmware version
+    type: string
+  agent_ver:
+    display_name: Agent Software Version
+    type: string
+
+telemetry:
+  temperature:
+    display_name: Temperature
+    type: integer
+    unit: "°C"
+  capacity:
+    display_name: Battery Capacity
+    type: integer
+    unit: "%"
+  status:
+    type: string
+    display_name: Battery Status
+    enum:
+      "1":
+        display_name: Charging
+      "2":
+        display_name: Discharging
+      "3":
+        display_name: Floating
+      "4":
+        display_name: Resting
+      "5":
+        display_name: unknown
+      "6":
+        display_name: Disconnected
+      "7":
+        display_name: Under Test
+      "8":
+        display_name: Check Battery
+  grid_freq:
+    type: integer
+    display_name: Grid Frequency
+    unit: "Hz"
+  ups_freq:
+    type: integer
+    display_name: UPS Output Frequency
+    unit: "Hz"
+  grid_v:
+    type: integer
+    display_name: Grid Voltage
+    unit: "V"
+  out_load:
+    type: integer
+    display_name: UPS Load
+    unit: "%"
+  ac_out_active_power:
+    type: integer
+    display_name: UPS Output Power
+    unit: "W"
+
+.cloud:
+  category: renewable_energy_sources
+  mobile_main_chart: ac_out_active_power
+  mobile_telemetry:
+    - capacity
+    - battery_status
+    - grid_v
+    - out_load
+    - temperature
+    - grid_freq
+    - ups_freq
+
+  mobile_charts:
+    - temperature
+    - capacity
+    - ac_out_active_power
+    - grid_freq
+    - ups_freq
+    - grid_v
+    - out_load
