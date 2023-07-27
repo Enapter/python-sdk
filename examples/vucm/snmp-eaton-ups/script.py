@@ -40,7 +40,26 @@ class EatonUPS(enapter.vucm.Device):
 
             status = await self.snmp_get("1.3.6.1.4.1.534.1.2.5.0")
             if status is not None:
-                self.telemetry["status"] = str(status)
+                if status == 1:
+                    status_name = "charge"
+                elif status == 2:
+                    status_name = "discharge"
+                elif status == 3:
+                    status_name = "float"
+                elif status == 4:
+                    status_name = "reset"
+                elif status == 5:
+                    status_name = "unknown"
+                elif status == 6:
+                    status_name = "disconnect"
+                elif status == 7:
+                    status_name = "test"
+                elif status == 8:
+                    status_name = "check"
+                else:
+                    raise ValueError(f"unexpected status: {status}")
+
+                self.telemetry["status"] = status_name
 
             grid_freq = await self.snmp_get("1.3.6.1.2.1.33.1.3.3.1.2.1")
             if grid_freq is not None:
