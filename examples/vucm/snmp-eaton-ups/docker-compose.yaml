@@ -4,6 +4,7 @@ services:
     build: .
     image: enapter-vucm-examples/snmp-eaton-ups:latest
     stop_signal: SIGINT
+    restart: "no"
     environment:
       ENAPTER_VUCM_BLOB: "REALENAPTERVUCMBLOBMUSTBEHERE="
       ENAPTER_SNMP_HOST: "192.168.192.192"

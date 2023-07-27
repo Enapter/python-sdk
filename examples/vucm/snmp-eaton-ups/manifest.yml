@@ -38,21 +38,21 @@ telemetry:
     type: string
     display_name: Battery Status
     enum:
-      "1":
+      "charge":
         display_name: Charging
-      "2":
+      "discharge":
         display_name: Discharging
-      "3":
+      "float":
         display_name: Floating
-      "4":
+      "reset":
         display_name: Resting
-      "5":
+      "unknown":
         display_name: unknown
-      "6":
+      "disconnect":
         display_name: Disconnected
-      "7":
+      "test":
         display_name: Under Test
-      "8":
+      "check":
         display_name: Check Battery
   grid_freq:
     type: integer
