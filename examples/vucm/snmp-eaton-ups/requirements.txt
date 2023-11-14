@@ -1,3 +1,3 @@
+enapter==0.9.0
 pysnmp==4.4.12
 pyasn1<=0.4.8
-enapter==0.8.0
