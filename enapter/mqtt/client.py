@@ -7,17 +7,16 @@ import tempfile
 
 import aiomqtt
 
-from .. import async_, mdns
-from .device_channel import DeviceChannel
+import enapter
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Client(async_.Routine):
+class Client(enapter.async_.Routine):
     def __init__(self, config):
         self._logger = self._new_logger(config)
         self._config = config
-        self._mdns_resolver = mdns.Resolver()
+        self._mdns_resolver = enapter.mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
         self._client = None
         self._client_ready = asyncio.Event()
@@ -31,16 +30,11 @@ class Client(async_.Routine):
     def config(self):
         return self._config
 
-    def device_channel(self, hardware_id, channel_id):
-        return DeviceChannel(
-            client=self, hardware_id=hardware_id, channel_id=channel_id
-        )
-
     async def publish(self, *args, **kwargs):
         client = await self._wait_client()
         await client.publish(*args, **kwargs)
 
-    @async_.generator
+    @enapter.async_.generator
     async def subscribe(self, topic):
         while True:
             client = await self._wait_client()

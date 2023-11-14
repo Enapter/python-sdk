@@ -1,9 +1,9 @@
-import enum
 import json
 import logging
 import time
 
-from .. import async_
+import enapter
+
 from .command import CommandRequest
 
 LOGGER = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class DeviceChannel:
         extra = {"hardware_id": hardware_id, "channel_id": channel_id}
         return logging.LoggerAdapter(LOGGER, extra=extra)
 
-    @async_.generator
+    @enapter.async_.generator
     async def subscribe_to_command_requests(self):
         async with self._subscribe("v1/command/requests") as messages:
             async for msg in messages:
@@ -72,10 +72,3 @@ class DeviceChannel:
             await self._client.publish(topic, payload, **kwargs)
         except Exception as e:
             self._logger.error("failed to publish %s: %r", path, e)
-
-
-class DeviceLogSeverity(enum.Enum):
-    DEBUG = "debug"
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
