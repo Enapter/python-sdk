@@ -7,7 +7,7 @@ import aiomqtt
 import enapter
 
 
-class TestMQTT:
+class TestClient:
     async def test_sanity(self, enapter_mqtt_client):
         async with contextlib.AsyncExitStack() as stack:
             heartbit_sender = await stack.enter_async_context(
