@@ -9,7 +9,7 @@ class TestDeviceChannel:
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
         mock_client = mock.Mock()
-        device_channel = enapter.mqtt.DeviceChannel(
+        device_channel = enapter.mqtt.api.DeviceChannel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )
         await device_channel.publish_telemetry({"timestamp": timestamp})
@@ -23,7 +23,7 @@ class TestDeviceChannel:
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
         mock_client = mock.Mock()
-        device_channel = enapter.mqtt.DeviceChannel(
+        device_channel = enapter.mqtt.api.DeviceChannel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )
         with mock.patch("time.time") as mock_time:
@@ -39,7 +39,7 @@ class TestDeviceChannel:
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
         mock_client = mock.Mock()
-        device_channel = enapter.mqtt.DeviceChannel(
+        device_channel = enapter.mqtt.api.DeviceChannel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )
         await device_channel.publish_properties({"timestamp": timestamp})
@@ -53,7 +53,7 @@ class TestDeviceChannel:
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
         mock_client = mock.Mock()
-        device_channel = enapter.mqtt.DeviceChannel(
+        device_channel = enapter.mqtt.api.DeviceChannel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )
         with mock.patch("time.time") as mock_time:
