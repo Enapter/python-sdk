@@ -109,11 +109,11 @@ class Device(enapter.async_.Routine):
         try:
             cmd = getattr(self, self.__cmd_prefix + req.name)
         except AttributeError:
-            return enapter.mqtt.CommandState.ERROR, {"reason": "unknown command"}
+            return enapter.mqtt.api.CommandState.ERROR, {"reason": "unknown command"}
 
         try:
-            return enapter.mqtt.CommandState.COMPLETED, await cmd(**req.args)
+            return enapter.mqtt.api.CommandState.COMPLETED, await cmd(**req.args)
         except:
-            return enapter.mqtt.CommandState.ERROR, {
+            return enapter.mqtt.api.CommandState.ERROR, {
                 "traceback": traceback.format_exc()
             }

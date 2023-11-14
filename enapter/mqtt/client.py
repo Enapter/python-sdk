@@ -9,8 +9,6 @@ import aiomqtt
 
 import enapter
 
-from .device_channel import DeviceChannel
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -31,11 +29,6 @@ class Client(enapter.async_.Routine):
 
     def config(self):
         return self._config
-
-    def device_channel(self, hardware_id, channel_id):
-        return DeviceChannel(
-            client=self, hardware_id=hardware_id, channel_id=channel_id
-        )
 
     async def publish(self, *args, **kwargs):
         client = await self._wait_client()
