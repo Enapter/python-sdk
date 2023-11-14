@@ -2,7 +2,7 @@ import base64
 import json
 import os
 
-from .. import mqtt
+import enapter
 
 
 class Config:
@@ -23,7 +23,7 @@ class Config:
         hardware_id = os.environ[prefix + "HARDWARE_ID"]
         channel_id = os.environ[prefix + "CHANNEL_ID"]
 
-        mqtt_config = mqtt.Config.from_env(prefix=prefix, env=env)
+        mqtt_config = enapter.mqtt.Config.from_env(prefix=prefix, env=env)
 
         start_ucm = os.environ.get(prefix + "START_UCM", "1") != "0"
 
@@ -38,7 +38,7 @@ class Config:
     def from_blob(cls, blob):
         payload = json.loads(base64.b64decode(blob))
 
-        mqtt_config = mqtt.Config(
+        mqtt_config = enapter.mqtt.Config(
             host=payload["mqtt_host"],
             port=int(payload["mqtt_port"]),
             tls_ca_cert=payload["mqtt_ca"],

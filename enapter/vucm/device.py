@@ -4,11 +4,12 @@ import functools
 import traceback
 from typing import Optional, Set
 
-from .. import async_, mqtt, types
+import enapter
+
 from .logger import Logger
 
 
-class Device(async_.Routine):
+class Device(enapter.async_.Routine):
     def __init__(
         self,
         channel,
@@ -28,7 +29,9 @@ class Device(async_.Routine):
         self.log = Logger(channel=channel)
         self.alerts: Set[str] = set()
 
-    async def send_telemetry(self, telemetry: Optional[types.JSON] = None) -> None:
+    async def send_telemetry(
+        self, telemetry: Optional[enapter.types.JSON] = None
+    ) -> None:
         if telemetry is None:
             telemetry = {}
         else:
@@ -38,7 +41,9 @@ class Device(async_.Routine):
 
         await self.__channel.publish_telemetry(telemetry)
 
-    async def send_properties(self, properties: Optional[types.JSON] = None) -> None:
+    async def send_properties(
+        self, properties: Optional[enapter.types.JSON] = None
+    ) -> None:
         if properties is None:
             properties = {}
         else:
@@ -104,9 +109,11 @@ class Device(async_.Routine):
         try:
             cmd = getattr(self, self.__cmd_prefix + req.name)
         except AttributeError:
-            return mqtt.CommandState.ERROR, {"reason": "unknown command"}
+            return enapter.mqtt.CommandState.ERROR, {"reason": "unknown command"}
 
         try:
-            return mqtt.CommandState.COMPLETED, await cmd(**req.args)
+            return enapter.mqtt.CommandState.COMPLETED, await cmd(**req.args)
         except:
-            return mqtt.CommandState.ERROR, {"traceback": traceback.format_exc()}
+            return enapter.mqtt.CommandState.ERROR, {
+                "traceback": traceback.format_exc()
+            }
