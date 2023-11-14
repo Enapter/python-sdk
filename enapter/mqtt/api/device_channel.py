@@ -1,4 +1,3 @@
-import enum
 import json
 import logging
 import time
@@ -73,10 +72,3 @@ class DeviceChannel:
             await self._client.publish(topic, payload, **kwargs)
         except Exception as e:
             self._logger.error("failed to publish %s: %r", path, e)
-
-
-class DeviceLogSeverity(enum.Enum):
-    DEBUG = "debug"
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
