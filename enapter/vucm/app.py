@@ -37,6 +37,7 @@ class App(enapter.async_.Routine):
         device = await self._stack.enter_async_context(
             self._device_factory(
                 channel=enapter.mqtt.api.DeviceChannel(
+                    client=mqtt_client,
                     hardware_id=self._config.hardware_id,
                     channel_id=self._config.channel_id,
                 )

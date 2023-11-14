@@ -1,13 +1,15 @@
 import asyncio
 
+import enapter
+
 from .device import Device
 
 
 class UCM(Device):
     def __init__(self, mqtt_client, hardware_id):
         super().__init__(
-            channel=mqtt_client.device_channel(
-                hardware_id=hardware_id, channel_id="ucm"
+            channel=enapter.mqtt.api.DeviceChannel(
+                client=mqtt_client, hardware_id=hardware_id, channel_id="ucm"
             )
         )
 
