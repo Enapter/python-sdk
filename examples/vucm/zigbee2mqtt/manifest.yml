@@ -1,0 +1,52 @@
+blueprint_spec: "device/1.0"
+
+display_name: "Temperature/Humidity Sensor"
+icon: home
+license: MIT
+author: enapter
+support:
+  url: https://go.enapter.com/enapter-blueprint-support
+  email: support@enapter.com
+
+communication_module:
+  product: ENP-VIRTUAL
+
+properties:
+  manufacturer:
+    display_name: Manufacturer
+    type: string
+  model:
+    display_name: Model
+    type: string
+
+telemetry:
+  temperature:
+    display_name: Temperature
+    type: float
+    unit: "°C"
+  battery:
+    display_name: Battery Capacity
+    type: float
+    unit: "%"
+  humidity:
+    display_name: Humidity
+    type: float
+    unit: "%"
+  linkquality:
+    display_name: Connection Link Quality
+    type: float
+
+
+.cloud:
+  mobile_main_chart: temperature
+  mobile_telemetry:
+    - temperature
+    - battery
+    - humidity
+    - linkquality
+
+  mobile_charts:
+    - temperature
+    - battery
+    - humidity
+    - linkquality
