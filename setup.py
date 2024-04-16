@@ -15,7 +15,7 @@ def main():
         author_email="rnovatorov@enapter.com",
         install_requires=[
             "aiomqtt==1.0.*",
-            "dnspython==2.2.*",
+            "dnspython==2.6.*",
             "json-log-formatter==0.5.*",
         ],
     )
