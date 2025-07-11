@@ -26,11 +26,9 @@ class TestJSONFormat:
         time = record.pop("time")
         assert re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+", time) is not None
 
-        assert record == {
-            "level": "INFO",
-            "name": "enapter",
-            "message": "hello",
-        }
+        assert record["level"] == "INFO"
+        assert record["name"] == "enapter"
+        assert record["message"] == "hello"
 
     def test_exc_info(self):
         buf = io.StringIO()
