@@ -38,7 +38,8 @@ class ZigbeeMqtt(enapter.vucm.Device):
         self.sensor_manufacturer = sensor_manufacturer
         self.sensor_model = sensor_model
 
-    async def task_consume(self):
+    @enapter.vucm.device_task
+    async def consume(self):
         async with enapter.mqtt.Client(self.mqtt_client_config) as client:
             async with client.subscribe(self.mqtt_topic) as messages:
                 async for msg in messages:
@@ -47,12 +48,14 @@ class ZigbeeMqtt(enapter.vucm.Device):
                     except json.JSONDecodeError as e:
                         await self.log.error(f"failed to decode json payload: {e}")
 
-    async def task_telemetry_sender(self):
+    @enapter.vucm.device_task
+    async def telemetry_sender(self):
         while True:
             await self.send_telemetry(self.telemetry)
             await asyncio.sleep(1)
 
-    async def task_properties_sender(self):
+    @enapter.vucm.device_task
+    async def properties_sender(self):
         while True:
             await self.send_properties(
                 {

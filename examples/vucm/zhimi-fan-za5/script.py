@@ -21,20 +21,25 @@ class ZhimiFanZA5(enapter.vucm.Device):
         super().__init__(**kwargs)
         self.fan = miio.FanZA5(ip=ip, token=token)
 
-    async def cmd_power(self, on: bool = False):
+    @enapter.vucm.device_command
+    async def power(self, on: bool = False):
         return await self.run_in_thread(self.fan.on if on else self.fan.off)
 
-    async def cmd_mode(self, mode: str):
+    @enapter.vucm.device_command
+    async def mode(self, mode: str):
         miio_mode = miio.fan_common.OperationMode(mode)
         return await self.run_in_thread(self.fan.set_mode, miio_mode)
 
-    async def cmd_buzzer(self, on: bool = False):
+    @enapter.vucm.device_command
+    async def buzzer(self, on: bool = False):
         return await self.run_in_thread(self.fan.set_buzzer, on)
 
-    async def cmd_speed(self, speed: int):
+    @enapter.vucm.device_command
+    async def speed(self, speed: int):
         return await self.run_in_thread(self.fan.set_speed, speed)
 
-    async def task_telemetry_sender(self):
+    @enapter.vucm.device_task
+    async def telemetry_sender(self):
         while True:
             status = await self.run_in_thread(self.fan.status)
             await self.send_telemetry(

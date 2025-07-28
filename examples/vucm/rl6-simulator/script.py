@@ -19,18 +19,22 @@ class Rl6Simulator(enapter.vucm.Device):
             "r6": False,
         }
 
-    async def cmd_enable_load(self, load: str):
+    @enapter.vucm.device_command
+    async def enable_load(self, load: str):
         self.loads[load] = True
 
-    async def cmd_disable_load(self, load: str):
+    @enapter.vucm.device_command
+    async def disable_load(self, load: str):
         self.loads[load] = False
 
-    async def task_telemetry_sender(self):
+    @enapter.vucm.device_task
+    async def telemetry_sender(self):
         while True:
             await self.send_telemetry(self.loads)
             await asyncio.sleep(1)
 
-    async def task_properties_publisher(self):
+    @enapter.vucm.device_task
+    async def properties_sender(self):
         while True:
             await self.send_properties({})
             await asyncio.sleep(10)

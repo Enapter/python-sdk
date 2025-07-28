@@ -11,7 +11,8 @@ async def main():
 
 
 class PSUtilBattery(enapter.vucm.Device):
-    async def task_data_sender(self):
+    @enapter.vucm.device_task
+    async def data_sender(self):
         while True:
             telemetry, properties, delay = await self.gather_data()
             await self.send_telemetry(telemetry)
