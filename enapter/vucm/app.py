@@ -6,10 +6,10 @@ from .config import Config
 from .ucm import UCM
 
 
-async def run(device_factory):
+async def run(device_factory, config_prefix=None):
     enapter.log.configure(level=enapter.log.LEVEL or "info")
 
-    config = Config.from_env()
+    config = Config.from_env(prefix=config_prefix)
 
     async with App(config=config, device_factory=device_factory) as app:
         await app.join()

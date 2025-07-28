@@ -7,7 +7,9 @@ import enapter
 
 class Config:
     @classmethod
-    def from_env(cls, prefix="ENAPTER_VUCM_", env=os.environ):
+    def from_env(cls, prefix=None, env=os.environ):
+        if prefix is None:
+            prefix = "ENAPTER_VUCM_"
         try:
             blob = os.environ[prefix + "BLOB"]
         except KeyError:
