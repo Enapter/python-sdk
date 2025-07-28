@@ -2,11 +2,35 @@ import asyncio
 import concurrent
 import functools
 import traceback
-from typing import Optional, Set
+from typing import Any, Callable, Coroutine, Optional, Set
 
 import enapter
 
 from .logger import Logger
+
+DEVICE_TASK_MARK = "_enapter_vucm_device_task"
+DEVICE_COMMAND_MARK = "_enapter_vucm_device_command"
+
+DeviceTaskFunc = Callable[[Any], Coroutine]
+DeviceCommandFunc = Callable[..., Coroutine]
+
+
+def device_task(func: DeviceTaskFunc) -> DeviceTaskFunc:
+    setattr(func, DEVICE_TASK_MARK, True)
+    return func
+
+
+def device_command(func: DeviceCommandFunc) -> DeviceTaskFunc:
+    setattr(func, DEVICE_COMMAND_MARK, True)
+    return func
+
+
+def is_device_task(func: DeviceTaskFunc) -> bool:
+    return getattr(func, DEVICE_TASK_MARK, False) is True
+
+
+def is_device_command(func: DeviceCommandFunc) -> bool:
+    return getattr(func, DEVICE_COMMAND_MARK, False) is True
 
 
 class Device(enapter.async_.Routine):
@@ -14,13 +38,21 @@ class Device(enapter.async_.Routine):
         self,
         channel,
         cmd_prefix="cmd_",
-        task_prefix="task_",
         thread_pool_executor=None,
     ) -> None:
         self.__channel = channel
 
-        self.__cmd_prefix = cmd_prefix
-        self.__task_prefix = task_prefix
+        self.__tasks = {}
+        for name in dir(self):
+            obj = getattr(self, name)
+            if is_device_task(obj):
+                self.__tasks[name] = obj
+
+        self.__commands = {}
+        for name in dir(self):
+            obj = getattr(self, name)
+            if is_device_command(obj):
+                self.__commands[name] = obj
 
         if thread_pool_executor is None:
             thread_pool_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
@@ -62,11 +94,8 @@ class Device(enapter.async_.Routine):
 
         tasks = set()
 
-        for name in dir(self):
-            if name.startswith(self.__task_prefix):
-                task_func = getattr(self, name)
-                name_without_prefix = name[len(self.__task_prefix) :]
-                tasks.add(asyncio.create_task(task_func(), name=name_without_prefix))
+        for name, func in self.__tasks.items():
+            tasks.add(asyncio.create_task(func(), name=name))
 
         tasks.add(
             asyncio.create_task(
@@ -107,8 +136,8 @@ class Device(enapter.async_.Routine):
 
     async def __execute_command(self, req):
         try:
-            cmd = getattr(self, self.__cmd_prefix + req.name)
-        except AttributeError:
+            cmd = self._commands[req.name]
+        except KeyError:
             return enapter.mqtt.api.CommandState.ERROR, {"reason": "unknown command"}
 
         try:

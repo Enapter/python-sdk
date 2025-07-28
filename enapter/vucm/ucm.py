@@ -2,7 +2,7 @@ import asyncio
 
 import enapter
 
-from .device import Device
+from .device import Device, device_command, device_task
 
 
 class UCM(Device):
@@ -13,20 +13,24 @@ class UCM(Device):
             )
         )
 
-    async def cmd_reboot(self):
+    @device_command
+    async def reboot(self):
         await asyncio.sleep(0)
         raise NotImplementedError
 
-    async def cmd_upload_lua_script(self, url, sha1, payload=None):
+    @device_command
+    async def upload_lua_script(self, url, sha1, payload=None):
         await asyncio.sleep(0)
         raise NotImplementedError
 
-    async def task_telemetry_publisher(self):
+    @device_task
+    async def telemetry_publisher(self) -> None:
         while True:
             await self.send_telemetry()
             await asyncio.sleep(1)
 
-    async def task_properties_publisher(self):
+    @device_task
+    async def properties_publisher(self):
         while True:
             await self.send_properties({"virtual": True, "lua_api_ver": 1})
             await asyncio.sleep(10)
