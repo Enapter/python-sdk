@@ -28,7 +28,8 @@ class EatonUPS(enapter.vucm.Device):
         self.auth_data = cmdgen.CommunityData(snmp_community)
         self.transport_target = cmdgen.UdpTransportTarget((snmp_host, snmp_port))
 
-    async def task_get_telemetry_data(self):
+    @enapter.vucm.device_task
+    async def get_telemetry_data(self):
         while True:
             temperature = await self.snmp_get("1.3.6.1.4.1.534.1.6.1.0")
             if temperature is not None:
@@ -83,7 +84,8 @@ class EatonUPS(enapter.vucm.Device):
 
             await asyncio.sleep(10)
 
-    async def task_get_properties_data(self):
+    @enapter.vucm.device_task
+    async def get_properties_data(self):
         while True:
             model = await self.snmp_get("1.3.6.1.2.1.33.1.1.2.0")
             if model is not None:
@@ -103,12 +105,14 @@ class EatonUPS(enapter.vucm.Device):
 
             await asyncio.sleep(60)
 
-    async def task_telemetry_sender(self):
+    @enapter.vucm.device_task
+    async def telemetry_sender(self):
         while True:
             await self.send_telemetry(self.telemetry)
             await asyncio.sleep(1)
 
-    async def task_properties_publisher(self):
+    @enapter.vucm.device_task
+    async def properties_sender(self):
         while True:
             await self.send_properties(self.properties)
             await asyncio.sleep(10)

@@ -23,7 +23,8 @@ class WttrIn(enapter.vucm.Device):
         self.client = client
         self.location = location
 
-    async def task_properties_sender(self):
+    @enapter.vucm.device_task
+    async def properties_sender(self):
         while True:
             await self.send_properties(
                 {
@@ -32,7 +33,8 @@ class WttrIn(enapter.vucm.Device):
             )
             await asyncio.sleep(10)
 
-    async def task_telemetry_sender(self):
+    @enapter.vucm.device_task
+    async def telemetry_sender(self):
         while True:
             try:
                 weather = await self.client.get(self.location)
