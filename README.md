@@ -30,12 +30,13 @@ Checkout [examples](examples).
 
 ### Device Telemetry and Properties
 
-Every method of `enapter.vucm.Device` subclass with a name that starts with
-`task_` prefix is considered a _device task_. When such a device is started,
-all of its tasks are started as well. Device tasks are started in random order
-and are being executed concurrently in the background. If a device task returns
-or raises an exception, device routine is terminated. A typical use of the task
-is to run a periodic job to send device telemetry and properties.
+Every method of `enapter.vucm.Device` subclass decorated with
+`enapter.vucm.device_task` decorator is considered a _device task_. When such a
+device is started, all of its tasks are started as well. Device tasks are
+started in random order and are being executed concurrently in the background.
+If a device task returns or raises an exception, device routine is terminated.
+A typical use of the task is to run a periodic job to send device telemetry and
+properties.
 
 In order to send telemetry and properties define two corresponding device
 tasks. It is advised (but is not obligatory) to send telemetry every **1
@@ -45,12 +46,12 @@ Examples:
 
 - [wttr-in](examples/vucm/wttr-in)
 
-### Device Commands
+### Device Command Handlers
 
-Every method of `enapter.vucm.Device` subclass with a name that starts with
-`cmd_` prefix is considered a _device command handler_. Device command handlers
-receive the same arguments as described in device Blueprint manifest and can
-optionally return a payload as `dict`.
+Every method of `enapter.vucm.Device` subclass decorated with
+`enapter.vucm.device_command` is considered a _device command handler_. Device
+command handlers receive the same arguments as described in device Blueprint
+manifest and can optionally return a payload as `enapter.types.JSON`.
 
 In order to handle device commands define corresponding device command
 handlers.
