@@ -6,7 +6,7 @@ import json_log_formatter
 class JSONFormatter(json_log_formatter.JSONFormatter):
     def json_record(self, message, extra, record):
         json_record = {
-            "time": datetime.datetime.now(datetime.UTC).isoformat(),
+            "time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "level": record.levelname[:4],
             "name": record.name,
             **extra,
