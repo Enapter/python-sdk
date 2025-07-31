@@ -1,2 +1,2 @@
-enapter==0.10.0
+enapter==0.10.1
 python-weather==0.4.2
