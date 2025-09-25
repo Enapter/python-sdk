@@ -34,12 +34,7 @@ def is_device_command(func: DeviceCommandFunc) -> bool:
 
 
 class Device(enapter.async_.Routine):
-    def __init__(
-        self,
-        channel,
-        cmd_prefix="cmd_",
-        thread_pool_executor=None,
-    ) -> None:
+    def __init__(self, channel, thread_pool_workers: int = 1) -> None:
         self.__channel = channel
 
         self.__tasks = {}
@@ -54,9 +49,9 @@ class Device(enapter.async_.Routine):
             if is_device_command(obj):
                 self.__commands[name] = obj
 
-        if thread_pool_executor is None:
-            thread_pool_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-        self.__thread_pool_executor = thread_pool_executor
+        self.__thread_pool_executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=thread_pool_workers
+        )
 
         self.log = Logger(channel=channel)
         self.alerts: Set[str] = set()
