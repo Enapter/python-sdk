@@ -136,7 +136,7 @@ class Device(enapter.async_.Routine):
 
     async def __execute_command(self, req):
         try:
-            cmd = self._commands[req.name]
+            cmd = self.__commands[req.name]
         except KeyError:
             return enapter.mqtt.api.CommandState.ERROR, {"reason": "unknown command"}
 
