@@ -62,6 +62,3 @@ commands:
           - r4
           - r5
           - r6
-
-.cloud:
-  mqtt_channel_id: rl6
