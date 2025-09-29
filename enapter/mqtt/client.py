@@ -1,5 +1,4 @@
 import asyncio
-import collections
 import contextlib
 import logging
 import ssl
@@ -18,9 +17,8 @@ class Client(enapter.async_.Routine):
         self._config = config
         self._mdns_resolver = enapter.mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
-        self._client = None
-        self._client_ready = asyncio.Event()
-        self._subscribers = collections.defaultdict(int)
+        self._publisher = None
+        self._publisher_connected = asyncio.Event()
 
     @staticmethod
     def _new_logger(config):
@@ -31,89 +29,56 @@ class Client(enapter.async_.Routine):
         return self._config
 
     async def publish(self, *args, **kwargs):
-        client = await self._wait_client()
-        await client.publish(*args, **kwargs)
+        await self._publisher_connected.wait()
+        await self._publisher.publish(*args, **kwargs)
 
     @enapter.async_.generator
-    async def subscribe(self, topic):
+    async def subscribe(self, *topics):
         while True:
-            client = await self._wait_client()
-
             try:
-                async with client.messages() as messages:
-                    async with self._subscribe(client, topic):
-                        async for msg in messages:
-                            if msg.topic.matches(topic):
-                                yield msg
-
+                async with self._connect() as subscriber:
+                    for topic in topics:
+                        await subscriber.subscribe(topic)
+                    self._logger.info("subscriber [%s] connected", ",".join(topics))
+                    async for msg in subscriber.messages:
+                        yield msg
             except aiomqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
 
-    @contextlib.asynccontextmanager
-    async def _subscribe(self, client, topic):
-        first_subscriber = not self._subscribers[topic]
-        self._subscribers[topic] += 1
-        try:
-            if first_subscriber:
-                await client.subscribe(topic)
-            yield
-        finally:
-            self._subscribers[topic] -= 1
-            assert not self._subscribers[topic] < 0
-            last_unsubscriber = not self._subscribers[topic]
-            if last_unsubscriber:
-                del self._subscribers[topic]
-                await client.unsubscribe(topic)
-
-    async def _wait_client(self):
-        await self._client_ready.wait()
-        assert self._client_ready.is_set()
-        return self._client
-
     async def _run(self):
         self._logger.info("starting")
-
         self._started.set()
-
         while True:
             try:
-                async with self._connect() as client:
-                    self._client = client
-                    self._client_ready.set()
-                    self._logger.info("client ready")
-
-                    # tracking disconnect
-                    async with client.messages() as messages:
-                        async for msg in messages:
-                            pass
+                async with self._connect() as publisher:
+                    self._logger.info("publisher connected")
+                    self._publisher = publisher
+                    self._publisher_connected.set()
+                    async for msg in publisher.messages:
+                        pass
             except aiomqtt.MqttError as e:
                 self._logger.error(e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
             finally:
-                self._client_ready.clear()
-                self._client = None
-                self._logger.info("client not ready")
+                self._publisher_connected.clear()
+                self._publisher = None
+                self._logger.info("publisher disconnected")
 
     @contextlib.asynccontextmanager
     async def _connect(self):
         host = await self._maybe_resolve_mdns(self._config.host)
-
-        try:
-            async with aiomqtt.Client(
-                hostname=host,
-                port=self._config.port,
-                username=self._config.user,
-                password=self._config.password,
-                logger=self._logger,
-                tls_context=self._tls_context,
-            ) as client:
-                yield client
-        except asyncio.CancelledError:
-            # FIXME: A cancelled `aiomqtt.Client.connect` leaks resources.
-            raise
+        async with aiomqtt.Client(
+            hostname=host,
+            port=self._config.port,
+            username=self._config.user,
+            password=self._config.password,
+            logger=self._logger,
+            tls_context=self._tls_context,
+        ) as client:
+            yield client
 
     @staticmethod
     def _new_tls_context(config):

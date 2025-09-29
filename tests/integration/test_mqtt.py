@@ -92,6 +92,6 @@ class HeartbitSender(enapter.async_.Routine):
             payload = str(int(time.time()))
             try:
                 await self.enapter_mqtt_client.publish(self.topic, payload)
-            except aiomqtt.error.MqttError as e:
+            except aiomqtt.MqttError as e:
                 print(f"failed to publish heartbit: {e}")
             await asyncio.sleep(self.interval)
