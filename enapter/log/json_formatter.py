@@ -5,6 +5,11 @@ import json_log_formatter
 
 class JSONFormatter(json_log_formatter.JSONFormatter):
     def json_record(self, message, extra, record):
+        try:
+            del extra["taskName"]
+        except KeyError:
+            pass
+
         json_record = {
             "time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "level": record.levelname[:4],
