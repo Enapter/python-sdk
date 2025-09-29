@@ -4,36 +4,41 @@ import logging
 import ssl
 import tempfile
 
-import aiomqtt
+import aiomqtt  # type: ignore
 
 import enapter
 
 LOGGER = logging.getLogger(__name__)
 
+from typing import AsyncGenerator, Optional
+
+from .config import Config
+
 
 class Client(enapter.async_.Routine):
-    def __init__(self, config):
+    def __init__(self, config: Config) -> None:
         self._logger = self._new_logger(config)
         self._config = config
         self._mdns_resolver = enapter.mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
-        self._publisher = None
+        self._publisher: Optional[aiomqtt.Client] = None
         self._publisher_connected = asyncio.Event()
 
     @staticmethod
-    def _new_logger(config):
+    def _new_logger(config: Config) -> logging.LoggerAdapter:
         extra = {"host": config.host, "port": config.port}
         return logging.LoggerAdapter(LOGGER, extra=extra)
 
-    def config(self):
+    def config(self) -> Config:
         return self._config
 
-    async def publish(self, *args, **kwargs):
+    async def publish(self, *args, **kwargs) -> None:
         await self._publisher_connected.wait()
+        assert self._publisher is not None
         await self._publisher.publish(*args, **kwargs)
 
     @enapter.async_.generator
-    async def subscribe(self, *topics):
+    async def subscribe(self, *topics: str) -> AsyncGenerator[aiomqtt.Message, None]:
         while True:
             try:
                 async with self._connect() as subscriber:
@@ -47,7 +52,7 @@ class Client(enapter.async_.Routine):
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
 
-    async def _run(self):
+    async def _run(self) -> None:
         self._logger.info("starting")
         self._started.set()
         while True:
@@ -68,43 +73,43 @@ class Client(enapter.async_.Routine):
                 self._logger.info("publisher disconnected")
 
     @contextlib.asynccontextmanager
-    async def _connect(self):
+    async def _connect(self) -> AsyncGenerator[aiomqtt.Client, None]:
         host = await self._maybe_resolve_mdns(self._config.host)
         async with aiomqtt.Client(
             hostname=host,
             port=self._config.port,
             username=self._config.user,
             password=self._config.password,
-            logger=self._logger,
+            logger=LOGGER,
             tls_context=self._tls_context,
         ) as client:
             yield client
 
     @staticmethod
-    def _new_tls_context(config):
-        if not config.tls_enabled:
+    def _new_tls_context(config: Config) -> Optional[ssl.SSLContext]:
+        if config.tls is None:
             return None
 
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
         ctx.verify_mode = ssl.CERT_REQUIRED
         ctx.check_hostname = False
-        ctx.load_verify_locations(None, None, config.tls_ca_cert)
+        ctx.load_verify_locations(None, None, config.tls.ca_cert)
 
         with contextlib.ExitStack() as stack:
             certfile = stack.enter_context(tempfile.NamedTemporaryFile())
-            certfile.write(config.tls_cert.encode())
+            certfile.write(config.tls.cert.encode())
             certfile.flush()
 
             keyfile = stack.enter_context(tempfile.NamedTemporaryFile())
-            keyfile.write(config.tls_secret_key.encode())
+            keyfile.write(config.tls.secret_key.encode())
             keyfile.flush()
 
             ctx.load_cert_chain(certfile.name, keyfile=keyfile.name)
 
         return ctx
 
-    async def _maybe_resolve_mdns(self, host):
+    async def _maybe_resolve_mdns(self, host: str) -> str:
         if not host.endswith(".local"):
             return host
 
