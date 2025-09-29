@@ -16,7 +16,7 @@ def main():
         install_requires=[
             "aiomqtt==2.4.*",
             "dnspython==2.6.*",
-            "json-log-formatter==0.5.*",
+            "json-log-formatter==1.1.*",
         ],
     )
 
