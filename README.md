@@ -6,20 +6,17 @@
 
 Enapter software development kit for Python.
 
-:warning: **This project is work in progress. The API is not stable and may change at any time.** :warning:
-
 ## Installation
 
-Stable from PyPI:
+This project uses [semantic versioning](https://semver.org/).
+
+The API is still under development and may change at any time. It is
+recommended to pin the version during installation.
+
+Latest from PyPI:
 
 ```bash
-pip install enapter
-```
-
-Latest for GitHub:
-
-```bash
-pip install git+https://github.com/Enapter/python-sdk#egg=enapter
+pip install enapter==0.11.3'
 ```
 
 ## Usage
