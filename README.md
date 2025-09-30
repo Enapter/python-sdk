@@ -16,7 +16,7 @@ recommended to pin the version during installation.
 Latest from PyPI:
 
 ```bash
-pip install enapter==0.11.3'
+pip install enapter==0.11.3
 ```
 
 ## Usage
