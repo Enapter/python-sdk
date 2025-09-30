@@ -12,7 +12,10 @@ async def subscriber(client: enapter.mqtt.Client) -> None:
 
 async def publisher(client: enapter.mqtt.Client) -> None:
     while True:
-        await client.publish(topic="/time", payload=str(time.time()))
+        try:
+            await client.publish(topic="/time", payload=str(time.time()))
+        except enapter.mqtt.Error as e:
+            print("error", e)
         await asyncio.sleep(1)
 
 
