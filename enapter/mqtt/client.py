@@ -3,16 +3,15 @@ import contextlib
 import logging
 import ssl
 import tempfile
+from typing import AsyncGenerator, Optional
 
 import aiomqtt  # type: ignore
 
 import enapter
 
-LOGGER = logging.getLogger(__name__)
-
-from typing import AsyncGenerator, Optional
-
 from .config import Config
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Client(enapter.async_.Routine):
