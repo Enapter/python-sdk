@@ -1,48 +1,69 @@
 import os
+from typing import MutableMapping, Optional
+
+
+class TLSConfig:
+
+    @classmethod
+    def from_env(
+        cls, prefix: str = "ENAPTER_", env: MutableMapping[str, str] = os.environ
+    ) -> Optional["TLSConfig"]:
+        secret_key = env.get(prefix + "MQTT_TLS_SECRET_KEY")
+        cert = env.get(prefix + "MQTT_TLS_CERT")
+        ca_cert = env.get(prefix + "MQTT_TLS_CA_CERT")
+
+        nothing_defined = {secret_key, cert, ca_cert} == {None}
+        if nothing_defined:
+            return None
+
+        if secret_key is None:
+            raise KeyError(prefix + "MQTT_TLS_SECRET_KEY")
+        if cert is None:
+            raise KeyError(prefix + "MQTT_TLS_CERT")
+        if ca_cert is None:
+            raise KeyError(prefix + "MQTT_TLS_CA_CERT")
+
+        def pem(value: str) -> str:
+            return value.replace("\\n", "\n")
+
+        return cls(secret_key=pem(secret_key), cert=pem(cert), ca_cert=pem(ca_cert))
+
+    def __init__(self, secret_key: str, cert: str, ca_cert: str) -> None:
+        self.secret_key = secret_key
+        self.cert = cert
+        self.ca_cert = ca_cert
 
 
 class Config:
     @classmethod
-    def from_env(cls, prefix="ENAPTER_", env=os.environ):
-        def pem(value):
-            if value is None:
-                return value
-            return value.replace("\\n", "\n")
-
+    def from_env(
+        cls, prefix: str = "ENAPTER_", env: MutableMapping[str, str] = os.environ
+    ) -> "Config":
         return cls(
             host=env[prefix + "MQTT_HOST"],
             port=int(env[prefix + "MQTT_PORT"]),
             user=env.get(prefix + "MQTT_USER", default=None),
             password=env.get(prefix + "MQTT_PASSWORD", default=None),
-            tls_secret_key=pem(env.get(prefix + "MQTT_TLS_SECRET_KEY", default=None)),
-            tls_cert=pem(env.get(prefix + "MQTT_TLS_CERT", default=None)),
-            tls_ca_cert=pem(env.get(prefix + "MQTT_TLS_CA_CERT", default=None)),
+            tls=TLSConfig.from_env(prefix=prefix, env=env),
         )
 
     def __init__(
         self,
-        host,
-        port,
-        user=None,
-        password=None,
-        tls_secret_key=None,
-        tls_cert=None,
-        tls_ca_cert=None,
-    ):
+        host: str,
+        port: int,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
+        tls: Optional[TLSConfig] = None,
+    ) -> None:
         self.host = host
         self.port = port
         self.user = user
         self.password = password
+        self.tls = tls
 
-        self.tls_secret_key = tls_secret_key
-        self.tls_cert = tls_cert
-        self.tls_ca_cert = tls_ca_cert
-
-        self.tls_enabled = {tls_secret_key, tls_cert, tls_ca_cert} != {None}
-
-    def __repr__(self):
-        return "mqtt.Config(host=%r, port=%r, tls_enabled=%r)" % (
+    def __repr__(self) -> str:
+        return "mqtt.Config(host=%r, port=%r, tls=%r)" % (
             self.host,
             self.port,
-            self.tls_enabled,
+            self.tls is not None,
         )

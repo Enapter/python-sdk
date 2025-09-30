@@ -2,7 +2,7 @@ import asyncio
 import concurrent
 import functools
 import traceback
-from typing import Any, Callable, Coroutine, Optional, Set
+from typing import Any, Callable, Coroutine, Dict, Optional, Set, Tuple
 
 import enapter
 
@@ -34,7 +34,9 @@ def is_device_command(func: DeviceCommandFunc) -> bool:
 
 
 class Device(enapter.async_.Routine):
-    def __init__(self, channel, thread_pool_workers: int = 1) -> None:
+    def __init__(
+        self, channel: enapter.mqtt.api.DeviceChannel, thread_pool_workers: int = 1
+    ) -> None:
         self.__channel = channel
 
         self.__tasks = {}
@@ -57,7 +59,7 @@ class Device(enapter.async_.Routine):
         self.alerts: Set[str] = set()
 
     async def send_telemetry(
-        self, telemetry: Optional[enapter.types.JSON] = None
+        self, telemetry: Optional[Dict[str, enapter.types.JSON]] = None
     ) -> None:
         if telemetry is None:
             telemetry = {}
@@ -69,7 +71,7 @@ class Device(enapter.async_.Routine):
         await self.__channel.publish_telemetry(telemetry)
 
     async def send_properties(
-        self, properties: Optional[enapter.types.JSON] = None
+        self, properties: Optional[Dict[str, enapter.types.JSON]] = None
     ) -> None:
         if properties is None:
             properties = {}
@@ -78,13 +80,13 @@ class Device(enapter.async_.Routine):
 
         await self.__channel.publish_properties(properties)
 
-    async def run_in_thread(self, func, *args, **kwargs):
+    async def run_in_thread(self, func, *args, **kwargs) -> Any:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(
             self.__thread_pool_executor, functools.partial(func, *args, **kwargs)
         )
 
-    async def _run(self):
+    async def _run(self) -> None:
         self._stack.enter_context(self.__thread_pool_executor)
 
         tasks = set()
@@ -110,7 +112,7 @@ class Device(enapter.async_.Routine):
                 task.cancel()
                 self._stack.push_async_callback(self.__wait_task, task)
 
-    async def __wait_task(self, task):
+    async def __wait_task(self, task) -> None:
         try:
             await task
         except asyncio.CancelledError:
@@ -122,14 +124,16 @@ class Device(enapter.async_.Routine):
                 pass
             raise
 
-    async def __process_command_requests(self):
+    async def __process_command_requests(self) -> None:
         async with self.__channel.subscribe_to_command_requests() as reqs:
             async for req in reqs:
                 state, payload = await self.__execute_command(req)
                 resp = req.new_response(state, payload)
                 await self.__channel.publish_command_response(resp)
 
-    async def __execute_command(self, req):
+    async def __execute_command(
+        self, req
+    ) -> Tuple[enapter.mqtt.api.CommandState, enapter.types.JSON]:
         try:
             cmd = self.__commands[req.name]
         except KeyError:
