@@ -1,4 +1,4 @@
-__version__ = "0.11.3"
+__version__ = "0.11.4"
 
 from . import async_, log, mdns, mqtt, types, vucm
 
