@@ -5,20 +5,20 @@ import contextlib
 
 class Routine(abc.ABC):
     @abc.abstractmethod
-    async def _run(self):
+    async def _run(self) -> None:
         raise NotImplementedError  # pragma: no cover
 
     async def __aenter__(self):
         await self.start()
         return self
 
-    async def __aexit__(self, *_):
+    async def __aexit__(self, *_) -> None:
         await self.stop()
 
-    def task(self):
+    def task(self) -> asyncio.Task:
         return self._task
 
-    async def start(self, cancel_parent_task_on_exception=True):
+    async def start(self, cancel_parent_task_on_exception: bool = True) -> None:
         self._started = asyncio.Event()
         self._stack = contextlib.AsyncExitStack()
 
@@ -43,26 +43,27 @@ class Routine(abc.ABC):
         if self._task in done:
             self._task.result()
 
-    async def stop(self):
+    async def stop(self) -> None:
         self.cancel()
         await self.join()
 
-    def cancel(self):
+    def cancel(self) -> None:
         self._task.cancel()
 
-    async def join(self):
+    async def join(self) -> None:
         if self._task.done():
             self._task.result()
         else:
             await self._task
 
-    async def __run(self):
+    async def __run(self) -> None:
         try:
             await self._run()
         except asyncio.CancelledError:
             pass
         except:
             if self._started.is_set() and self._cancel_parent_task_on_exception:
+                assert self._parent_task is not None
                 self._parent_task.cancel()
             raise
         finally:

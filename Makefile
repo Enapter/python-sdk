@@ -13,10 +13,23 @@ update-deps:
 check: lint test
 
 .PHONY: lint
-lint:
+lint: lint-black lint-isort lint-pyflakes lint-mypy
+
+.PHONY: lint-black
+lint-black:
 	pipenv run black --check .
+
+.PHONY: lint-isort
+lint-isort:
 	pipenv run isort --check .
+
+.PHONY: lint-pyflakes
+lint-pyflakes:
 	pipenv run pyflakes .
+
+.PHONY: lint-mypy
+lint-mypy:
+	pipenv run mypy enapter
 
 .PHONY: test
 test: run-unit-tests run-integration-tests

@@ -1,9 +1,10 @@
 from . import api
 from .client import Client
-from .config import Config
+from .config import Config, TLSConfig
 
 __all__ = [
-    "api",
     "Client",
     "Config",
+    "TLSConfig",
+    "api",
 ]
