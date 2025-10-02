@@ -3,12 +3,11 @@ import logging
 import time
 from typing import Any, AsyncContextManager, AsyncGenerator, Dict
 
-import aiomqtt  # type: ignore
-
 import enapter
 
 from . import api
 from .client import Client
+from .message import Message
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,7 +62,7 @@ class DeviceChannel:
 
     def _subscribe(
         self, path: str
-    ) -> AsyncContextManager[AsyncGenerator[aiomqtt.Message, None]]:
+    ) -> AsyncContextManager[AsyncGenerator[Message, None]]:
         topic = f"v1/to/{self._hardware_id}/{self._channel_id}/{path}"
         return self._client.subscribe(topic)
 
