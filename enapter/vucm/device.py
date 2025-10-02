@@ -1,6 +1,7 @@
 import asyncio
 import concurrent
 import functools
+import time
 import traceback
 from typing import Any, Callable, Coroutine, Dict, Optional, Set, Tuple
 
@@ -58,26 +59,18 @@ class Device(enapter.async_.Routine):
         self.log = Logger(channel=channel)
         self.alerts: Set[str] = set()
 
-    async def send_telemetry(
-        self, telemetry: Optional[Dict[str, enapter.types.JSON]] = None
-    ) -> None:
-        if telemetry is None:
-            telemetry = {}
-        else:
-            telemetry = telemetry.copy()
-
-        telemetry.setdefault("alerts", list(self.alerts))
-
+    async def send_telemetry(self, values: Optional[Dict[str, Any]] = None) -> None:
+        values = values.copy() if values is not None else {}
+        timestamp = values.pop("timestamp", int(time.time()))
+        telemetry = enapter.mqtt.api.Telemetry(
+            timestamp=timestamp, alerts=list(self.alerts), values=values
+        )
         await self.__channel.publish_telemetry(telemetry)
 
-    async def send_properties(
-        self, properties: Optional[Dict[str, enapter.types.JSON]] = None
-    ) -> None:
-        if properties is None:
-            properties = {}
-        else:
-            properties = properties.copy()
-
+    async def send_properties(self, values: Optional[Dict[str, Any]] = None) -> None:
+        values = values.copy() if values is not None else {}
+        timestamp = values.pop("timestamp", int(time.time()))
+        properties = enapter.mqtt.api.Properties(timestamp=timestamp, values=values)
         await self.__channel.publish_properties(properties)
 
     async def run_in_thread(self, func, *args, **kwargs) -> Any:
@@ -132,15 +125,15 @@ class Device(enapter.async_.Routine):
                 await self.__channel.publish_command_response(resp)
 
     async def __execute_command(
-        self, req
-    ) -> Tuple[enapter.mqtt.api.CommandState, enapter.types.JSON]:
+        self, req: enapter.mqtt.api.CommandRequest
+    ) -> Tuple[enapter.mqtt.api.CommandState, Dict[str, Any]]:
         try:
             cmd = self.__commands[req.name]
         except KeyError:
             return enapter.mqtt.api.CommandState.ERROR, {"reason": "unknown command"}
 
         try:
-            return enapter.mqtt.api.CommandState.COMPLETED, await cmd(**req.args)
+            return enapter.mqtt.api.CommandState.COMPLETED, await cmd(**req.arguments)
         except:
             return enapter.mqtt.api.CommandState.ERROR, {
                 "traceback": traceback.format_exc()
