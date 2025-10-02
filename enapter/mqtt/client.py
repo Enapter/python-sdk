@@ -10,6 +10,7 @@ import aiomqtt  # type: ignore
 import enapter
 
 from .config import Config
+from .message import Message
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class Client(enapter.async_.Routine):
         await self._publisher.publish(*args, **kwargs)
 
     @enapter.async_.generator
-    async def subscribe(self, *topics: str) -> AsyncGenerator[aiomqtt.Message, None]:
+    async def subscribe(self, *topics: str) -> AsyncGenerator[Message, None]:
         while True:
             try:
                 async with self._connect() as subscriber:
