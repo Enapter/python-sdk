@@ -1,7 +1,5 @@
-import json
 import logging
-import time
-from typing import Any, AsyncContextManager, AsyncGenerator, Dict
+from typing import AsyncContextManager, AsyncGenerator
 
 import enapter
 
@@ -39,40 +37,25 @@ class DeviceChannel:
         async with self._subscribe("v1/command/requests") as messages:
             async for msg in messages:
                 assert isinstance(msg.payload, str) or isinstance(msg.payload, bytes)
-                yield api.CommandRequest.unmarshal_json(msg.payload)
+                yield api.CommandRequest.from_json(msg.payload)
 
-    async def publish_command_response(self, resp: api.CommandResponse) -> None:
-        await self._publish_json("v1/command/responses", resp.json())
+    async def publish_command_response(self, response: api.CommandResponse) -> None:
+        await self._publish("v1/command/responses", response.to_json())
 
-    async def publish_telemetry(self, telemetry: Dict[str, Any], **kwargs) -> None:
-        await self._publish_json("v1/telemetry", telemetry, **kwargs)
+    async def publish_telemetry(self, telemetry: api.Telemetry, **kwargs) -> None:
+        await self._publish("v1/telemetry", telemetry.to_json(), **kwargs)
 
-    async def publish_properties(self, properties: Dict[str, Any], **kwargs) -> None:
-        await self._publish_json("v1/register", properties, **kwargs)
+    async def publish_properties(self, properties: api.Properties, **kwargs) -> None:
+        await self._publish("v1/register", properties.to_json(), **kwargs)
 
-    async def publish_logs(
-        self, msg: str, severity: api.LogSeverity, persist: bool = False, **kwargs
-    ) -> None:
-        logs = {
-            "message": msg,
-            "severity": severity.value,
-            "persist": persist,
-        }
-        await self._publish_json("v3/logs", logs, **kwargs)
+    async def publish_log(self, log: api.Log, **kwargs) -> None:
+        await self._publish("v3/logs", log.to_json(), **kwargs)
 
     def _subscribe(
         self, path: str
     ) -> AsyncContextManager[AsyncGenerator[Message, None]]:
         topic = f"v1/to/{self._hardware_id}/{self._channel_id}/{path}"
         return self._client.subscribe(topic)
-
-    async def _publish_json(
-        self, path: str, json_object: Dict[str, Any], **kwargs
-    ) -> None:
-        if "timestamp" not in json_object:
-            json_object["timestamp"] = int(time.time())
-        payload = json.dumps(json_object)
-        await self._publish(path, payload, **kwargs)
 
     async def _publish(self, path: str, payload: str, **kwargs) -> None:
         topic = f"v1/from/{self._hardware_id}/{self._channel_id}/{path}"
