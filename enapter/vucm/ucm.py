@@ -8,7 +8,7 @@ from .device import Device, device_command, device_task
 class UCM(Device):
     def __init__(self, mqtt_client, hardware_id) -> None:
         super().__init__(
-            channel=enapter.mqtt.api.DeviceChannel(
+            channel=enapter.mqtt.DeviceChannel(
                 client=mqtt_client, hardware_id=hardware_id, channel_id="ucm"
             )
         )

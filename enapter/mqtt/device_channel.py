@@ -7,9 +7,8 @@ import aiomqtt  # type: ignore
 
 import enapter
 
-from ..client import Client
-from .command import CommandRequest, CommandResponse
-from .log_severity import LogSeverity
+from . import api
+from .client import Client
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,20 +29,20 @@ class DeviceChannel:
         return self._channel_id
 
     @staticmethod
-    def _new_logger(hardware_id, channel_id) -> logging.LoggerAdapter:
+    def _new_logger(hardware_id: str, channel_id: str) -> logging.LoggerAdapter:
         extra = {"hardware_id": hardware_id, "channel_id": channel_id}
         return logging.LoggerAdapter(LOGGER, extra=extra)
 
     @enapter.async_.generator
     async def subscribe_to_command_requests(
         self,
-    ) -> AsyncGenerator[CommandRequest, None]:
+    ) -> AsyncGenerator[api.CommandRequest, None]:
         async with self._subscribe("v1/command/requests") as messages:
             async for msg in messages:
                 assert isinstance(msg.payload, str) or isinstance(msg.payload, bytes)
-                yield CommandRequest.unmarshal_json(msg.payload)
+                yield api.CommandRequest.unmarshal_json(msg.payload)
 
-    async def publish_command_response(self, resp: CommandResponse) -> None:
+    async def publish_command_response(self, resp: api.CommandResponse) -> None:
         await self._publish_json("v1/command/responses", resp.json())
 
     async def publish_telemetry(self, telemetry: Dict[str, Any], **kwargs) -> None:
@@ -53,7 +52,7 @@ class DeviceChannel:
         await self._publish_json("v1/register", properties, **kwargs)
 
     async def publish_logs(
-        self, msg: str, severity: LogSeverity, persist: bool = False, **kwargs
+        self, msg: str, severity: api.LogSeverity, persist: bool = False, **kwargs
     ) -> None:
         logs = {
             "message": msg,

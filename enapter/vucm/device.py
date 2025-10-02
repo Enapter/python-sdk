@@ -35,7 +35,7 @@ def is_device_command(func: DeviceCommandFunc) -> bool:
 
 class Device(enapter.async_.Routine):
     def __init__(
-        self, channel: enapter.mqtt.api.DeviceChannel, thread_pool_workers: int = 1
+        self, channel: enapter.mqtt.DeviceChannel, thread_pool_workers: int = 1
     ) -> None:
         self.__channel = channel
 
