@@ -8,8 +8,8 @@ def main():
         long_description=read_file("README.md"),
         long_description_content_type="text/markdown",
         description="Enapter Python SDK",
-        packages=setuptools.find_packages(),
-        include_package_data=True,
+        packages=setuptools.find_packages("src"),
+        package_dir={"": "src"},
         url="https://github.com/Enapter/python-sdk",
         author="Roman Novatorov",
         author_email="rnovatorov@enapter.com",
@@ -22,7 +22,7 @@ def main():
 
 
 def read_version():
-    with open("enapter/__init__.py") as f:
+    with open("src/enapter/__init__.py") as f:
         local_scope = {}
         exec(f.readline(), {}, local_scope)
         return local_scope["__version__"]

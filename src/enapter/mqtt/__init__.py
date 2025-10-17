@@ -3,8 +3,7 @@ from .config import Config, TLSConfig
 from .errors import Error
 from .message import Message
 
-# isort: split
-from . import api
+from . import api  # isort: skip
 
 __all__ = [
     "Client",
