@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Logger:
 
-    def __init__(self, channel: enapter.mqtt.DeviceChannel) -> None:
+    def __init__(self, channel: enapter.mqtt.api.DeviceChannel) -> None:
         self._channel = channel
         self._logger = self._new_logger(channel.hardware_id, channel.channel_id)
 

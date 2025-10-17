@@ -10,7 +10,7 @@ from .ucm import UCM
 
 class DeviceFactory(Protocol):
 
-    def __call__(self, channel: enapter.mqtt.DeviceChannel, **kwargs) -> Device:
+    def __call__(self, channel: enapter.mqtt.api.DeviceChannel, **kwargs) -> Device:
         pass
 
 
