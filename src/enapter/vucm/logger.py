@@ -2,14 +2,14 @@ import logging
 import time
 from typing import Optional
 
-import enapter
+from enapter import mqtt
 
 LOGGER = logging.getLogger(__name__)
 
 
 class Logger:
 
-    def __init__(self, channel: enapter.mqtt.api.DeviceChannel) -> None:
+    def __init__(self, channel: mqtt.api.DeviceChannel) -> None:
         self._channel = channel
         self._logger = self._new_logger(channel.hardware_id, channel.channel_id)
 
@@ -20,36 +20,28 @@ class Logger:
 
     async def debug(self, msg: str, persist: Optional[bool] = None) -> None:
         self._logger.debug(msg)
-        await self._log(
-            msg, severity=enapter.mqtt.api.LogSeverity.DEBUG, persist=persist
-        )
+        await self._log(msg, severity=mqtt.api.LogSeverity.DEBUG, persist=persist)
 
     async def info(self, msg: str, persist: Optional[bool] = None) -> None:
         self._logger.info(msg)
-        await self._log(
-            msg, severity=enapter.mqtt.api.LogSeverity.INFO, persist=persist
-        )
+        await self._log(msg, severity=mqtt.api.LogSeverity.INFO, persist=persist)
 
     async def warning(self, msg: str, persist: Optional[bool] = None) -> None:
         self._logger.warning(msg)
-        await self._log(
-            msg, severity=enapter.mqtt.api.LogSeverity.WARNING, persist=persist
-        )
+        await self._log(msg, severity=mqtt.api.LogSeverity.WARNING, persist=persist)
 
     async def error(self, msg: str, persist: Optional[bool] = None) -> None:
         self._logger.error(msg)
-        await self._log(
-            msg, severity=enapter.mqtt.api.LogSeverity.ERROR, persist=persist
-        )
+        await self._log(msg, severity=mqtt.api.LogSeverity.ERROR, persist=persist)
 
     async def _log(
         self,
         msg: str,
-        severity: enapter.mqtt.api.LogSeverity,
+        severity: mqtt.api.LogSeverity,
         persist: Optional[bool] = None,
     ) -> None:
         await self._channel.publish_log(
-            enapter.mqtt.api.Log(
+            mqtt.api.Log(
                 message=msg,
                 severity=severity,
                 persist=persist if persist is not None else False,

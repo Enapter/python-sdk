@@ -7,7 +7,7 @@ from typing import AsyncGenerator, Optional
 
 import aiomqtt  # type: ignore
 
-import enapter
+from enapter import async_, mdns
 
 from .config import Config
 from .message import Message
@@ -15,11 +15,11 @@ from .message import Message
 LOGGER = logging.getLogger(__name__)
 
 
-class Client(enapter.async_.Routine):
+class Client(async_.Routine):
     def __init__(self, config: Config) -> None:
         self._logger = self._new_logger(config)
         self._config = config
-        self._mdns_resolver = enapter.mdns.Resolver()
+        self._mdns_resolver = mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
         self._publisher: Optional[aiomqtt.Client] = None
         self._publisher_connected = asyncio.Event()
@@ -37,7 +37,7 @@ class Client(enapter.async_.Routine):
         assert self._publisher is not None
         await self._publisher.publish(*args, **kwargs)
 
-    @enapter.async_.generator
+    @async_.generator
     async def subscribe(self, *topics: str) -> AsyncGenerator[Message, None]:
         while True:
             try:
