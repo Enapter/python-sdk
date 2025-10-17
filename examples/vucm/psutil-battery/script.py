@@ -1,5 +1,5 @@
 import asyncio
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 import psutil
 
@@ -19,17 +19,17 @@ class PSUtilBattery(enapter.vucm.Device):
             await self.send_properties(properties)
             await asyncio.sleep(delay)
 
-    async def gather_data(self) -> Tuple[enapter.types.JSON, enapter.types.JSON, int]:
+    async def gather_data(self) -> Tuple[Dict[str, Any], Dict[str, Any], int]:
         try:
             battery = psutil.sensors_battery()
         except Exception as e:
             await self.log.error(f"failed to gather data: {e}")
             self.alerts.add("gather_data_error")
-            return None, None, 10
+            return {}, {}, 10
         self.alerts.clear()
 
-        telemetry = None
-        properties = {"battery_installed": battery is not None}
+        telemetry: Dict[str, Any] = {}
+        properties: Dict[str, Any] = {"battery_installed": battery is not None}
 
         if battery is not None:
             telemetry = {

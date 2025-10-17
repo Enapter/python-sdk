@@ -1,6 +1,6 @@
 __version__ = "0.11.4"
 
-from . import async_, log, mdns, mqtt, types, vucm
+from . import async_, log, mdns, mqtt, vucm
 
 __all__ = [
     "__version__",
@@ -8,6 +8,5 @@ __all__ = [
     "log",
     "mdns",
     "mqtt",
-    "types",
     "vucm",
 ]
