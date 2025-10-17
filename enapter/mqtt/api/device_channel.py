@@ -1,17 +1,18 @@
 import logging
 from typing import AsyncContextManager, AsyncGenerator
 
-import enapter
+from enapter import async_, mqtt
 
-from . import api
-from .client import Client
-from .message import Message
+from .commands import CommandRequest, CommandResponse
+from .logs import Log
+from .properties import Properties
+from .telemetry import Telemetry
 
 LOGGER = logging.getLogger(__name__)
 
 
 class DeviceChannel:
-    def __init__(self, client: Client, hardware_id: str, channel_id: str) -> None:
+    def __init__(self, client: mqtt.Client, hardware_id: str, channel_id: str) -> None:
         self._client = client
         self._logger = self._new_logger(hardware_id, channel_id)
         self._hardware_id = hardware_id
@@ -30,30 +31,30 @@ class DeviceChannel:
         extra = {"hardware_id": hardware_id, "channel_id": channel_id}
         return logging.LoggerAdapter(LOGGER, extra=extra)
 
-    @enapter.async_.generator
+    @async_.generator
     async def subscribe_to_command_requests(
         self,
-    ) -> AsyncGenerator[api.CommandRequest, None]:
+    ) -> AsyncGenerator[CommandRequest, None]:
         async with self._subscribe("v1/command/requests") as messages:
             async for msg in messages:
                 assert isinstance(msg.payload, str) or isinstance(msg.payload, bytes)
-                yield api.CommandRequest.from_json(msg.payload)
+                yield CommandRequest.from_json(msg.payload)
 
-    async def publish_command_response(self, response: api.CommandResponse) -> None:
+    async def publish_command_response(self, response: CommandResponse) -> None:
         await self._publish("v1/command/responses", response.to_json())
 
-    async def publish_telemetry(self, telemetry: api.Telemetry, **kwargs) -> None:
+    async def publish_telemetry(self, telemetry: Telemetry, **kwargs) -> None:
         await self._publish("v1/telemetry", telemetry.to_json(), **kwargs)
 
-    async def publish_properties(self, properties: api.Properties, **kwargs) -> None:
+    async def publish_properties(self, properties: Properties, **kwargs) -> None:
         await self._publish("v1/register", properties.to_json(), **kwargs)
 
-    async def publish_log(self, log: api.Log, **kwargs) -> None:
+    async def publish_log(self, log: Log, **kwargs) -> None:
         await self._publish("v3/logs", log.to_json(), **kwargs)
 
     def _subscribe(
         self, path: str
-    ) -> AsyncContextManager[AsyncGenerator[Message, None]]:
+    ) -> AsyncContextManager[AsyncGenerator[mqtt.Message, None]]:
         topic = f"v1/to/{self._hardware_id}/{self._channel_id}/{path}"
         return self._client.subscribe(topic)
 
