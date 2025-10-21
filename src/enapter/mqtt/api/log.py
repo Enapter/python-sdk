@@ -1,16 +1,8 @@
 import dataclasses
-import enum
 from typing import Any, Dict
 
+from .log_severity import LogSeverity
 from .message import Message
-
-
-class LogSeverity(enum.Enum):
-
-    DEBUG = "debug"
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
 
 
 @dataclasses.dataclass
