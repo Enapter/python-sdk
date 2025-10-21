@@ -1,6 +1,9 @@
-from .commands import CommandRequest, CommandResponse, CommandState
+from .command_request import CommandRequest
+from .command_response import CommandResponse
+from .command_state import CommandState
 from .device_channel import DeviceChannel
-from .logs import Log, LogSeverity
+from .log import Log
+from .log_severity import LogSeverity
 from .message import Message
 from .properties import Properties
 from .telemetry import Telemetry

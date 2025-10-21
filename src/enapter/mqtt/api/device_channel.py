@@ -3,8 +3,9 @@ from typing import AsyncContextManager, AsyncGenerator
 
 from enapter import async_, mqtt
 
-from .commands import CommandRequest, CommandResponse
-from .logs import Log
+from .command_request import CommandRequest
+from .command_response import CommandResponse
+from .log import Log
 from .properties import Properties
 from .telemetry import Telemetry
 
@@ -12,6 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class DeviceChannel:
+
     def __init__(self, client: mqtt.Client, hardware_id: str, channel_id: str) -> None:
         self._client = client
         self._logger = self._new_logger(hardware_id, channel_id)
