@@ -1,8 +1,7 @@
 import asyncio
-import contextlib
 from typing import Optional
 
-from enapter import async_, log, mqtt
+from enapter import log, mqtt
 
 from .config import Config
 from .device import Device
@@ -15,38 +14,41 @@ async def run(device: Device, config_prefix: Optional[str] = None) -> None:
 
     config = Config.from_env(prefix=config_prefix)
 
-    async with App(config=config, device=device) as app:
-        await app.join()
+    try:
+        async with asyncio.TaskGroup() as tg:
+            _ = App(task_group=tg, config=config, device=device)
+    except asyncio.CancelledError:
+        pass
 
 
-class App(async_.Routine):
+class App:
 
-    def __init__(self, config: Config, device: Device) -> None:
+    def __init__(
+        self, task_group: asyncio.TaskGroup, config: Config, device: Device
+    ) -> None:
         self._config = config
         self._device = device
+        self._task = task_group.create_task(self._run())
 
     async def _run(self) -> None:
-        async with contextlib.AsyncExitStack() as stack:
-            mqtt_client = await stack.enter_async_context(
-                mqtt.Client(config=self._config.mqtt)
-            )
-            device_channel = mqtt.api.DeviceChannel(
-                client=mqtt_client,
-                hardware_id=self._config.hardware_id,
-                channel_id=self._config.channel_id,
-            )
-            _ = await stack.enter_async_context(
-                DeviceDriver(device_channel=device_channel, device=self._device)
-            )
-            if self._config.start_ucm:
-                ucm_channel = mqtt.api.DeviceChannel(
+        async with asyncio.TaskGroup() as tg:
+            mqtt_client = mqtt.Client(task_group=tg, config=self._config.mqtt)
+            _ = DeviceDriver(
+                task_group=tg,
+                device_channel=mqtt.api.DeviceChannel(
                     client=mqtt_client,
                     hardware_id=self._config.hardware_id,
-                    channel_id="ucm",
+                    channel_id=self._config.channel_id,
+                ),
+                device=self._device,
+            )
+            if self._config.start_ucm:
+                _ = DeviceDriver(
+                    task_group=tg,
+                    device_channel=mqtt.api.DeviceChannel(
+                        client=mqtt_client,
+                        hardware_id=self._config.hardware_id,
+                        channel_id="ucm",
+                    ),
+                    device=UCM(),
                 )
-                _ = await stack.enter_async_context(
-                    DeviceDriver(device_channel=ucm_channel, device=UCM())
-                )
-            self._started.set()
-            while True:
-                await asyncio.sleep(1)
