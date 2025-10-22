@@ -18,6 +18,7 @@ class DeviceDriver(async_.Routine):
         async with asyncio.TaskGroup() as tg:
             tg.create_task(self._send_properties())
             tg.create_task(self._send_telemetry())
+            tg.create_task(self._send_logs())
             tg.create_task(self._execute_commands())
             self._started.set()
 
@@ -41,6 +42,18 @@ class DeviceDriver(async_.Routine):
                 await self._device_channel.publish_telemetry(
                     telemetry=mqtt.api.Telemetry(
                         timestamp=timestamp, alerts=alerts, values=telemetry
+                    )
+                )
+
+    async def _send_logs(self) -> None:
+        async with contextlib.aclosing(self._device.send_logs()) as iterator:
+            async for log in iterator:
+                await self._device_channel.publish_log(
+                    log=mqtt.api.Log(
+                        timestamp=int(time.time()),
+                        severity=mqtt.api.LogSeverity(log[0]),
+                        message=log[1],
+                        persist=log[2],
                     )
                 )
 
@@ -74,8 +87,6 @@ class DeviceDriver(async_.Routine):
                 )
             )
         else:
-            if payload is None:
-                payload = {}
             await self._device_channel.publish_command_response(
                 request.new_response(mqtt.api.CommandState.COMPLETED, payload)
             )

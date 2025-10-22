@@ -1,19 +1,10 @@
 import asyncio
 from typing import AsyncGenerator
 
-from .device import CommandArgs, CommandResult, Properties, Telemetry
+from .device import CommandResult, Device, Properties, Telemetry
 
 
-class UCM:
-
-    async def execute_command(self, name: str, args: CommandArgs) -> CommandResult:
-        match name:
-            case "reboot":
-                return await self.reboot()
-            case "upload_lua_script":
-                return await self.upload_lua_script(**args)
-            case _:
-                raise NotImplementedError
+class UCM(Device):
 
     async def reboot(self) -> CommandResult:
         raise NotImplementedError
