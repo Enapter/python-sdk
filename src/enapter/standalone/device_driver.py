@@ -3,16 +3,22 @@ import contextlib
 import time
 import traceback
 
-from enapter import async_, mqtt
+from enapter import mqtt
 
 from .device import Device
 
 
-class DeviceDriver(async_.Routine):
+class DeviceDriver:
 
-    def __init__(self, device_channel: mqtt.api.DeviceChannel, device: Device) -> None:
+    def __init__(
+        self,
+        task_group: asyncio.TaskGroup,
+        device_channel: mqtt.api.DeviceChannel,
+        device: Device,
+    ) -> None:
         self._device_channel = device_channel
         self._device = device
+        self._task = task_group.create_task(self._run())
 
     async def _run(self) -> None:
         async with asyncio.TaskGroup() as tg:
@@ -20,7 +26,6 @@ class DeviceDriver(async_.Routine):
             tg.create_task(self._send_telemetry())
             tg.create_task(self._send_logs())
             tg.create_task(self._execute_commands())
-            self._started.set()
 
     async def _send_properties(self) -> None:
         async with contextlib.aclosing(self._device.send_properties()) as iterator:
