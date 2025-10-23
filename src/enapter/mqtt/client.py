@@ -79,7 +79,7 @@ class Client:
     @contextlib.asynccontextmanager
     async def _connect(self) -> AsyncGenerator[aiomqtt.Client, None]:
         host = await self._maybe_resolve_mdns(self._config.host)
-        async with aiomqtt.Client(
+        async with _new_aiomqtt_client(
             hostname=host,
             port=self._config.port,
             username=self._config.user,
@@ -124,3 +124,28 @@ class Client:
                 self._logger.error("failed to resolve mDNS host %r: %s", host, e)
                 retry_interval = 5
                 await asyncio.sleep(retry_interval)
+
+
+@contextlib.asynccontextmanager
+async def _new_aiomqtt_client(*args, **kwargs) -> AsyncGenerator[aiomqtt.Client, None]:
+    """
+    Creates `aiomqtt.Client` shielding `__aenter__` from cancellation.
+
+    See:
+        - https://github.com/empicano/aiomqtt/issues/377
+    """
+    client = aiomqtt.Client(*args, **kwargs)
+    setup_task = asyncio.create_task(client.__aenter__())
+    try:
+        await asyncio.shield(setup_task)
+    except asyncio.CancelledError as e:
+        await setup_task
+        await client.__aexit__(type(e), e, e.__traceback__)
+        raise
+    try:
+        yield client
+    except BaseException as e:
+        await client.__aexit__(type(e), e, e.__traceback__)
+        raise
+    else:
+        await client.__aexit__(None, None, None)
