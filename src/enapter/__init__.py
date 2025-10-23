@@ -1,6 +1,6 @@
 __version__ = "0.11.4"
 
-from . import async_, log, mdns, mqtt, standalone  # isort: skip
+from . import async_, log, mdns, mqtt, http, standalone  # isort: skip
 
 __all__ = [
     "__version__",
@@ -8,5 +8,6 @@ __all__ = [
     "log",
     "mdns",
     "mqtt",
+    "http",
     "standalone",
 ]
