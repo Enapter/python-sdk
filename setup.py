@@ -17,6 +17,7 @@ def main():
             "aiomqtt==2.4.*",
             "dnspython==2.8.*",
             "json-log-formatter==1.1.*",
+            "httpx==0.28.*",
         ],
     )
 
