@@ -11,8 +11,9 @@ CommandResult: TypeAlias = Dict[str, Any]
 
 class Device(abc.ABC):
 
-    def __init__(self) -> None:
+    def __init__(self, command_prefix: str = "") -> None:
         self.logger = Logger()
+        self.__command_prefix = command_prefix
 
     @abc.abstractmethod
     async def send_properties(self) -> AsyncGenerator[Properties]:
@@ -28,7 +29,7 @@ class Device(abc.ABC):
 
     async def execute_command(self, name: str, args: CommandArgs) -> CommandResult:
         try:
-            command = getattr(self, name)
+            command = getattr(self, self.__command_prefix + name)
         except AttributeError:
             raise NotImplementedError() from None
         result = await command(**args)
