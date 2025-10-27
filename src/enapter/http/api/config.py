@@ -7,10 +7,14 @@ class Config:
     @classmethod
     def from_env(
         cls,
-        prefix: str = "ENAPTER_HTTP_API_",
         env: MutableMapping[str, str] = os.environ,
+        namespace: str = "ENAPTER_",
     ) -> "Config":
-        return cls(token=env[prefix + "TOKEN"], base_url=env.get(prefix + "BASE_URL"))
+        prefix = namespace + "HTTP_API_"
+        return cls(
+            token=env[prefix + "TOKEN"],
+            base_url=env.get(prefix + "BASE_URL"),
+        )
 
     def __init__(self, token: str, base_url: Optional[str] = None) -> None:
         if not token:
