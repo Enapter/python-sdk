@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 
 from enapter import log, mqtt
 
@@ -9,10 +8,10 @@ from .device_driver import DeviceDriver
 from .ucm import UCM
 
 
-async def run(device: Device, config_prefix: Optional[str] = None) -> None:
+async def run(device: Device) -> None:
     log.configure(level=log.LEVEL or "info")
 
-    config = Config.from_env(prefix=config_prefix)
+    config = Config.from_env()
 
     try:
         async with asyncio.TaskGroup() as tg:

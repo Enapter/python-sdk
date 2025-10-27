@@ -6,22 +6,24 @@ class TLSConfig:
 
     @classmethod
     def from_env(
-        cls, prefix: str = "ENAPTER_", env: MutableMapping[str, str] = os.environ
+        cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
     ) -> Optional["TLSConfig"]:
-        secret_key = env.get(prefix + "MQTT_TLS_SECRET_KEY")
-        cert = env.get(prefix + "MQTT_TLS_CERT")
-        ca_cert = env.get(prefix + "MQTT_TLS_CA_CERT")
+        prefix = namespace + "MQTT_TLS_"
+
+        secret_key = env.get(prefix + "SECRET_KEY")
+        cert = env.get(prefix + "CERT")
+        ca_cert = env.get(prefix + "CA_CERT")
 
         nothing_defined = {secret_key, cert, ca_cert} == {None}
         if nothing_defined:
             return None
 
         if secret_key is None:
-            raise KeyError(prefix + "MQTT_TLS_SECRET_KEY")
+            raise KeyError(prefix + "SECRET_KEY")
         if cert is None:
-            raise KeyError(prefix + "MQTT_TLS_CERT")
+            raise KeyError(prefix + "CERT")
         if ca_cert is None:
-            raise KeyError(prefix + "MQTT_TLS_CA_CERT")
+            raise KeyError(prefix + "CA_CERT")
 
         def pem(value: str) -> str:
             return value.replace("\\n", "\n")
@@ -35,16 +37,18 @@ class TLSConfig:
 
 
 class Config:
+
     @classmethod
     def from_env(
-        cls, prefix: str = "ENAPTER_", env: MutableMapping[str, str] = os.environ
+        cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
     ) -> "Config":
+        prefix = namespace + "MQTT_"
         return cls(
-            host=env[prefix + "MQTT_HOST"],
-            port=int(env[prefix + "MQTT_PORT"]),
-            user=env.get(prefix + "MQTT_USER", default=None),
-            password=env.get(prefix + "MQTT_PASSWORD", default=None),
-            tls=TLSConfig.from_env(prefix=prefix, env=env),
+            host=env[prefix + "HOST"],
+            port=int(env[prefix + "PORT"]),
+            user=env.get(prefix + "USER", default=None),
+            password=env.get(prefix + "PASSWORD", default=None),
+            tls=TLSConfig.from_env(env, namespace=namespace),
         )
 
     def __init__(
