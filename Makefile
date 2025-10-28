@@ -29,7 +29,7 @@ lint-pyflakes:
 
 .PHONY: lint-mypy
 lint-mypy:
-	pipenv run mypy enapter
+	pipenv run mypy src/enapter
 
 .PHONY: test
 test: run-unit-tests run-integration-tests

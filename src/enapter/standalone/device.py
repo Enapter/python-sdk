@@ -1,12 +1,12 @@
 import abc
-from typing import Any, AsyncGenerator, Dict, TypeAlias
+from typing import Any, AsyncGenerator, TypeAlias
 
 from .logger import Log, Logger
 
-Properties: TypeAlias = Dict[str, Any]
-Telemetry: TypeAlias = Dict[str, Any]
-CommandArgs: TypeAlias = Dict[str, Any]
-CommandResult: TypeAlias = Dict[str, Any]
+Properties: TypeAlias = dict[str, Any]
+Telemetry: TypeAlias = dict[str, Any]
+CommandArgs: TypeAlias = dict[str, Any]
+CommandResult: TypeAlias = dict[str, Any]
 
 
 class Device(abc.ABC):
@@ -16,14 +16,14 @@ class Device(abc.ABC):
         self.__command_prefix = command_prefix
 
     @abc.abstractmethod
-    async def send_properties(self) -> AsyncGenerator[Properties]:
+    async def send_properties(self) -> AsyncGenerator[Properties, None]:
         yield {}
 
     @abc.abstractmethod
-    async def send_telemetry(self) -> AsyncGenerator[Telemetry]:
+    async def send_telemetry(self) -> AsyncGenerator[Telemetry, None]:
         yield {}
 
-    async def send_logs(self) -> AsyncGenerator[Log]:
+    async def send_logs(self) -> AsyncGenerator[Log, None]:
         while True:
             yield await self.logger.queue.get()
 

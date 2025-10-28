@@ -14,12 +14,12 @@ class UCM(Device):
     ) -> CommandResult:
         raise NotImplementedError
 
-    async def send_telemetry(self) -> AsyncGenerator[Telemetry]:
+    async def send_telemetry(self) -> AsyncGenerator[Telemetry, None]:
         while True:
             yield {}
             await asyncio.sleep(1)
 
-    async def send_properties(self) -> AsyncGenerator[Properties]:
+    async def send_properties(self) -> AsyncGenerator[Properties, None]:
         while True:
             yield {"virtual": True, "lua_api_ver": 1}
             await asyncio.sleep(30)

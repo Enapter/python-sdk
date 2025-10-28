@@ -1,17 +1,15 @@
 import datetime
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import json_log_formatter  # type: ignore
 
 
 class JSONFormatter(json_log_formatter.JSONFormatter):
+
     def json_record(
-        self,
-        message: str,
-        extra: Dict[str, Any],
-        record: logging.LogRecord,
-    ) -> Dict[str, Any]:
+        self, message: str, extra: dict[str, Any], record: logging.LogRecord
+    ) -> dict[str, Any]:
         try:
             del extra["taskName"]
         except KeyError:
@@ -34,5 +32,5 @@ class JSONFormatter(json_log_formatter.JSONFormatter):
 
         return json_record
 
-    def mutate_json_record(self, json_record: Dict[str, Any]) -> Dict[str, Any]:
+    def mutate_json_record(self, json_record: dict[str, Any]) -> dict[str, Any]:
         return json_record

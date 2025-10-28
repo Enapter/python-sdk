@@ -1,5 +1,5 @@
 import os
-from typing import MutableMapping, Optional
+from typing import MutableMapping, Self
 
 
 class TLSConfig:
@@ -7,7 +7,7 @@ class TLSConfig:
     @classmethod
     def from_env(
         cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
-    ) -> Optional["TLSConfig"]:
+    ) -> Self | None:
         prefix = namespace + "MQTT_TLS_"
 
         secret_key = env.get(prefix + "SECRET_KEY")
@@ -41,7 +41,7 @@ class Config:
     @classmethod
     def from_env(
         cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
-    ) -> "Config":
+    ) -> Self:
         prefix = namespace + "MQTT_"
         return cls(
             host=env[prefix + "HOST"],
@@ -55,9 +55,9 @@ class Config:
         self,
         host: str,
         port: int,
-        user: Optional[str] = None,
-        password: Optional[str] = None,
-        tls_config: Optional[TLSConfig] = None,
+        user: str | None = None,
+        password: str | None = None,
+        tls_config: TLSConfig | None = None,
     ) -> None:
         self.host = host
         self.port = port

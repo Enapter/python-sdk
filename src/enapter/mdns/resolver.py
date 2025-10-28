@@ -6,6 +6,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Resolver:
+
     def __init__(self) -> None:
         self._logger = LOGGER
         self._dns_resolver = self._new_dns_resolver()

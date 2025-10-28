@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Self
 
 from .mqtt_credentials import MQTTCredentials
 from .mqtt_protocol import MQTTProtocol
@@ -21,7 +21,7 @@ class CommunicationConfig:
     channel_id: str
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> "CommunicationConfig":
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         mqtt_protocol = MQTTProtocol(dto["mqtt_protocol"])
         mqtt_credentials: MQTTCredentials | MQTTSCredentials | None = None
         match mqtt_protocol:
