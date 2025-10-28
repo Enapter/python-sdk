@@ -48,7 +48,7 @@ class Config:
             port=int(env[prefix + "PORT"]),
             user=env.get(prefix + "USER", default=None),
             password=env.get(prefix + "PASSWORD", default=None),
-            tls=TLSConfig.from_env(env, namespace=namespace),
+            tls_config=TLSConfig.from_env(env, namespace=namespace),
         )
 
     def __init__(
@@ -57,13 +57,17 @@ class Config:
         port: int,
         user: Optional[str] = None,
         password: Optional[str] = None,
-        tls: Optional[TLSConfig] = None,
+        tls_config: Optional[TLSConfig] = None,
     ) -> None:
         self.host = host
         self.port = port
         self.user = user
         self.password = password
-        self.tls = tls
+        self.tls_config = tls_config
+
+    @property
+    def tls(self) -> TLSConfig | None:
+        return self.tls_config
 
     def __repr__(self) -> str:
         return "mqtt.Config(host=%r, port=%r, tls=%r)" % (

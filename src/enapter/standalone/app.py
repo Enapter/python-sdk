@@ -31,22 +31,24 @@ class App:
 
     async def _run(self) -> None:
         async with asyncio.TaskGroup() as tg:
-            mqtt_client = mqtt.Client(task_group=tg, config=self._config.mqtt)
+            mqtt_client = mqtt.Client(
+                task_group=tg, config=self._config.communication.mqtt
+            )
             _ = DeviceDriver(
                 task_group=tg,
                 device_channel=mqtt.api.DeviceChannel(
                     client=mqtt_client,
-                    hardware_id=self._config.hardware_id,
-                    channel_id=self._config.channel_id,
+                    hardware_id=self._config.communication.hardware_id,
+                    channel_id=self._config.communication.channel_id,
                 ),
                 device=self._device,
             )
-            if self._config.start_ucm:
+            if self._config.communication.ucm_needed:
                 _ = DeviceDriver(
                     task_group=tg,
                     device_channel=mqtt.api.DeviceChannel(
                         client=mqtt_client,
-                        hardware_id=self._config.hardware_id,
+                        hardware_id=self._config.communication.hardware_id,
                         channel_id="ucm",
                     ),
                     device=UCM(),
