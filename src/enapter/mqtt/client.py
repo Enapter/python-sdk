@@ -74,7 +74,6 @@ class Client:
             finally:
                 self._publisher_connected.clear()
                 self._publisher = None
-                self._logger.info("publisher disconnected")
 
     @contextlib.asynccontextmanager
     async def _connect(self) -> AsyncGenerator[aiomqtt.Client, None]:
