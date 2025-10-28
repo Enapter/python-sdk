@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import Any, Dict
+from typing import Any, Self
 
 from .authorized_role import AuthorizedRole
 from .device_type import DeviceType
@@ -19,7 +19,7 @@ class Device:
     authorized_role: AuthorizedRole
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> "Device":
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             id=dto["id"],
             blueprint_id=dto["blueprint_id"],

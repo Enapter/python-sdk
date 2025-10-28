@@ -1,22 +1,20 @@
 import os
-from typing import MutableMapping, Optional
+from typing import MutableMapping, Self
 
 
 class Config:
 
     @classmethod
     def from_env(
-        cls,
-        env: MutableMapping[str, str] = os.environ,
-        namespace: str = "ENAPTER_",
-    ) -> "Config":
+        cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
+    ) -> Self:
         prefix = namespace + "HTTP_API_"
         return cls(
             token=env[prefix + "TOKEN"],
             base_url=env.get(prefix + "BASE_URL"),
         )
 
-    def __init__(self, token: str, base_url: Optional[str] = None) -> None:
+    def __init__(self, token: str, base_url: str | None = None) -> None:
         if not token:
             raise ValueError("token is missing")
         self.token = token

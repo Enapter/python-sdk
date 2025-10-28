@@ -3,7 +3,7 @@ import contextlib
 import logging
 import ssl
 import tempfile
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator
 
 import aiomqtt  # type: ignore
 
@@ -22,7 +22,7 @@ class Client:
         self._config = config
         self._mdns_resolver = mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
-        self._publisher: Optional[aiomqtt.Client] = None
+        self._publisher: aiomqtt.Client | None = None
         self._publisher_connected = asyncio.Event()
         self._task = task_group.create_task(self._run())
 
@@ -89,7 +89,7 @@ class Client:
             yield client
 
     @staticmethod
-    def _new_tls_context(config: Config) -> Optional[ssl.SSLContext]:
+    def _new_tls_context(config: Config) -> ssl.SSLContext | None:
         if config.tls is None:
             return None
 

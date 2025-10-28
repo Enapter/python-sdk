@@ -1,7 +1,7 @@
 import asyncio
-from typing import Literal, Tuple, TypeAlias
+from typing import Literal, TypeAlias
 
-Log: TypeAlias = Tuple[Literal["debug", "info", "warning", "error"], str, bool]
+Log: TypeAlias = tuple[Literal["debug", "info", "warning", "error"], str, bool]
 
 
 class Logger:

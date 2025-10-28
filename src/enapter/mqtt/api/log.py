@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Self
 
 from .log_severity import LogSeverity
 from .message import Message
@@ -14,7 +14,7 @@ class Log(Message):
     persist: bool
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> "Log":
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             timestamp=dto["timestamp"],
             message=dto["message"],
@@ -22,7 +22,7 @@ class Log(Message):
             persist=dto["persist"],
         )
 
-    def to_dto(self) -> Dict[str, Any]:
+    def to_dto(self) -> dict[str, Any]:
         return {
             "timestamp": self.timestamp,
             "message": self.message,

@@ -1,3 +1,5 @@
+from typing import Self
+
 import httpx
 
 from enapter.http.api import devices
@@ -17,7 +19,7 @@ class Client:
             base_url=self._config.base_url,
         )
 
-    async def __aenter__(self) -> "Client":
+    async def __aenter__(self) -> Self:
         await self._client.__aenter__()
         return self
 

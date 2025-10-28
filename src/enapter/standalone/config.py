@@ -3,7 +3,7 @@ import dataclasses
 import enum
 import json
 import os
-from typing import Any, Dict, MutableMapping, Self
+from typing import Any, MutableMapping, Self
 
 from enapter import mqtt
 
@@ -123,7 +123,7 @@ class CommunicationConfigV1:
     channel_id: str
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> Self:
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             mqtt_host=dto["mqtt_host"],
             mqtt_port=int(dto["mqtt_port"]),
@@ -150,7 +150,7 @@ class CommunicationConfigV3:
         password: str
 
         @classmethod
-        def from_dto(cls, dto: Dict[str, Any]) -> Self:
+        def from_dto(cls, dto: dict[str, Any]) -> Self:
             return cls(username=dto["username"], password=dto["password"])
 
     @dataclasses.dataclass
@@ -161,7 +161,7 @@ class CommunicationConfigV3:
         ca_chain: str
 
         @classmethod
-        def from_dto(cls, dto: Dict[str, Any]) -> Self:
+        def from_dto(cls, dto: dict[str, Any]) -> Self:
             return cls(
                 private_key=dto["private_key"],
                 certificate=dto["certificate"],
@@ -176,7 +176,7 @@ class CommunicationConfigV3:
     channel_id: str
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> Self:
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         mqtt_protocol = cls.MQTTProtocol(dto["mqtt_protocol"])
         mqtt_credentials: (
             CommunicationConfigV3.MQTTCredentials

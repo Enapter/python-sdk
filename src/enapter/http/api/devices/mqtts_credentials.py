@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Self
 
 
 @dataclasses.dataclass
@@ -10,7 +10,7 @@ class MQTTSCredentials:
     ca_chain: str
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> "MQTTSCredentials":
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             private_key=dto["private_key"],
             certificate=dto["certificate"],

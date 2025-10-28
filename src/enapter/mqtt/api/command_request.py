@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Self
 
 from .command_response import CommandResponse
 from .command_state import CommandState
@@ -11,17 +11,17 @@ class CommandRequest(Message):
 
     id: str
     name: str
-    arguments: Dict[str, Any]
+    arguments: dict[str, Any]
 
     @classmethod
-    def from_dto(cls, dto: Dict[str, Any]) -> "CommandRequest":
+    def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             id=dto["id"],
             name=dto["name"],
             arguments=dto.get("arguments", {}),
         )
 
-    def to_dto(self) -> Dict[str, Any]:
+    def to_dto(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,
@@ -29,7 +29,7 @@ class CommandRequest(Message):
         }
 
     def new_response(
-        self, state: CommandState, payload: Dict[str, Any]
+        self, state: CommandState, payload: dict[str, Any]
     ) -> CommandResponse:
         return CommandResponse(
             id=self.id,
