@@ -37,7 +37,7 @@ class CommunicationConfig:
             mqtt_port=int(dto["mqtt_port"]),
             mqtt_credentials=mqtt_credentials,
             mqtt_protocol=mqtt_protocol,
-            time_sync_protocol=dto["time_sync_protocol"],
+            time_sync_protocol=TimeSyncProtocol(dto["time_sync_protocol"].upper()),
             time_sync_host=dto["time_sync_host"],
             time_sync_port=int(dto["time_sync_port"]),
             hardware_id=dto["hardware_id"],
