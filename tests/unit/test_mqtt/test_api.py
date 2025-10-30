@@ -17,7 +17,7 @@ class TestDeviceChannel:
         )
         mock_client.publish.assert_called_once_with(
             f"v1/from/{hardware_id}/{channel_id}/v1/telemetry",
-            '{"timestamp": ' + str(timestamp) + "}",
+            '{"timestamp": ' + str(timestamp) + ', "alerts": null}',
         )
 
     async def test_publish_properties(self, fake):
