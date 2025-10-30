@@ -1,0 +1,64 @@
+blueprint_spec: "device/1.0"
+
+display_name: "Mi Smart Standing Fan 1C"
+
+communication_module:
+  product: ENP-VIRTUAL
+
+command_groups:
+  commands:
+    display_name: Commands
+
+properties: {}
+
+telemetry:
+  "on":
+    display_name: "On"
+    type: boolean
+  mode:
+    display_name: Mode
+    type: string
+    enum:
+      - normal
+      - nature
+  buzzer:
+    display_name: Buzzer
+    type: boolean
+  speed:
+    display_name: Speed
+    type: integer
+    enum: [1, 2, 3]
+
+commands:
+  power:
+    display_name: Power
+    group: commands
+    arguments:
+      "on":
+        display_name: "On"
+        type: boolean
+  mode:
+    display_name: Mode
+    group: commands
+    arguments:
+      mode:
+        display_name: Mode
+        type: string
+        enum:
+          - normal
+          - nature
+  buzzer:
+    display_name: Buzzer
+    group: commands
+    arguments:
+      "on":
+        display_name: "On"
+        type: boolean
+  speed:
+    display_name: Speed
+    group: commands
+    arguments:
+      speed:
+        display_name: Speed
+        type: integer
+        enum: [1, 2, 3]
