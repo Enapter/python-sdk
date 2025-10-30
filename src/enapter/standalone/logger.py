@@ -1,26 +1,21 @@
 import asyncio
-from typing import Literal, TypeAlias
 
-Log: TypeAlias = tuple[Literal["debug", "info", "warning", "error"], str, bool]
+from .device_protocol import Log
 
 
 class Logger:
 
-    def __init__(self) -> None:
-        self._queue: asyncio.Queue[Log] = asyncio.Queue(1)
+    def __init__(self, queue: asyncio.Queue[Log]) -> None:
+        self._queue = queue
 
     async def debug(self, msg: str, persist: bool = False) -> None:
-        await self._queue.put(("debug", msg, persist))
+        await self._queue.put(Log("debug", msg, persist))
 
     async def info(self, msg: str, persist: bool = False) -> None:
-        await self._queue.put(("info", msg, persist))
+        await self._queue.put(Log("info", msg, persist))
 
     async def warning(self, msg: str, persist: bool = False) -> None:
-        await self._queue.put(("warning", msg, persist))
+        await self._queue.put(Log("warning", msg, persist))
 
     async def error(self, msg: str, persist: bool = False) -> None:
-        await self._queue.put(("error", msg, persist))
-
-    @property
-    def queue(self) -> asyncio.Queue[Log]:
-        return self._queue
+        await self._queue.put(Log("error", msg, persist))

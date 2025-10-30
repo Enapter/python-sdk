@@ -1,25 +1,19 @@
 import asyncio
-from typing import AsyncGenerator
 
-from .device import CommandResult, Device, Properties, Telemetry
+from .device import Device
+from .device_protocol import CommandResult
 
 
 class UCM(Device):
 
-    async def reboot(self) -> CommandResult:
-        raise NotImplementedError
-
-    async def upload_lua_script(
-        self, url: str, sha1: str, payload=None
-    ) -> CommandResult:
-        raise NotImplementedError
-
-    async def send_telemetry(self) -> AsyncGenerator[Telemetry, None]:
+    async def run(self) -> None:
         while True:
-            yield {}
-            await asyncio.sleep(1)
-
-    async def send_properties(self) -> AsyncGenerator[Properties, None]:
-        while True:
-            yield {"virtual": True, "lua_api_ver": 1}
+            await self.send_properties({"virtual": True, "lua_api_ver": 1})
+            await self.send_telemetry({})
             await asyncio.sleep(30)
+
+    async def cmd_reboot(self, *args, **kwargs) -> CommandResult:
+        raise NotImplementedError
+
+    async def cmd_upload_lua_script(self, *args, **kwargs) -> CommandResult:
+        raise NotImplementedError
