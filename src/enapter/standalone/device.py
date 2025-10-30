@@ -56,5 +56,4 @@ class Device(abc.ABC):
             command = getattr(self, self._command_prefix + name)
         except AttributeError:
             raise NotImplementedError() from None
-        result = await command(**args)
-        return result if result is not None else {}
+        return {"result": await command(**args)}
