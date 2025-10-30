@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import os
 
 import python_weather
@@ -9,45 +8,37 @@ import enapter
 
 async def main():
     async with python_weather.Client() as client:
-        device_factory = functools.partial(
-            WttrIn,
-            client=client,
-            location=os.environ["WTTR_IN_LOCATION"],
+        await enapter.standalone.run(
+            WttrIn(client=client, location=os.environ["WTTR_IN_LOCATION"])
         )
-        await enapter.vucm.run(device_factory)
 
 
-class WttrIn(enapter.vucm.Device):
-    def __init__(self, client, location, **kwargs):
-        super().__init__(**kwargs)
+class WttrIn(enapter.standalone.Device):
+
+    def __init__(self, client, location):
+        super().__init__()
         self.client = client
         self.location = location
 
-    @enapter.vucm.device_task
+    async def run(self):
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self.properties_sender())
+            tg.create_task(self.telemetry_sender())
+
     async def properties_sender(self):
         while True:
-            await self.send_properties(
-                {
-                    "location": self.location,
-                }
-            )
+            await self.send_properties({"location": self.location})
             await asyncio.sleep(10)
 
-    @enapter.vucm.device_task
     async def telemetry_sender(self):
         while True:
             try:
                 weather = await self.client.get(self.location)
-                await self.send_telemetry(
-                    {
-                        "temperature": weather.current.temperature,
-                    }
-                )
-                self.alerts.clear()
+                await self.send_telemetry({"temperature": weather.temperature})
             except Exception as e:
-                self.alerts.add("wttr_in_error")
                 await self.log.error(f"failed to get weather: {e}")
-            await asyncio.sleep(1)
+                await self.send_telemetry({"alerts": ["wttr_in_error"]})
+            await asyncio.sleep(10)
 
 
 if __name__ == "__main__":
