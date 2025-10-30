@@ -4,12 +4,13 @@ import enapter
 
 
 async def main():
-    await enapter.vucm.run(Rl6Simulator)
+    await enapter.standalone.run(Rl6Simulator())
 
 
-class Rl6Simulator(enapter.vucm.Device):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+class Rl6Simulator(enapter.standalone.Device):
+
+    def __init__(self):
+        super().__init__()
         self.loads = {
             "r1": False,
             "r2": False,
@@ -19,25 +20,26 @@ class Rl6Simulator(enapter.vucm.Device):
             "r6": False,
         }
 
-    @enapter.vucm.device_command
-    async def enable_load(self, load: str):
-        self.loads[load] = True
+    async def run(self):
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self.properties_sender())
+            tg.create_task(self.telemetry_sender())
 
-    @enapter.vucm.device_command
-    async def disable_load(self, load: str):
-        self.loads[load] = False
+    async def properties_sender(self):
+        while True:
+            await self.send_properties({})
+            await asyncio.sleep(10)
 
-    @enapter.vucm.device_task
     async def telemetry_sender(self):
         while True:
             await self.send_telemetry(self.loads)
             await asyncio.sleep(1)
 
-    @enapter.vucm.device_task
-    async def properties_sender(self):
-        while True:
-            await self.send_properties({})
-            await asyncio.sleep(10)
+    async def cmd_enable_load(self, load: str):
+        self.loads[load] = True
+
+    async def cmd_disable_load(self, load: str):
+        self.loads[load] = False
 
 
 if __name__ == "__main__":
