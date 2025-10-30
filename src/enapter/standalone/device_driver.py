@@ -5,7 +5,7 @@ import traceback
 
 from enapter import mqtt
 
-from .device import Device
+from .device_protocol import DeviceProtocol
 
 
 class DeviceDriver:
@@ -14,7 +14,7 @@ class DeviceDriver:
         self,
         task_group: asyncio.TaskGroup,
         device_channel: mqtt.api.DeviceChannel,
-        device: Device,
+        device: DeviceProtocol,
     ) -> None:
         self._device_channel = device_channel
         self._device = device
@@ -22,13 +22,14 @@ class DeviceDriver:
 
     async def _run(self) -> None:
         async with asyncio.TaskGroup() as tg:
-            tg.create_task(self._send_properties())
-            tg.create_task(self._send_telemetry())
-            tg.create_task(self._send_logs())
+            tg.create_task(self._device.run())
+            tg.create_task(self._stream_properties())
+            tg.create_task(self._stream_telemetry())
+            tg.create_task(self._stream_logs())
             tg.create_task(self._execute_commands())
 
-    async def _send_properties(self) -> None:
-        async with contextlib.aclosing(self._device.send_properties()) as iterator:
+    async def _stream_properties(self) -> None:
+        async with contextlib.aclosing(self._device.stream_properties()) as iterator:
             async for properties in iterator:
                 properties = properties.copy()
                 timestamp = properties.pop("timestamp", int(time.time()))
@@ -38,8 +39,8 @@ class DeviceDriver:
                     )
                 )
 
-    async def _send_telemetry(self) -> None:
-        async with contextlib.aclosing(self._device.send_telemetry()) as iterator:
+    async def _stream_telemetry(self) -> None:
+        async with contextlib.aclosing(self._device.stream_telemetry()) as iterator:
             async for telemetry in iterator:
                 telemetry = telemetry.copy()
                 timestamp = telemetry.pop("timestamp", int(time.time()))
@@ -50,15 +51,15 @@ class DeviceDriver:
                     )
                 )
 
-    async def _send_logs(self) -> None:
-        async with contextlib.aclosing(self._device.send_logs()) as iterator:
+    async def _stream_logs(self) -> None:
+        async with contextlib.aclosing(self._device.stream_logs()) as iterator:
             async for log in iterator:
                 await self._device_channel.publish_log(
                     log=mqtt.api.Log(
                         timestamp=int(time.time()),
-                        severity=mqtt.api.LogSeverity(log[0]),
-                        message=log[1],
-                        persist=log[2],
+                        severity=mqtt.api.LogSeverity(log.severity),
+                        message=log.message,
+                        persist=log.persist,
                     )
                 )
 

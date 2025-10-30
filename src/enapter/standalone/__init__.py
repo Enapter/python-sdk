@@ -1,6 +1,14 @@
 from .app import App, run
 from .config import Config
-from .device import CommandArgs, CommandResult, Device, Log, Properties, Telemetry
+from .device import Device
+from .device_protocol import (
+    CommandArgs,
+    CommandResult,
+    DeviceProtocol,
+    Log,
+    Properties,
+    Telemetry,
+)
 from .logger import Logger
 
 __all__ = [
@@ -9,6 +17,7 @@ __all__ = [
     "CommandResult",
     "Config",
     "Device",
+    "DeviceProtocol",
     "Log",
     "Logger",
     "Properties",
