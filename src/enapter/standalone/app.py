@@ -10,14 +10,9 @@ from .ucm import UCM
 
 async def run(device: Device) -> None:
     log.configure(level=log.LEVEL or "info")
-
     config = Config.from_env()
-
-    try:
-        async with asyncio.TaskGroup() as tg:
-            _ = App(task_group=tg, config=config, device=device)
-    except asyncio.CancelledError:
-        pass
+    async with asyncio.TaskGroup() as tg:
+        _ = App(task_group=tg, config=config, device=device)
 
 
 class App:
