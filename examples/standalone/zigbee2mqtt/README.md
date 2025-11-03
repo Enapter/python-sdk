@@ -1,42 +1,54 @@
 # Zigbee Sensor (MQTT)
 
-This example describes the implementation of the [Standalone UCM](https://handbook.enapter.com/software/virtual_ucm/) concept using the opensource [Enapter python-sdk](https://github.com/Enapter/python-sdk) for monitoring Zigbee Sensor via MQTT protocol (Zigbee2Mqtt).
+This example describes the implementation of the Standalone Device concept
+using the opensource [Enapter
+python-sdk](https://github.com/Enapter/python-sdk) for monitoring Zigbee Sensor
+via MQTT protocol (Zigbee2Mqtt).
 
-In order to use this UCM you need to have [Zigbee2MQTT](https://www.zigbee2mqtt.io/guide/installation/) and some MQTT broker (for example [Mosquitto](https://mosquitto.org)) running.
+In order to use this Standalone Device you need to have
+[Zigbee2MQTT](https://www.zigbee2mqtt.io/guide/installation/) and some MQTT
+broker (for example [Mosquitto](https://mosquitto.org)) running.
 
-As an example in this guide we will use the following dummy settings for configuration:
+As an example in this guide we will use the following dummy settings for
+configuration:
 
-MQTT Broker Address: 192.168.192.190
-
-MQTT Broker Port: 9883
-
-MQTT User: mqtt_user
-
-MQTT Password: mqtt_password
-
-Device MQTT topic: zigbee2mqtt/MyDevice
+- MQTT Broker Address: 192.168.192.190
+- MQTT Broker Port: 9883
+- MQTT User: mqtt_user
+- MQTT Password: mqtt_password
+- Device MQTT topic: zigbee2mqtt/MyDevice
 
 ## Requirements
 
-It is recommended to run this UCM using Docker and Docker Compose. This will ensure that environment is correct.
+It is recommended to run this Standalone Device using Docker and Docker
+Compose. This will ensure that environment is correct.
 
-The MQTT broker must be reachable from the computer where the Docker Container will be running.
+The MQTT broker must be reachable from the computer where the Docker Container
+will be running.
 
-## Step 1. Create Standalone UCM in Enapter Cloud
+## Step 1. Create Standalone Device in Enapter Cloud
 
-Log in to the Enapter Cloud, navigate to the Site where you want to create Standalone UCM and click on `Add new` button in the Standalone Device section.
+Log in to the Enapter Cloud, navigate to the Site where you want to create
+Standalone Device and click on `Add new` button in the Standalone Device
+section.
 
-After creating Standalone UCM, you need to Generate and save Configuration string also known as ENAPTER_VUCM_BLOB as well as save UCM ID which will be needed for the next step
-
-More information you can find on [this page](https://developers.enapter.com/docs/tutorial/software-ucms/standalone).
+After creating Standalone Device, you need to Generate and save Configuration
+string also known as `ENAPTER_STANDALONE_COMMUNICATION_CONFIG` as well as save
+UCM ID which will be needed for the next step.
 
 ## Step 2. Upload Blueprint into the Cloud
 
-The general case [Enapter Blueprint](https://marketplace.enapter.com/about) consists of two files - declaration in YAML format (manifest.yaml) and logic written in Lua. Howerver for this case the logic is written in Python as Lua implementation doesn't have SNMP integration.
+The general case [Enapter Blueprint](https://marketplace.enapter.com/about)
+consists of two files - declaration in YAML format (manifest.yaml) and logic
+written in Lua. Howerver for this case the logic is written in Python.
 
-But for both cases we need to tell Enapter Cloud which telemetry we are going to send and store and how to name it.
+But for both cases we need to tell Enapter Cloud which telemetry we are going
+to send and store and how to name it.
 
-The easiest way to do that - using [Enapter CLI](https://github.com/Enapter/enapter-cli) to upload manifest.yaml into Cloud. The other option is to use [Web IDE](https://developers.enapter.com/docs/tutorial/uploading-blueprint).
+The easiest way to do that - using [Enapter
+CLI](https://github.com/Enapter/enapter-cli) to upload manifest.yaml into
+Cloud. The other option is to use [Web
+IDE](https://developers.enapter.com/docs/tutorial/uploading-blueprint).
 
 ```bash
 user@pc zigbee2mqtt % enapter devices upload --blueprint-dir . --hardware-id REAL_UCM_ID
@@ -53,16 +65,17 @@ Done!
 
 Open `docker-compose.yaml` in any editor.
 
-Set environment variables according to your configuration settings. With dummy settings your file will look like this:
+Set environment variables according to your configuration settings. With dummy
+settings your file will look like this:
 
 ```yaml
 version: "3"
 services:
-  zigbee2mqtt-ucm:
+  zigbee2mqtt-standalone:
     build: .
-    image: enapter-vucm-examples/zigbee2mqtt:latest
+    image: enapter-standalone-examples/zigbee2mqtt:latest
     environment:
-      - ENAPTER_VUCM_BLOB: "REALENAPTERVUCMBLOBMUSTBEHERE="
+      - ENAPTER_STANDALONE_COMMUNICATION_CONFIG: "PUT_YOUR_CONFIG_HERE"
       - ZIGBEE_MQTT_HOST: "192.168.192.190"
       - ZIGBEE_MQTT_PORT: "9883"
       - ZIGBEE_MQTT_USER: "mqtt_user"
@@ -72,12 +85,13 @@ services:
       - ZIGBEE_SENSOR_MODEL: "Device Model"
 ```
 
-## Step 4. Build Docker Image with Standalone UCM
+## Step 4. Build Docker Image with Standalone Device
 
-> You can you can skip this step and go directly to th Step 5.
-> Docker Compose will automatically build your image before starting container.
+> You can you can skip this step and go directly to Step 5. Docker Compose will
+> automatically build your image before starting container.
 
-Build your Docker image by running `bash docker_build.sh` command in directory with UCM.
+Build your Docker image by running `bash docker_build.sh` command in directory
+with Standalone Device.
 
 ```bash
 user@pc zigbee2mqtt  % bash docker_build.sh
@@ -122,20 +136,21 @@ user@pc zigbee2mqtt  % bash docker_build.sh
 #12 exporting to image
 #12 exporting layers done
 #12 writing image sha256:92e1050debeabaff5837c6ca5bc26b0b966d09fc6f24e21b1d10cbb2f4d9aeec done
-#12 naming to docker.io/enapter-vucm-examples/zigbee2mqtt:latest done
+#12 naming to docker.io/enapter-standalone-examples/zigbee2mqtt:latest done
 #12 DONE 0.0s
 ```
 
-Your `enapter-vucm-examples/zigbee2mqtt` image is now built and you can see it by running `docker images` command:
+Your `enapter-standalone-examples/zigbee2mqtt` image is now built and you can
+see it by running `docker images` command:
 
 ```bash
-user@pc zigbee2mqtt % docker images enapter-vucm-examples/zigbee2mqtt
-REPOSITORY                             TAG       IMAGE ID       CREATED       SIZE
-enapter-vucm-examples/zigbee2mqtt   latest    92e1050debea   5 hours ago   285MB
+user@pc zigbee2mqtt % docker images enapter-standalone-examples/zigbee2mqtt
+REPOSITORY                                TAG       IMAGE ID       CREATED       SIZE
+enapter-standalone-examples/zigbee2mqtt   latest    92e1050debea   5 hours ago   285MB
 ```
 
-## Step 5. Run your Standalone UCM Docker Container
+## Step 5. Run your Standalone Device Docker Container
 
-Finally run your Standalone UCM with `docker-compose up` command:
+Finally run your Standalone Device with `docker-compose up` command:
 
-On this step you can check that your UCM is now Online in the Cloud.
+On this step you can check that your Device is now Online in the Cloud.
