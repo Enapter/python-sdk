@@ -43,7 +43,11 @@ class CommunicationConfig:
     ) -> Self:
         prefix = namespace + "STANDALONE_COMMUNICATION_"
         blob = env[prefix + "CONFIG"]
-        return cls.from_blob(blob)
+        config = cls.from_blob(blob)
+        override_mqtt_host = env.get(prefix + "OVERRIDE_MQTT_HOST")
+        if override_mqtt_host is not None:
+            config.mqtt.host = override_mqtt_host
+        return config
 
     @classmethod
     def from_blob(cls, blob: str) -> Self:
