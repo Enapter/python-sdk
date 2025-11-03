@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import os
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
@@ -8,27 +7,30 @@ import enapter
 
 
 async def main():
-    device_factory = functools.partial(
-        EatonUPS,
+    eaton_ups = EatonUPS(
         snmp_community=os.environ["ENAPTER_SNMP_COMMUNITY"],
         snmp_host=os.environ["ENAPTER_SNMP_HOST"],
         snmp_port=os.environ["ENAPTER_SNMP_PORT"],
     )
-    await enapter.vucm.run(device_factory)
+    await enapter.standalone.run(eaton_ups)
 
 
-class EatonUPS(enapter.vucm.Device):
-    def __init__(self, snmp_community, snmp_host, snmp_port, **kwargs):
-        super().__init__(**kwargs)
+class EatonUPS(enapter.standalone.Device):
 
+    def __init__(self, snmp_community, snmp_host, snmp_port):
+        super().__init__()
         self.telemetry = {}
         self.properties = {}
-
         self.cmd_gen = cmdgen.CommandGenerator()
         self.auth_data = cmdgen.CommunityData(snmp_community)
         self.transport_target = cmdgen.UdpTransportTarget((snmp_host, snmp_port))
 
-    @enapter.vucm.device_task
+    async def run(self):
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(self.get_telemetry_data())
+            tg.create_task(self.telemetry_sender())
+            tg.create_task(self.properties_sender())
+
     async def get_telemetry_data(self):
         while True:
             temperature = await self.snmp_get("1.3.6.1.4.1.534.1.6.1.0")
@@ -105,20 +107,18 @@ class EatonUPS(enapter.vucm.Device):
 
             await asyncio.sleep(60)
 
-    @enapter.vucm.device_task
     async def telemetry_sender(self):
         while True:
             await self.send_telemetry(self.telemetry)
             await asyncio.sleep(1)
 
-    @enapter.vucm.device_task
     async def properties_sender(self):
         while True:
             await self.send_properties(self.properties)
             await asyncio.sleep(10)
 
     async def snmp_get(self, oid):
-        result = await self.run_in_thread(
+        result = await asyncio.to_thread(
             self.cmd_gen.getCmd,
             self.auth_data,
             self.transport_target,
@@ -147,4 +147,7 @@ class EatonUPS(enapter.vucm.Device):
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
