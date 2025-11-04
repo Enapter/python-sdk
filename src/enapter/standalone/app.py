@@ -3,12 +3,12 @@ import asyncio
 from enapter import log, mqtt
 
 from .config import Config
-from .device import Device
 from .device_driver import DeviceDriver
+from .device_protocol import DeviceProtocol
 from .ucm import UCM
 
 
-async def run(device: Device) -> None:
+async def run(device: DeviceProtocol) -> None:
     log.configure(level=log.LEVEL or "info")
     config = Config.from_env()
     async with asyncio.TaskGroup() as tg:
@@ -18,7 +18,7 @@ async def run(device: Device) -> None:
 class App:
 
     def __init__(
-        self, task_group: asyncio.TaskGroup, config: Config, device: Device
+        self, task_group: asyncio.TaskGroup, config: Config, device: DeviceProtocol
     ) -> None:
         self._config = config
         self._device = device
