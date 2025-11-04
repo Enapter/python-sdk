@@ -29,6 +29,8 @@ lint-pyflakes:
 
 .PHONY: lint-mypy
 lint-mypy:
+	pipenv run mypy setup.py
+	pipenv run mypy tests
 	pipenv run mypy src/enapter
 
 .PHONY: test
