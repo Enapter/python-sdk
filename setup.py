@@ -1,7 +1,7 @@
 import setuptools
 
 
-def main():
+def main() -> None:
     setuptools.setup(
         name="enapter",
         version=read_version(),
@@ -22,14 +22,14 @@ def main():
     )
 
 
-def read_version():
+def read_version() -> str:
     with open("src/enapter/__init__.py") as f:
-        local_scope = {}
+        local_scope: dict = {}
         exec(f.readline(), {}, local_scope)
         return local_scope["__version__"]
 
 
-def read_file(name):
+def read_file(name) -> str:
     with open(name) as f:
         return f.read()
 
