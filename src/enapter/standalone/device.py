@@ -30,7 +30,7 @@ class Device(abc.ABC):
         pass
 
     @property
-    async def logger(self) -> Logger:
+    def logger(self) -> Logger:
         return self._logger
 
     async def send_properties(self, properties: Properties) -> None:
