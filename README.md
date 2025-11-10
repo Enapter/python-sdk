@@ -6,89 +6,48 @@
 
 Enapter software development kit for Python.
 
+## Features
+
+- [Standalone
+  Devices](https://v3.developers.enapter.com/docs/standalone/introduction)
+  framework.
+- [MQTT
+  API](https://v3.developers.enapter.com/reference/device_integration/mqtt_api/)
+  client.
+- [HTTP API](https://v3.developers.enapter.com/reference/http/intro) client.
+
 ## Installation
 
-This project uses [semantic versioning](https://semver.org/).
+> [!IMPORTANT]
+> Make sure you are using Python 3.11+.
 
-The API is still under development and may change at any time. It is
-recommended to pin the version during installation.
+> [!WARNING]
+> The API is still under development and may change at any time. It is
+> recommended to pin the version during installation.
 
-Latest from PyPI:
+From PyPI:
 
 ```bash
-pip install enapter==0.11.3
+pip install enapter==0.12.0
 ```
 
 ## Usage
 
-Checkout [examples](examples).
+Check out examples:
 
-## Implementing your own VUCM
+- [Standalone Devices](examples/standalone)
+- [MQTT API](examples/mqtt)
+- [HTTP API](examples/http)
 
-### Device Telemetry and Properties
+They provide a good overview of available features and should give you enough
+power to get started.
 
-Every method of `enapter.vucm.Device` subclass decorated with
-`enapter.vucm.device_task` decorator is considered a _device task_. When such a
-device is started, all of its tasks are started as well. Device tasks are
-started in random order and are being executed concurrently in the background.
-If a device task returns or raises an exception, device routine is terminated.
-A typical use of the task is to run a periodic job to send device telemetry and
-properties.
+> [!TIP]
+> Don't hesitate to peek into the source code - it is supposed to be easy to
+> follow.
 
-In order to send telemetry and properties define two corresponding device
-tasks. It is advised (but is not obligatory) to send telemetry every **1
-second** and to send properties every **10 seconds**.
+## Help
 
-Examples:
-
-- [wttr-in](examples/vucm/wttr-in)
-
-### Device Command Handlers
-
-Every method of `enapter.vucm.Device` subclass decorated with
-`enapter.vucm.device_command` is considered a _device command handler_. Device
-command handlers receive the same arguments as described in device Blueprint
-manifest and can optionally return a payload as `enapter.types.JSON`.
-
-In order to handle device commands define corresponding device command
-handlers.
-
-Examples:
-
-- [zhimi-fan-za5](examples/vucm/zhimi-fan-za5)
-
-### Device Alerts
-
-Device alerts are stored in `self.alerts`. It is a usual Python `set`, so you
-can add an alert using `alerts.add`, remove an alert `alerts.remove` and clear
-alerts using `alerts.clear`.
-
-Alerts are sent only as part of telemetry, so in order to report device alert,
-use `send_telemetry` with any payload.
-
-## Running your own VUCM via Docker
-
-A simple Dockerfile can be:
-
-```
-FROM python:3.10-alpine3.16
-
-WORKDIR /app
-
-RUN python -m venv .venv
-COPY requirements.txt requirements.txt
-RUN .venv/bin/pip install -r requirements.txt
-
-COPY script.py script.py
-
-CMD [".venv/bin/python", "script.py"]
-```
-
-:information_source: If you are using [Enapter
-Gateway](https://handbook.enapter.com/software/gateway_software/) and running
-Linux, you should connect your containers to `host` network
-:information_source::
-
-```bash
-docker run --network host ...
-```
+If you feel lost or confused, reach us in
+[Discord](https://discord.com/invite/TCaEZs3qpe) or just [file a
+bug](https://github.com/Enapter/python-sdk/issues/new). We'd be glad to help.
