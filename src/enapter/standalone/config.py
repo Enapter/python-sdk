@@ -2,10 +2,13 @@ import base64
 import dataclasses
 import enum
 import json
+import logging
 import os
 from typing import Any, MutableMapping, Self
 
 from enapter import mqtt
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -42,7 +45,15 @@ class CommunicationConfig:
         cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
     ) -> Self:
         prefix = namespace + "STANDALONE_COMMUNICATION_"
-        blob = env[prefix + "CONFIG"]
+        try:
+            blob = env[namespace + "VUCM_BLOB"]
+            LOGGER.warn(
+                "`%s` is deprecated and will be removed soon. Please use `%s`.",
+                namespace + "VUCM_BLOB",
+                prefix + "CONFIG",
+            )
+        except KeyError:
+            blob = env[prefix + "CONFIG"]
         config = cls.from_blob(blob)
         override_mqtt_host = env.get(prefix + "OVERRIDE_MQTT_HOST")
         if override_mqtt_host is not None:
