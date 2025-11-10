@@ -34,7 +34,9 @@ class WttrIn(enapter.standalone.Device):
         while True:
             try:
                 weather = await self.client.get(self.location)
-                await self.send_telemetry({"temperature": weather.temperature})
+                await self.send_telemetry(
+                    {"temperature": weather.temperature, "alerts": []}
+                )
             except Exception as e:
                 await self.log.error(f"failed to get weather: {e}")
                 await self.send_telemetry({"alerts": ["wttr_in_error"]})
