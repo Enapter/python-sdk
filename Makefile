@@ -29,7 +29,9 @@ lint-pyflakes:
 
 .PHONY: lint-mypy
 lint-mypy:
-	pipenv run mypy enapter
+	pipenv run mypy setup.py
+	pipenv run mypy tests
+	pipenv run mypy src/enapter
 
 .PHONY: test
 test: run-unit-tests run-integration-tests
@@ -69,7 +71,7 @@ bump-version:
 ifndef V
 	$(error V is not defined)
 endif
-	sed -E -i 's/__version__ = "[0-9]+.[0-9]+.[0-9]+"/__version__ = "$(V)"/g' enapter/__init__.py
+	sed -E -i 's/__version__ = "[0-9]+.[0-9]+.[0-9]+"/__version__ = "$(V)"/g' src/enapter/__init__.py
 
 	grep -E --files-with-matches --recursive 'enapter==[0-9]+.[0-9]+.[0-9]+' examples \
 		| xargs -n 1 sed -E -i 's/enapter==[0-9]+.[0-9]+.[0-9]+/enapter==$(V)/g'

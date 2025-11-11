@@ -1,0 +1,12 @@
+version: "3"
+services:
+  snmp-eaton-ups-standalone:
+    build: .
+    image: enapter-standalone-examples/snmp-eaton-ups:latest
+    stop_signal: SIGINT
+    restart: "no"
+    environment:
+      ENAPTER_STANDALONE_COMMUNICATION_CONFIG: "PUT_YOUR_CONFIG_HERE"
+      ENAPTER_SNMP_HOST: "192.168.192.192"
+      ENAPTER_SNMP_PORT: "161"
+      ENAPTER_SNMP_COMMUNITY: "public"
