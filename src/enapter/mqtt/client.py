@@ -15,19 +15,18 @@ from .message import Message
 LOGGER = logging.getLogger(__name__)
 
 
-class Client:
+class Client(async_.Routine):
 
-    def __init__(self, task_group: asyncio.TaskGroup, config: Config) -> None:
+    def __init__(
+        self, config: Config, task_group: asyncio.TaskGroup | None = None
+    ) -> None:
+        super().__init__(task_group=task_group)
         self._logger = self._new_logger(config)
         self._config = config
         self._mdns_resolver = mdns.Resolver()
         self._tls_context = self._new_tls_context(config)
         self._publisher: aiomqtt.Client | None = None
         self._publisher_connected = asyncio.Event()
-        self._task = task_group.create_task(self._run())
-
-    def cancel(self) -> None:
-        self._task.cancel()
 
     @staticmethod
     def _new_logger(config: Config) -> logging.LoggerAdapter:
