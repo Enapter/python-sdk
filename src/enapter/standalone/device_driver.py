@@ -3,22 +3,22 @@ import contextlib
 import time
 import traceback
 
-from enapter import mqtt
+from enapter import async_, mqtt
 
 from .device_protocol import DeviceProtocol
 
 
-class DeviceDriver:
+class DeviceDriver(async_.Routine):
 
     def __init__(
         self,
-        task_group: asyncio.TaskGroup,
         device_channel: mqtt.api.DeviceChannel,
         device: DeviceProtocol,
+        task_group: asyncio.TaskGroup | None,
     ) -> None:
+        super().__init__(task_group=task_group)
         self._device_channel = device_channel
         self._device = device
-        self._task = task_group.create_task(self._run())
 
     async def _run(self) -> None:
         async with asyncio.TaskGroup() as tg:

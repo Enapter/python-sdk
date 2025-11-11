@@ -20,9 +20,8 @@ async def fixture_enapter_mqtt_client(mosquitto_container):
         port=int(ports[0]["HostPort"]),
     )
     async with asyncio.TaskGroup() as tg:
-        mqtt_client = enapter.mqtt.Client(tg, config)
-        yield mqtt_client
-        mqtt_client.cancel()
+        async with enapter.mqtt.Client(config, task_group=tg) as mqtt_client:
+            yield mqtt_client
 
 
 @pytest.fixture(scope="session", name="mosquitto_container")

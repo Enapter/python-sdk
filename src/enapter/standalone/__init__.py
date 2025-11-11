@@ -1,4 +1,3 @@
-from .app import App, run
 from .config import Config
 from .device import Device
 from .device_protocol import (
@@ -10,9 +9,9 @@ from .device_protocol import (
     Telemetry,
 )
 from .logger import Logger
+from .run import run
 
 __all__ = [
-    "App",
     "CommandArgs",
     "CommandResult",
     "Config",

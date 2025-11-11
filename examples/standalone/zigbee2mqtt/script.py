@@ -36,13 +36,15 @@ class ZigbeeMqtt(enapter.standalone.Device):
             tg.create_task(self.properties_sender())
 
     async def consumer(self, tg):
-        client = enapter.mqtt.Client(tg, self.mqtt_client_config)
-        async with client.subscribe(self.mqtt_topic) as messages:
-            async for msg in messages:
-                try:
-                    self.telemetry = json.loads(msg.payload)
-                except json.JSONDecodeError as e:
-                    await self.log.error(f"failed to decode json payload: {e}")
+        async with enapter.mqtt.Client(
+            self.mqtt_client_config, task_group=tg
+        ) as client:
+            async with client.subscribe(self.mqtt_topic) as messages:
+                async for msg in messages:
+                    try:
+                        self.telemetry = json.loads(msg.payload)
+                    except json.JSONDecodeError as e:
+                        await self.log.error(f"failed to decode json payload: {e}")
 
     async def telemetry_sender(self):
         while True:
