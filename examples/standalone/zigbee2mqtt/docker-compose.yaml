@@ -1,0 +1,14 @@
+version: "3"
+services:
+  zigbee2mqtt-standalone:
+    build: .
+    image: enapter-standalone-examples/zigbee2mqtt:latest
+    environment:
+      - ENAPTER_STANDALONE_COMMUNICATION_CONFIG: "PUT_YOUR_CONFIG_HERE"
+      - ZIGBEE_MQTT_HOST: "192.168.192.190"
+      - ZIGBEE_MQTT_PORT: "9883"
+      - ZIGBEE_MQTT_USER: "mqtt_user"
+      - ZIGBEE_MQTT_PASSWORD: "mqtt_password"
+      - ZIGBEE_MQTT_TOPIC: "zigbee2mqtt/MyDevice"
+      - ZIGBEE_SENSOR_MANUFACTURER: "Device Manufacturer"
+      - ZIGBEE_SENSOR_MODEL: "Device Model"
