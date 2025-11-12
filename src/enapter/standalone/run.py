@@ -4,8 +4,8 @@ import contextlib
 from enapter import log, mqtt
 
 from .config import Config
-from .device_driver import DeviceDriver
 from .device_protocol import DeviceProtocol
+from .mqtt_adapter import MQTTAdapter
 from .ucm import UCM
 
 
@@ -18,7 +18,7 @@ async def run(device: DeviceProtocol) -> None:
             mqtt.api.Client(config=config.communication.mqtt_api, task_group=task_group)
         )
         _ = await stack.enter_async_context(
-            DeviceDriver(
+            MQTTAdapter(
                 device_channel=mqtt_api_client.device_channel(
                     hardware_id=config.communication.hardware_id,
                     channel_id=config.communication.channel_id,
@@ -29,7 +29,7 @@ async def run(device: DeviceProtocol) -> None:
         )
         if config.communication.ucm_needed:
             _ = await stack.enter_async_context(
-                DeviceDriver(
+                MQTTAdapter(
                     device_channel=mqtt_api_client.device_channel(
                         hardware_id=config.communication.hardware_id,
                         channel_id="ucm",

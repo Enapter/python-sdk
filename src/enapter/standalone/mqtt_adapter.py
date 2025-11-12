@@ -8,7 +8,7 @@ from enapter import async_, mqtt
 from .device_protocol import DeviceProtocol
 
 
-class DeviceDriver(async_.Routine):
+class MQTTAdapter(async_.Routine):
 
     def __init__(
         self,
@@ -29,8 +29,8 @@ class DeviceDriver(async_.Routine):
             tg.create_task(self._execute_commands())
 
     async def _stream_properties(self) -> None:
-        async with contextlib.aclosing(self._device.stream_properties()) as iterator:
-            async for properties in iterator:
+        async with contextlib.aclosing(self._device.stream_properties()) as stream:
+            async for properties in stream:
                 properties = properties.copy()
                 timestamp = properties.pop("timestamp", int(time.time()))
                 await self._device_channel.publish_properties(
@@ -40,8 +40,8 @@ class DeviceDriver(async_.Routine):
                 )
 
     async def _stream_telemetry(self) -> None:
-        async with contextlib.aclosing(self._device.stream_telemetry()) as iterator:
-            async for telemetry in iterator:
+        async with contextlib.aclosing(self._device.stream_telemetry()) as stream:
+            async for telemetry in stream:
                 telemetry = telemetry.copy()
                 timestamp = telemetry.pop("timestamp", int(time.time()))
                 alerts = telemetry.pop("alerts", None)
@@ -52,8 +52,8 @@ class DeviceDriver(async_.Routine):
                 )
 
     async def _stream_logs(self) -> None:
-        async with contextlib.aclosing(self._device.stream_logs()) as iterator:
-            async for log in iterator:
+        async with contextlib.aclosing(self._device.stream_logs()) as stream:
+            async for log in stream:
                 await self._device_channel.publish_log(
                     log=mqtt.api.device.Log(
                         timestamp=int(time.time()),
