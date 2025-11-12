@@ -73,5 +73,5 @@ ifndef V
 endif
 	sed -E -i 's/__version__ = "[0-9]+.[0-9]+.[0-9]+"/__version__ = "$(V)"/g' src/enapter/__init__.py
 
-	grep -E --files-with-matches --recursive 'enapter==[0-9]+.[0-9]+.[0-9]+' examples \
+	grep -E --files-with-matches --recursive 'enapter==[0-9]+.[0-9]+.[0-9]+' README.md examples \
 		| xargs -n 1 sed -E -i 's/enapter==[0-9]+.[0-9]+.[0-9]+/enapter==$(V)/g'
