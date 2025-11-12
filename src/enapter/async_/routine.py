@@ -12,7 +12,7 @@ class Routine(abc.ABC):
 
     @abc.abstractmethod
     async def _run(self) -> None:
-        pass
+        pass  # pragma: no cover
 
     async def __aenter__(self) -> Self:
         await self.start()
