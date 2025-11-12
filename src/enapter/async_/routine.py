@@ -6,7 +6,7 @@ from typing import Self
 
 class Routine(abc.ABC):
 
-    def __init__(self, task_group: asyncio.TaskGroup | None) -> None:
+    def __init__(self, task_group: asyncio.TaskGroup | None = None) -> None:
         self._task_group = task_group
         self._task: asyncio.Task | None = None
 
