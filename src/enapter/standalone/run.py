@@ -19,10 +19,9 @@ async def run(device: DeviceProtocol) -> None:
         )
         _ = await stack.enter_async_context(
             MQTTAdapter(
-                device_channel=mqtt_api_client.device_channel(
-                    hardware_id=config.communication.hardware_id,
-                    channel_id=config.communication.channel_id,
-                ),
+                hardware_id=config.communication.hardware_id,
+                channel_id=config.communication.channel_id,
+                mqtt_api_client=mqtt_api_client,
                 device=device,
                 task_group=task_group,
             )
@@ -30,10 +29,9 @@ async def run(device: DeviceProtocol) -> None:
         if config.communication.ucm_needed:
             _ = await stack.enter_async_context(
                 MQTTAdapter(
-                    device_channel=mqtt_api_client.device_channel(
-                        hardware_id=config.communication.hardware_id,
-                        channel_id="ucm",
-                    ),
+                    hardware_id=config.communication.hardware_id,
+                    channel_id="ucm",
+                    mqtt_api_client=mqtt_api_client,
                     device=UCM(),
                     task_group=task_group,
                 )

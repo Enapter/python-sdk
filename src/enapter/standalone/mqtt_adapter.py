@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import logging
 import time
 import traceback
 
@@ -7,17 +8,24 @@ from enapter import async_, mqtt
 
 from .device_protocol import DeviceProtocol
 
+LOGGER = logging.getLogger(__name__)
+
 
 class MQTTAdapter(async_.Routine):
 
     def __init__(
         self,
-        device_channel: mqtt.api.device.Channel,
+        hardware_id: str,
+        channel_id: str,
+        mqtt_api_client: mqtt.api.Client,
         device: DeviceProtocol,
         task_group: asyncio.TaskGroup | None,
     ) -> None:
         super().__init__(task_group=task_group)
-        self._device_channel = device_channel
+        self._logger = logging.LoggerAdapter(
+            LOGGER, extra={"hardware_id": hardware_id, "channel_id": channel_id}
+        )
+        self._device_channel = mqtt_api_client.device_channel(hardware_id, channel_id)
         self._device = device
 
     async def _run(self) -> None:
@@ -33,11 +41,15 @@ class MQTTAdapter(async_.Routine):
             async for properties in stream:
                 properties = properties.copy()
                 timestamp = properties.pop("timestamp", int(time.time()))
-                await self._device_channel.publish_properties(
-                    properties=mqtt.api.device.Properties(
-                        timestamp=timestamp, values=properties
-                    )
+                await self._publish_properties(
+                    mqtt.api.device.Properties(timestamp=timestamp, values=properties)
                 )
+
+    async def _publish_properties(self, properties: mqtt.api.device.Properties) -> None:
+        try:
+            await self._device_channel.publish_properties(properties=properties)
+        except Exception as e:
+            self._logger.error("failed to publish properties: %s", e)
 
     async def _stream_telemetry(self) -> None:
         async with contextlib.aclosing(self._device.stream_telemetry()) as stream:
@@ -45,23 +57,46 @@ class MQTTAdapter(async_.Routine):
                 telemetry = telemetry.copy()
                 timestamp = telemetry.pop("timestamp", int(time.time()))
                 alerts = telemetry.pop("alerts", None)
-                await self._device_channel.publish_telemetry(
-                    telemetry=mqtt.api.device.Telemetry(
+                await self._publish_telemetry(
+                    mqtt.api.device.Telemetry(
                         timestamp=timestamp, alerts=alerts, values=telemetry
                     )
                 )
 
+    async def _publish_telemetry(self, telemetry: mqtt.api.device.Telemetry) -> None:
+        try:
+            await self._device_channel.publish_telemetry(telemetry=telemetry)
+        except Exception as e:
+            self._logger.error("failed to publish telemetry: %s", e)
+
     async def _stream_logs(self) -> None:
         async with contextlib.aclosing(self._device.stream_logs()) as stream:
             async for log in stream:
-                await self._device_channel.publish_log(
-                    log=mqtt.api.device.Log(
+                match log.severity:
+                    case "debug":
+                        self._logger.debug(log.message)
+                    case "info":
+                        self._logger.info(log.message)
+                    case "warning":
+                        self._logger.warning(log.message)
+                    case "error":
+                        self._logger.error(log.message)
+                    case _:
+                        raise NotImplementedError(log.severity)
+                await self._publish_log(
+                    mqtt.api.device.Log(
                         timestamp=int(time.time()),
                         severity=mqtt.api.device.LogSeverity(log.severity),
                         message=log.message,
                         persist=log.persist,
                     )
                 )
+
+    async def _publish_log(self, log: mqtt.api.device.Log) -> None:
+        try:
+            await self._device_channel.publish_log(log=log)
+        except Exception as e:
+            self._logger.error("failed to publish log: %s", e)
 
     async def _execute_commands(self) -> None:
         async with asyncio.TaskGroup() as tg:

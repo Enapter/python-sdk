@@ -1,4 +1,3 @@
-import logging
 from typing import AsyncContextManager, AsyncGenerator
 
 from enapter import async_, mqtt
@@ -9,14 +8,11 @@ from .log import Log
 from .properties import Properties
 from .telemetry import Telemetry
 
-LOGGER = logging.getLogger(__name__)
-
 
 class Channel:
 
     def __init__(self, client: mqtt.Client, hardware_id: str, channel_id: str) -> None:
         self._client = client
-        self._logger = self._new_logger(hardware_id, channel_id)
         self._hardware_id = hardware_id
         self._channel_id = channel_id
 
@@ -27,11 +23,6 @@ class Channel:
     @property
     def channel_id(self) -> str:
         return self._channel_id
-
-    @staticmethod
-    def _new_logger(hardware_id: str, channel_id: str) -> logging.LoggerAdapter:
-        extra = {"hardware_id": hardware_id, "channel_id": channel_id}
-        return logging.LoggerAdapter(LOGGER, extra=extra)
 
     @async_.generator
     async def subscribe_to_command_requests(
@@ -62,7 +53,4 @@ class Channel:
 
     async def _publish(self, path: str, payload: str, **kwargs) -> None:
         topic = f"v1/from/{self._hardware_id}/{self._channel_id}/{path}"
-        try:
-            await self._client.publish(topic, payload, **kwargs)
-        except Exception as e:
-            self._logger.error("failed to publish %s: %r", path, e)
+        await self._client.publish(topic, payload, **kwargs)
