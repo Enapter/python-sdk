@@ -2,7 +2,7 @@
 
 ## Basic Implementation
 
-The most straightforward way to implement your own Standalone Device is this:
+The most straightforward way to implement your own standalone device is:
 
 1. Subclass `enapter.standalone.Device`.
 2. Override `async def run(self) -> None` method to send telemetry and properties.
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 ## Handling Commands
 
 `enapter.standalone.Device` dispatches incoming command execution requests to
-corresponding methods on your subclass.
+the corresponding methods on your subclass.
 
 If this command is defined in the manifest:
 
@@ -52,14 +52,14 @@ configure_connection:
       required: false
 ```
 
-This is the signature you would create in your device class to implement a
-command handler:
+Then you would implement the following command handler in your device class:
 
 ```python
-async def cmd_configure_connection(ip_address: str, token: str | None = None): ...
+async def cmd_configure_connection(ip_address: str, token: str | None = None):
+    ...
 ```
 
-By default `cmd_` prefix is used to search the command handler.
+By default, the `cmd_` prefix is used to locate command handlers.
 
 ## Synchronous Code
 
@@ -67,7 +67,7 @@ Blocking (CPU-bound) code should not be called directly. For example, if a
 function performs a CPU-intensive calculation for 1 second, all concurrent
 `asyncio` Tasks and IO operations would be delayed by 1 second.
 
-Instead, use `asyncio.to_thread`:
+Instead, use `asyncio.to_thread` to offload such work to a thread pool:
 
 ```python
 await asyncio.to_thread(blocking_call())
@@ -76,7 +76,7 @@ await asyncio.to_thread(blocking_call())
 ## Communication Config
 
 > [!NOTE]
-> The following instruction works only for v3 sites. If you have a v1 site,
+> The following instruction apply only to v3 sites. If you have a v1 site,
 > follow [this
 > tutorial](https://developers.enapter.com/docs/tutorial/software-ucms/standalone)
 > to generate your communication config.
@@ -92,7 +92,7 @@ enapter3 device communication-config generate --device-id "$YOUR_DEVICE_ID" --pr
 
 ## Running
 
-Now you can use the communication config to run your device:
+Use the generated communication config to run your device:
 
 ```bash
 export ENAPTER_STANDALONE_COMMUNICATION_CONFIG="$YOUR_COMMUNICATION_CONFIG"
@@ -118,8 +118,8 @@ CMD [".venv/bin/python", "script.py"]
 ```
 
 > [!WARNING]
-> If you are using Enapter Gateway and running Linux, you should connect your
-> containers to the `host` network to make mDNS resolution work:
+> If you are using Enapter Gateway and running Linux, connect your containers
+> to the `host` network to enable mDNS resolution:
 >
 > ```bash
 > docker run --network host ...
