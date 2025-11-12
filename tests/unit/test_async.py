@@ -5,7 +5,7 @@ import enapter
 
 class TestGenerator:
 
-    async def test_aclose(self):
+    async def test_aclose(self) -> None:
         @enapter.async_.generator
         async def agen():
             yield 1
