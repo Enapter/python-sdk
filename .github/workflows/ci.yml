@@ -32,6 +32,7 @@ jobs:
 
   upload_to_pypi:
     name: "Upload To PyPI"
+    needs: run_checks
     runs-on: "ubuntu-latest"
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
