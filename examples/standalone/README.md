@@ -76,7 +76,7 @@ await asyncio.to_thread(blocking_call())
 ## Communication Config
 
 > [!NOTE]
-> The following instruction apply only to v3 sites. If you have a v1 site,
+> The following instruction applies only to v3 sites. If you have a v1 site,
 > follow [this
 > tutorial](https://developers.enapter.com/docs/tutorial/software-ucms/standalone)
 > to generate your communication config.
