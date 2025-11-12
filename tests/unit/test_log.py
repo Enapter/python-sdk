@@ -61,7 +61,7 @@ class TestJSONFormat:
 
     @staticmethod
     @contextlib.contextmanager
-    def configure(*args, **kwargs) -> Generator[None, None]:
+    def configure(*args, **kwargs) -> Generator[None, None, None]:
         enapter.log.configure(*args, **kwargs)
         try:
             yield

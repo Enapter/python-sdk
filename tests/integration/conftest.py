@@ -30,7 +30,7 @@ async def fixture_enapter_mqtt_client(
 @pytest.fixture(scope="session", name="mosquitto_container")
 def fixture_mosquitto_container(
     docker_client: docker.DockerClient,
-) -> Generator[docker.models.containers.Container, None]:
+) -> Generator[docker.models.containers.Container, None, None]:
     name = "enapter-python-sdk-integration-tests-mosquitto"
 
     try:
@@ -64,7 +64,7 @@ def random_unused_port() -> int:
 
 
 @pytest.fixture(name="docker_client", scope="session")
-def fixture_docker_client() -> Generator[docker.DockerClient, None]:
+def fixture_docker_client() -> Generator[docker.DockerClient, None, None]:
     docker_client = docker.from_env()
     try:
         yield docker_client
