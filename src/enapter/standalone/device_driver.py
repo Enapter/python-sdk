@@ -12,7 +12,7 @@ class DeviceDriver(async_.Routine):
 
     def __init__(
         self,
-        device_channel: mqtt.api.DeviceChannel,
+        device_channel: mqtt.api.device.Channel,
         device: DeviceProtocol,
         task_group: asyncio.TaskGroup | None,
     ) -> None:
@@ -34,7 +34,7 @@ class DeviceDriver(async_.Routine):
                 properties = properties.copy()
                 timestamp = properties.pop("timestamp", int(time.time()))
                 await self._device_channel.publish_properties(
-                    properties=mqtt.api.Properties(
+                    properties=mqtt.api.device.Properties(
                         timestamp=timestamp, values=properties
                     )
                 )
@@ -46,7 +46,7 @@ class DeviceDriver(async_.Routine):
                 timestamp = telemetry.pop("timestamp", int(time.time()))
                 alerts = telemetry.pop("alerts", None)
                 await self._device_channel.publish_telemetry(
-                    telemetry=mqtt.api.Telemetry(
+                    telemetry=mqtt.api.device.Telemetry(
                         timestamp=timestamp, alerts=alerts, values=telemetry
                     )
                 )
@@ -55,9 +55,9 @@ class DeviceDriver(async_.Routine):
         async with contextlib.aclosing(self._device.stream_logs()) as iterator:
             async for log in iterator:
                 await self._device_channel.publish_log(
-                    log=mqtt.api.Log(
+                    log=mqtt.api.device.Log(
                         timestamp=int(time.time()),
-                        severity=mqtt.api.LogSeverity(log.severity),
+                        severity=mqtt.api.device.LogSeverity(log.severity),
                         message=log.message,
                         persist=log.persist,
                     )
@@ -69,10 +69,10 @@ class DeviceDriver(async_.Routine):
                 async for request in requests:
                     tg.create_task(self._execute_command(request))
 
-    async def _execute_command(self, request: mqtt.api.CommandRequest) -> None:
+    async def _execute_command(self, request: mqtt.api.device.CommandRequest) -> None:
         await self._device_channel.publish_command_response(
             request.new_response(
-                mqtt.api.CommandState.LOG, {"message": "Executing command..."}
+                mqtt.api.device.CommandState.LOG, {"message": "Executing command..."}
             )
         )
         try:
@@ -82,17 +82,18 @@ class DeviceDriver(async_.Routine):
         except NotImplementedError:
             await self._device_channel.publish_command_response(
                 request.new_response(
-                    mqtt.api.CommandState.ERROR,
+                    mqtt.api.device.CommandState.ERROR,
                     {"message": "Command handler not implemented."},
                 )
             )
         except Exception:
             await self._device_channel.publish_command_response(
                 request.new_response(
-                    mqtt.api.CommandState.ERROR, {"message": traceback.format_exc()}
+                    mqtt.api.device.CommandState.ERROR,
+                    {"message": traceback.format_exc()},
                 )
             )
         else:
             await self._device_channel.publish_command_response(
-                request.new_response(mqtt.api.CommandState.COMPLETED, payload)
+                request.new_response(mqtt.api.device.CommandState.COMPLETED, payload)
             )

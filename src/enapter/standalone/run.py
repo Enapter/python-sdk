@@ -14,13 +14,12 @@ async def run(device: DeviceProtocol) -> None:
     config = Config.from_env()
     async with contextlib.AsyncExitStack() as stack:
         task_group = await stack.enter_async_context(asyncio.TaskGroup())
-        mqtt_client = await stack.enter_async_context(
-            mqtt.Client(config=config.communication.mqtt, task_group=task_group)
+        mqtt_api_client = await stack.enter_async_context(
+            mqtt.api.Client(config=config.communication.mqtt_api, task_group=task_group)
         )
         _ = await stack.enter_async_context(
             DeviceDriver(
-                device_channel=mqtt.api.DeviceChannel(
-                    client=mqtt_client,
+                device_channel=mqtt_api_client.device_channel(
                     hardware_id=config.communication.hardware_id,
                     channel_id=config.communication.channel_id,
                 ),
@@ -31,8 +30,7 @@ async def run(device: DeviceProtocol) -> None:
         if config.communication.ucm_needed:
             _ = await stack.enter_async_context(
                 DeviceDriver(
-                    device_channel=mqtt.api.DeviceChannel(
-                        client=mqtt_client,
+                    device_channel=mqtt_api_client.device_channel(
                         hardware_id=config.communication.hardware_id,
                         channel_id="ucm",
                     ),
