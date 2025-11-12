@@ -1,15 +1,16 @@
 from unittest import mock
 
 import enapter
+import tests
 
 
 class TestChannel:
 
-    async def test_publish_telemetry(self, fake) -> None:
+    async def test_publish_telemetry(self, fake: tests.FakeDataGenerator) -> None:
         hardware_id = fake.hardware_id()
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
-        mock_client = mock.Mock()
+        mock_client = mock.AsyncMock()
         channel = enapter.mqtt.api.device.Channel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )
@@ -21,11 +22,11 @@ class TestChannel:
             '{"timestamp": ' + str(timestamp) + ', "alerts": null}',
         )
 
-    async def test_publish_properties(self, fake) -> None:
+    async def test_publish_properties(self, fake: tests.FakeDataGenerator) -> None:
         hardware_id = fake.hardware_id()
         channel_id = fake.channel_id()
         timestamp = fake.timestamp()
-        mock_client = mock.Mock()
+        mock_client = mock.AsyncMock()
         channel = enapter.mqtt.api.device.Channel(
             client=mock_client, hardware_id=hardware_id, channel_id=channel_id
         )

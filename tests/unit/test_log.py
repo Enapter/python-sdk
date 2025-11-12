@@ -2,12 +2,14 @@ import contextlib
 import io
 import json
 import re
+from typing import Generator
 
 import enapter
 
 
 class TestJSONFormat:
-    def test_record_ends_with_newline(self):
+
+    def test_record_ends_with_newline(self) -> None:
         buf = io.StringIO()
 
         with self.configure(level="info", stream=buf):
@@ -15,7 +17,7 @@ class TestJSONFormat:
 
         assert buf.getvalue().endswith("\n")
 
-    def test_record_fields(self):
+    def test_record_fields(self) -> None:
         buf = io.StringIO()
 
         with self.configure(level="info", stream=buf):
@@ -30,7 +32,7 @@ class TestJSONFormat:
         assert record["name"] == "enapter"
         assert record["message"] == "hello"
 
-    def test_exc_info(self):
+    def test_exc_info(self) -> None:
         buf = io.StringIO()
 
         with self.configure(level="info", stream=buf):
@@ -45,7 +47,7 @@ class TestJSONFormat:
         assert "Traceback (most recent call last)" in record["exc_info"]
         assert 'RuntimeError("oops")' in record["exc_info"]
 
-    def test_stack_info(self):
+    def test_stack_info(self) -> None:
         buf = io.StringIO()
 
         with self.configure(level="info", stream=buf):
@@ -59,7 +61,7 @@ class TestJSONFormat:
 
     @staticmethod
     @contextlib.contextmanager
-    def configure(*args, **kwargs):
+    def configure(*args, **kwargs) -> Generator[None, None]:
         enapter.log.configure(*args, **kwargs)
         try:
             yield

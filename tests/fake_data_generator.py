@@ -4,7 +4,8 @@ import faker
 
 
 class FakeDataGenerator:
-    def __init__(self, seed: int):
+
+    def __init__(self, seed: int) -> None:
         self._random = random.Random(seed)
         self._fake = self._new_faker(seed)
 
@@ -19,7 +20,7 @@ class FakeDataGenerator:
     def channel_id(self) -> str:
         return self._fake.word()
 
-    def _new_faker(self, seed):
+    def _new_faker(self, seed) -> faker.Faker:
         fake = faker.Faker()
         fake.seed_instance(seed)
         return fake

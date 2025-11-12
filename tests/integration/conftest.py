@@ -1,8 +1,10 @@
 import asyncio
 import os
 import socket
+from typing import AsyncGenerator, Generator
 
 import docker
+import docker.models.containers
 import pytest
 
 import enapter
@@ -11,7 +13,9 @@ MOSQUITTO_PORT = "1883/tcp"
 
 
 @pytest.fixture(name="enapter_mqtt_client")
-async def fixture_enapter_mqtt_client(mosquitto_container):
+async def fixture_enapter_mqtt_client(
+    mosquitto_container: docker.models.containers.Container,
+) -> AsyncGenerator[enapter.mqtt.Client, None]:
     ports = mosquitto_container.ports[MOSQUITTO_PORT]
     assert ports
     async with asyncio.TaskGroup() as tg:
@@ -24,7 +28,9 @@ async def fixture_enapter_mqtt_client(mosquitto_container):
 
 
 @pytest.fixture(scope="session", name="mosquitto_container")
-def fixture_mosquitto_container(docker_client):
+def fixture_mosquitto_container(
+    docker_client: docker.DockerClient,
+) -> Generator[docker.models.containers.Container, None]:
     name = "enapter-python-sdk-integration-tests-mosquitto"
 
     try:
@@ -50,7 +56,7 @@ def fixture_mosquitto_container(docker_client):
         mosquitto.stop()
 
 
-def random_unused_port():
+def random_unused_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("", 0))
         addr = s.getsockname()
@@ -58,7 +64,7 @@ def random_unused_port():
 
 
 @pytest.fixture(name="docker_client", scope="session")
-def fixture_docker_client():
+def fixture_docker_client() -> Generator[docker.DockerClient, None]:
     docker_client = docker.from_env()
     try:
         yield docker_client
