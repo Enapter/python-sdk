@@ -14,13 +14,12 @@ MOSQUITTO_PORT = "1883/tcp"
 async def fixture_enapter_mqtt_client(mosquitto_container):
     ports = mosquitto_container.ports[MOSQUITTO_PORT]
     assert ports
-
-    config = enapter.mqtt.Config(
-        host=ports[0]["HostIp"],
-        port=int(ports[0]["HostPort"]),
-    )
     async with asyncio.TaskGroup() as tg:
-        async with enapter.mqtt.Client(config, task_group=tg) as mqtt_client:
+        async with enapter.mqtt.Client(
+            hostname=ports[0]["HostIp"],
+            port=int(ports[0]["HostPort"]),
+            task_group=tg,
+        ) as mqtt_client:
             yield mqtt_client
 
 

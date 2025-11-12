@@ -12,7 +12,7 @@ from .telemetry import Telemetry
 LOGGER = logging.getLogger(__name__)
 
 
-class DeviceChannel:
+class Channel:
 
     def __init__(self, client: mqtt.Client, hardware_id: str, channel_id: str) -> None:
         self._client = client

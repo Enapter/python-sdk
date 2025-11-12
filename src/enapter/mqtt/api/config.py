@@ -8,7 +8,7 @@ class TLSConfig:
     def from_env(
         cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
     ) -> Self | None:
-        prefix = namespace + "MQTT_TLS_"
+        prefix = namespace + "MQTT_API_TLS_"
 
         secret_key = env.get(prefix + "SECRET_KEY")
         cert = env.get(prefix + "CERT")
@@ -42,7 +42,7 @@ class Config:
     def from_env(
         cls, env: MutableMapping[str, str] = os.environ, namespace: str = "ENAPTER_"
     ) -> Self:
-        prefix = namespace + "MQTT_"
+        prefix = namespace + "MQTT_API_"
         return cls(
             host=env[prefix + "HOST"],
             port=int(env[prefix + "PORT"]),
@@ -70,7 +70,7 @@ class Config:
         return self.tls_config
 
     def __repr__(self) -> str:
-        return "mqtt.Config(host=%r, port=%r, tls=%r)" % (
+        return "mqtt.api.Config(host=%r, port=%r, tls=%r)" % (
             self.host,
             self.port,
             self.tls is not None,
