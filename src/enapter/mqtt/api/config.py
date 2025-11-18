@@ -46,8 +46,8 @@ class Config:
         return cls(
             host=env[prefix + "HOST"],
             port=int(env[prefix + "PORT"]),
-            user=env.get(prefix + "USER", default=None),
-            password=env.get(prefix + "PASSWORD", default=None),
+            user=env.get(prefix + "USER", None),
+            password=env.get(prefix + "PASSWORD", None),
             tls_config=TLSConfig.from_env(env, namespace=namespace),
         )
 

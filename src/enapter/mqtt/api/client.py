@@ -12,7 +12,9 @@ from .config import Config
 
 class Client:
 
-    def __init__(self, config: Config, task_group: asyncio.TaskGroup | None) -> None:
+    def __init__(
+        self, config: Config, task_group: asyncio.TaskGroup | None = None
+    ) -> None:
         self._config = config
         self._client = self._new_client(task_group=task_group)
 

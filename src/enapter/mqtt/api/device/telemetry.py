@@ -8,8 +8,8 @@ from .message import Message
 class Telemetry(Message):
 
     timestamp: int
-    alerts: list[str] | None = None
-    values: dict[str, Any] = dataclasses.field(default_factory=dict)
+    alerts: list[str] | None
+    values: dict[str, Any]
 
     def __post_init__(self) -> None:
         if "timestamp" in self.values:

@@ -8,11 +8,11 @@ class Message(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
-        pass
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def to_dto(self) -> dict[str, Any]:
-        pass
+        pass  # pragma: no cover
 
     @classmethod
     def from_json(cls, data: str | bytes) -> Self:

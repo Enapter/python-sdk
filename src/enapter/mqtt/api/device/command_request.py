@@ -18,7 +18,7 @@ class CommandRequest(Message):
         return cls(
             id=dto["id"],
             name=dto["name"],
-            arguments=dto.get("arguments", {}),
+            arguments=dto["arguments"] if dto.get("arguments") is not None else {},
         )
 
     def to_dto(self) -> dict[str, Any]:
