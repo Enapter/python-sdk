@@ -9,7 +9,7 @@ import enapter
 class Device(enapter.standalone.Device):
 
     async def run(self) -> None:
-        pass
+        pass  # pragma: no cover
 
     async def cmd_test(self, value: int) -> dict:
         return {"echo": value}
