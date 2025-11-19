@@ -34,14 +34,14 @@ lint-mypy:
 	pipenv run mypy src/enapter
 
 .PHONY: test
-test: run-unit-tests run-integration-tests
+test: test-unit test-integration
 
-.PHONY: run-unit-tests
-run-unit-tests:
+.PHONY: test-unit
+test-unit:
 	pipenv run pytest -vv --cov --cov-report term-missing tests/unit
 
-.PHONY: run-integration-tests
-run-integration-tests:
+.PHONY: test-integration
+test-integration:
 	pipenv run pytest -vv --capture=no tests/integration
 
 .PHONY: get-pipenv
