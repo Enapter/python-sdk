@@ -81,8 +81,8 @@ class MQTTAdapter(async_.Routine):
                         self._logger.warning(log.message)
                     case "error":
                         self._logger.error(log.message)
-                    case _:
-                        raise NotImplementedError(log.severity)
+                    case _:  # pragma: no cover
+                        raise NotImplementedError(log.severity)  # pragma: no cover
                 await self._publish_log(
                     mqtt.api.device.Log(
                         timestamp=int(time.time()),

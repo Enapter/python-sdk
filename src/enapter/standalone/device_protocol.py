@@ -18,16 +18,16 @@ class Log:
 class DeviceProtocol(Protocol):
 
     async def run(self) -> None:
-        pass
+        pass  # pragma: no cover
 
     async def stream_properties(self) -> AsyncGenerator[Properties, None]:
-        yield {}
+        yield {}  # pragma: no cover
 
     async def stream_telemetry(self) -> AsyncGenerator[Telemetry, None]:
-        yield {}
+        yield {}  # pragma: no cover
 
     async def stream_logs(self) -> AsyncGenerator[Log, None]:
-        yield Log("debug", "", False)
+        yield Log("debug", "", False)  # pragma: no cover
 
     async def execute_command(self, name: str, args: CommandArgs) -> CommandResult:
-        pass
+        pass  # pragma: no cover

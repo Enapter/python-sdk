@@ -1,8 +1,17 @@
+import dataclasses
 import os
 from typing import MutableMapping, Self
 
 
+@dataclasses.dataclass(repr=False)
 class TLSConfig:
+
+    secret_key: str
+    cert: str
+    ca_cert: str
+
+    def __repr__(self) -> str:
+        return "mqtt.api.TLSConfig(...)"
 
     @classmethod
     def from_env(
@@ -30,13 +39,15 @@ class TLSConfig:
 
         return cls(secret_key=pem(secret_key), cert=pem(cert), ca_cert=pem(ca_cert))
 
-    def __init__(self, secret_key: str, cert: str, ca_cert: str) -> None:
-        self.secret_key = secret_key
-        self.cert = cert
-        self.ca_cert = ca_cert
 
-
+@dataclasses.dataclass
 class Config:
+
+    host: str
+    port: int
+    user: str | None = None
+    password: str | None = None
+    tls_config: TLSConfig | None = None
 
     @classmethod
     def from_env(
@@ -51,27 +62,6 @@ class Config:
             tls_config=TLSConfig.from_env(env, namespace=namespace),
         )
 
-    def __init__(
-        self,
-        host: str,
-        port: int,
-        user: str | None = None,
-        password: str | None = None,
-        tls_config: TLSConfig | None = None,
-    ) -> None:
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-        self.tls_config = tls_config
-
     @property
     def tls(self) -> TLSConfig | None:
         return self.tls_config
-
-    def __repr__(self) -> str:
-        return "mqtt.api.Config(host=%r, port=%r, tls=%r)" % (
-            self.host,
-            self.port,
-            self.tls is not None,
-        )
