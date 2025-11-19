@@ -27,7 +27,7 @@ class Device(abc.ABC):
 
     @abc.abstractmethod
     async def run(self) -> None:
-        pass
+        pass  # pragma: no cover
 
     @property
     def logger(self) -> Logger:

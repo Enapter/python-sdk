@@ -47,7 +47,7 @@ class CommunicationConfig:
         prefix = namespace + "STANDALONE_COMMUNICATION_"
         try:
             blob = env[namespace + "VUCM_BLOB"]
-            LOGGER.warn(
+            LOGGER.warning(
                 "`%s` is deprecated and will be removed soon. Please use `%s`.",
                 namespace + "VUCM_BLOB",
                 prefix + "CONFIG",
@@ -115,8 +115,8 @@ class CommunicationConfig:
                         ca_cert=config.mqtt_credentials.ca_chain,
                     ),
                 )
-            case _:
-                raise NotImplementedError(config.mqtt_protocol)
+            case _:  # pragma: no cover
+                raise NotImplementedError(config.mqtt_protocol)  # pragma: no cover
         assert mqtt_api_config is not None
         return cls(
             mqtt_api_config=mqtt_api_config,
@@ -205,8 +205,8 @@ class CommunicationConfigV3:
                 mqtt_credentials = cls.MQTTSCredentials.from_dto(
                     dto["mqtt_credentials"]
                 )
-            case _:
-                raise NotImplementedError(mqtt_protocol)
+            case _:  # pragma: no cover
+                raise NotImplementedError(mqtt_protocol)  # pragma: no cover
         assert mqtt_credentials is not None
         return cls(
             mqtt_host=dto["mqtt_host"],
