@@ -2,7 +2,7 @@ from typing import Self
 
 import httpx
 
-from enapter.http.api import devices
+from enapter.http.api import devices, sites
 
 from .config import Config
 
@@ -33,3 +33,7 @@ class Client:
     @property
     def devices(self) -> devices.Client:
         return devices.Client(client=self._client)
+
+    @property
+    def sites(self) -> sites.Client:
+        return sites.Client(client=self._client)
