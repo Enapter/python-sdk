@@ -43,3 +43,16 @@ class CommunicationConfig:
             hardware_id=dto["hardware_id"],
             channel_id=dto["channel_id"],
         )
+
+    def to_dto(self) -> dict[str, Any]:
+        return {
+            "mqtt_host": self.mqtt_host,
+            "mqtt_port": self.mqtt_port,
+            "mqtt_credentials": self.mqtt_credentials.to_dto(),
+            "mqtt_protocol": self.mqtt_protocol.value,
+            "time_sync_protocol": self.time_sync_protocol.value.lower(),
+            "time_sync_host": self.time_sync_host,
+            "time_sync_port": self.time_sync_port,
+            "hardware_id": self.hardware_id,
+            "channel_id": self.channel_id,
+        }
