@@ -16,3 +16,10 @@ class MQTTSCredentials:
             certificate=dto["certificate"],
             ca_chain=dto["ca_chain"],
         )
+
+    def to_dto(self) -> dict[str, Any]:
+        return {
+            "private_key": self.private_key,
+            "certificate": self.certificate,
+            "ca_chain": self.ca_chain,
+        }

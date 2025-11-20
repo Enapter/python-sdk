@@ -30,3 +30,15 @@ class Device:
             type=DeviceType(dto["type"]),
             authorized_role=AuthorizedRole(dto["authorized_role"]),
         )
+
+    def to_dto(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "blueprint_id": self.blueprint_id,
+            "name": self.name,
+            "site_id": self.site_id,
+            "updated_at": self.updated_at.isoformat(),
+            "slug": self.slug,
+            "type": self.type.value,
+            "authorized_role": self.authorized_role.value,
+        }
