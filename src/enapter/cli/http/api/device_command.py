@@ -2,6 +2,7 @@ import argparse
 
 from enapter import cli
 
+from .device_assign_blueprint_command import DeviceAssignBlueprintCommand
 from .device_create_standalone_command import DeviceCreateStandaloneCommand
 from .device_delete_command import DeviceDeleteCommand
 from .device_generate_communication_config_command import (
@@ -23,6 +24,7 @@ class DeviceCommand(cli.Command):
             dest="http_api_device_command", required=True
         )
         for command in [
+            DeviceAssignBlueprintCommand,
             DeviceCreateStandaloneCommand,
             DeviceDeleteCommand,
             DeviceGenerateCommunicationConfigCommand,
@@ -35,6 +37,8 @@ class DeviceCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         match args.http_api_device_command:
+            case "assign-blueprint":
+                await DeviceAssignBlueprintCommand.run(args)
             case "create-standalone":
                 await DeviceCreateStandaloneCommand.run(args)
             case "delete":
