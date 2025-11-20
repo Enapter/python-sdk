@@ -44,6 +44,16 @@ class Client:
                 yield Device.from_dto(dto)
             offset += limit
 
+    async def update(
+        self, device_id: str, name: str | None = None, slug: str | None = None
+    ) -> Device:
+        if name is None and slug is None:
+            return await self.get(device_id)
+        url = f"v3/devices/{device_id}"
+        response = await self._client.patch(url, json={"name": name, "slug": slug})
+        api.check_error(response)
+        return Device.from_dto(response.json()["device"])
+
     async def delete(self, device_id: str) -> None:
         url = f"v3/devices/{device_id}"
         response = await self._client.delete(url)
