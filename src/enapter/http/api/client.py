@@ -14,8 +14,12 @@ class Client:
         self._client = self._new_client()
 
     def _new_client(self) -> httpx.AsyncClient:
+        assert self._config.base_url is not None
+        headers = {"X-Enapter-Auth-Token": self._config.token}
+        if self._config.allow_http:
+            headers["X-Enapter-Allow-HTTP"] = "true"
         return httpx.AsyncClient(
-            headers={"X-Enapter-Auth-Token": self._config.token},
+            headers=headers,
             base_url=self._config.base_url,
         )
 
