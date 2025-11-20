@@ -59,6 +59,12 @@ class Client:
         response = await self._client.delete(url)
         api.check_error(response)
 
+    async def assign_blueprint(self, device_id: str, blueprint_id: str) -> Device:
+        url = f"v3/devices/{device_id}/assign_blueprint"
+        response = await self._client.post(url, json={"blueprint_id": blueprint_id})
+        api.check_error(response)
+        return Device.from_dto(response.json()["device"])
+
     async def generate_communication_config(
         self, device_id: str, mqtt_protocol: MQTTProtocol
     ) -> CommunicationConfig:
