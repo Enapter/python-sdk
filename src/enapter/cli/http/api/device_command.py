@@ -9,6 +9,7 @@ from .device_generate_communication_config_command import (
 )
 from .device_get_command import DeviceGetCommand
 from .device_list_command import DeviceListCommand
+from .device_update_command import DeviceUpdateCommand
 
 
 class DeviceCommand(cli.Command):
@@ -27,6 +28,7 @@ class DeviceCommand(cli.Command):
             DeviceGenerateCommunicationConfigCommand,
             DeviceGetCommand,
             DeviceListCommand,
+            DeviceUpdateCommand,
         ]:
             command.register(subparsers)
 
@@ -43,5 +45,7 @@ class DeviceCommand(cli.Command):
                 await DeviceGetCommand.run(args)
             case "list":
                 await DeviceListCommand.run(args)
+            case "update":
+                await DeviceUpdateCommand.run(args)
             case _:
                 raise NotImplementedError(args.device_command)
