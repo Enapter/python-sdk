@@ -3,6 +3,7 @@ import argparse
 from enapter import cli
 
 from .device_create_standalone_command import DeviceCreateStandaloneCommand
+from .device_delete_command import DeviceDeleteCommand
 from .device_generate_communication_config_command import (
     DeviceGenerateCommunicationConfigCommand,
 )
@@ -22,6 +23,7 @@ class DeviceCommand(cli.Command):
         )
         for command in [
             DeviceCreateStandaloneCommand,
+            DeviceDeleteCommand,
             DeviceGenerateCommunicationConfigCommand,
             DeviceGetCommand,
             DeviceListCommand,
@@ -33,6 +35,8 @@ class DeviceCommand(cli.Command):
         match args.http_api_device_command:
             case "create-standalone":
                 await DeviceCreateStandaloneCommand.run(args)
+            case "delete":
+                await DeviceDeleteCommand.run(args)
             case "generate-communication-config":
                 await DeviceGenerateCommunicationConfigCommand.run(args)
             case "get":
