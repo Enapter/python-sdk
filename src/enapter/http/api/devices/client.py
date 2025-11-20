@@ -1,5 +1,7 @@
 import httpx
 
+from enapter.http import api
+
 from .communication_config import CommunicationConfig
 from .device import Device
 from .mqtt_protocol import MQTTProtocol
@@ -13,7 +15,7 @@ class Client:
     async def get(self, device_id: str) -> Device:
         url = f"v3/devices/{device_id}"
         response = await self._client.get(url)
-        response.raise_for_status()
+        api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
     async def generate_communication_config(
@@ -21,5 +23,5 @@ class Client:
     ) -> CommunicationConfig:
         url = f"v3/devices/{device_id}/generate_config"
         response = await self._client.post(url, json={"protocol": mqtt_protocol.value})
-        response.raise_for_status()
+        api.check_error(response)
         return CommunicationConfig.from_dto(response.json()["config"])

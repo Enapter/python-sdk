@@ -1,5 +1,7 @@
-from . import devices
 from .client import Client
 from .config import Config
+from .errors import Error, MultiError, check_error
 
-__all__ = ["Client", "Config", "devices"]
+from . import devices  # isort: skip
+
+__all__ = ["Client", "Config", "devices", "Error", "MultiError", "check_error"]
