@@ -44,6 +44,11 @@ class Client:
                 yield Device.from_dto(dto)
             offset += limit
 
+    async def delete(self, device_id: str) -> None:
+        url = f"v3/devices/{device_id}"
+        response = await self._client.delete(url)
+        api.check_error(response)
+
     async def generate_communication_config(
         self, device_id: str, mqtt_protocol: MQTTProtocol
     ) -> CommunicationConfig:
