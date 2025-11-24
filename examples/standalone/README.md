@@ -1,12 +1,24 @@
 # Standalone
 
-## Basic Implementation
+## Communication Config
 
-The most straightforward way to implement your own standalone device is:
+To connect your device to Enapter Cloud, you first need to generate a
+communication config.
 
-1. Subclass `enapter.standalone.Device`.
-2. Override `async def run(self) -> None` method to send telemetry and properties.
-3. Pass an instance of your device to `enapter.standalone.run`.
+> [!NOTE]
+> The following instruction applies only to v3 sites. If you have a v1 site,
+> follow [this
+> tutorial](https://developers.enapter.com/docs/tutorial/software-ucms/standalone)
+> to generate your communication config.
+
+Generate a communication config using [Enapter
+CLI](https://github.com/Enapter/enapter-cli):
+
+```bash
+enapter3 device communication-config generate --device-id "$YOUR_DEVICE_ID" --protocol MQTTS | jq .config | base64 --wrap=0
+```
+
+## Device Implementation
 
 Here's a basic example:
 
@@ -28,6 +40,30 @@ class MyDevice(enapter.standalone.Device):
 
 if __name__ == "__main__":
     asyncio.run(main())
+```
+
+<details>
+<summary>What's going on?</summary>
+
+The most straightforward way to implement your own standalone device is:
+
+1. Subclass `enapter.standalone.Device`.
+2. Override `async def run(self) -> None` method to send telemetry and
+   properties.
+3. Pass an instance of your device to `enapter.standalone.run`.
+
+`enapter.standalone.run` will take care of loading the communication config and
+connecting your device to an upstream.
+
+</details>
+
+## Running
+
+Use the generated communication config to run your device:
+
+```bash
+export ENAPTER_STANDALONE_COMMUNICATION_CONFIG="$YOUR_COMMUNICATION_CONFIG"
+python my_device.py
 ```
 
 ## Handling Commands
@@ -71,32 +107,6 @@ Instead, use `asyncio.to_thread` to offload such work to a thread pool:
 
 ```python
 await asyncio.to_thread(blocking_call())
-```
-
-## Communication Config
-
-> [!NOTE]
-> The following instruction applies only to v3 sites. If you have a v1 site,
-> follow [this
-> tutorial](https://developers.enapter.com/docs/tutorial/software-ucms/standalone)
-> to generate your communication config.
-
-Generate a communication config using [Enapter
-CLI](https://github.com/Enapter/enapter-cli):
-
-```bash
-enapter3 device communication-config generate --device-id "$YOUR_DEVICE_ID" --protocol MQTTS | jq .config | base64 --wrap=0
-```
-
-</details>
-
-## Running
-
-Use the generated communication config to run your device:
-
-```bash
-export ENAPTER_STANDALONE_COMMUNICATION_CONFIG="$YOUR_COMMUNICATION_CONFIG"
-python my_device.py
 ```
 
 ## Running In Docker
