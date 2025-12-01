@@ -29,12 +29,6 @@ class Client:
         api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
-    async def get_manifest(self, device_id: str) -> dict[str, Any]:
-        url = f"v3/devices/{device_id}/manifest"
-        response = await self._client.get(url)
-        api.check_error(response)
-        return response.json()["manifest"]
-
     @async_.generator
     async def list(self) -> AsyncGenerator[Device, None]:
         url = "v3/devices"
