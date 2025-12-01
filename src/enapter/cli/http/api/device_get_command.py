@@ -32,6 +32,12 @@ class DeviceGetCommand(cli.Command):
             action="store_true",
             help="Expand device connectivity information",
         )
+        parser.add_argument(
+            "-u",
+            "--communication",
+            action="store_true",
+            help="Expand device communication information",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -41,5 +47,6 @@ class DeviceGetCommand(cli.Command):
                 expand_manifest=args.manifest,
                 expand_properties=args.properties,
                 expand_connectivity=args.connectivity,
+                expand_communication=args.communication,
             )
             print(json.dumps(device.to_dto()))

@@ -27,12 +27,14 @@ class Client:
         expand_manifest: bool = False,
         expand_properties: bool = False,
         expand_connectivity: bool = False,
+        expand_communication: bool = False,
     ) -> Device:
         url = f"v3/devices/{device_id}"
         expand = {
             "manifest": expand_manifest,
             "properties": expand_properties,
             "connectivity": expand_connectivity,
+            "communication": expand_communication,
         }
         params = {"expand": ",".join(k for k, v in expand.items() if v)}
         response = await self._client.get(url, params=params)
