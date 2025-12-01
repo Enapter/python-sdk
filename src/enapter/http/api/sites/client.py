@@ -29,8 +29,8 @@ class Client:
         api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
-    async def get(self, site_id: str) -> Site:
-        url = f"v3/sites/{site_id}"
+    async def get(self, site_id: str | None) -> Site:
+        url = f"v3/sites/{site_id}" if site_id is not None else "v3/site"
         response = await self._client.get(url)
         api.check_error(response)
         return Site.from_dto(response.json()["site"])
@@ -52,10 +52,10 @@ class Client:
                 yield Site.from_dto(dto)
             offset += limit
 
-    async def update(self, site_id: str, name: str | None = None) -> Site:
+    async def update(self, site_id: str | None, name: str | None = None) -> Site:
         if name is None:
             return await self.get(site_id)
-        url = f"v3/sites/{site_id}"
+        url = f"v3/sites/{site_id}" if site_id is not None else "v3/site"
         response = await self._client.patch(url, json={"name": name})
         api.check_error(response)
         return Site.from_dto(response.json()["site"])
