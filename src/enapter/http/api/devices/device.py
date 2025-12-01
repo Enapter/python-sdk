@@ -18,6 +18,7 @@ class Device:
     type: DeviceType
     authorized_role: AuthorizedRole
     manifest: dict[str, Any] | None = None
+    properties: dict[str, Any] | None = None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
@@ -31,6 +32,7 @@ class Device:
             type=DeviceType(dto["type"]),
             authorized_role=AuthorizedRole(dto["authorized_role"]),
             manifest=dto.get("manifest"),
+            properties=dto.get("properties"),
         )
 
     def to_dto(self) -> dict[str, Any]:
@@ -44,4 +46,5 @@ class Device:
             "type": self.type.value,
             "authorized_role": self.authorized_role.value,
             "manifest": self.manifest,
+            "properties": self.properties,
         }

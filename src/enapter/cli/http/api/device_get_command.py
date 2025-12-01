@@ -20,9 +20,19 @@ class DeviceGetCommand(cli.Command):
             action="store_true",
             help="Expand device manifest information",
         )
+        parser.add_argument(
+            "-p",
+            "--properties",
+            action="store_true",
+            help="Expand device properties information",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices.get(args.id, expand_manifest=args.manifest)
+            device = await client.devices.get(
+                args.id,
+                expand_manifest=args.manifest,
+                expand_properties=args.properties,
+            )
             print(json.dumps(device.to_dto()))

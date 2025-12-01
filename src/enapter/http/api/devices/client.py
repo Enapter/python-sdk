@@ -21,9 +21,14 @@ class Client:
         api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
-    async def get(self, device_id: str, expand_manifest: bool = False) -> Device:
+    async def get(
+        self,
+        device_id: str,
+        expand_manifest: bool = False,
+        expand_properties: bool = False,
+    ) -> Device:
         url = f"v3/devices/{device_id}"
-        expand = {"manifest": expand_manifest}
+        expand = {"manifest": expand_manifest, "properties": expand_properties}
         params = {"expand": ",".join(k for k, v in expand.items() if v)}
         response = await self._client.get(url, params=params)
         api.check_error(response)
