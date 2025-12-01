@@ -5,6 +5,7 @@ import httpx
 from enapter import async_
 from enapter.http import api
 
+from .location import Location
 from .site import Site
 
 
@@ -13,9 +14,18 @@ class Client:
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
 
-    async def create(self, name: str) -> Site:
+    async def create(
+        self, name: str, timezone: str, location: Location | None = None
+    ) -> Site:
         url = "v3/sites"
-        response = await self._client.post(url, json={"name": name})
+        response = await self._client.post(
+            url,
+            json={
+                "name": name,
+                "timezone": timezone,
+                "location": location.to_dto() if location is not None else None,
+            },
+        )
         api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
