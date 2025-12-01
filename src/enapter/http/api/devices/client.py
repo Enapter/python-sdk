@@ -26,9 +26,14 @@ class Client:
         device_id: str,
         expand_manifest: bool = False,
         expand_properties: bool = False,
+        expand_connectivity: bool = False,
     ) -> Device:
         url = f"v3/devices/{device_id}"
-        expand = {"manifest": expand_manifest, "properties": expand_properties}
+        expand = {
+            "manifest": expand_manifest,
+            "properties": expand_properties,
+            "connectivity": expand_connectivity,
+        }
         params = {"expand": ",".join(k for k, v in expand.items() if v)}
         response = await self._client.get(url, params=params)
         api.check_error(response)

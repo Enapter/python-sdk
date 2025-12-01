@@ -3,6 +3,7 @@ import datetime
 from typing import Any, Self
 
 from .authorized_role import AuthorizedRole
+from .device_connectivity import DeviceConnectivity
 from .device_type import DeviceType
 
 
@@ -19,6 +20,7 @@ class Device:
     authorized_role: AuthorizedRole
     manifest: dict[str, Any] | None = None
     properties: dict[str, Any] | None = None
+    connectivity: DeviceConnectivity | None = None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
@@ -33,6 +35,11 @@ class Device:
             authorized_role=AuthorizedRole(dto["authorized_role"]),
             manifest=dto.get("manifest"),
             properties=dto.get("properties"),
+            connectivity=(
+                DeviceConnectivity.from_dto(dto["connectivity"])
+                if dto.get("connectivity") is not None
+                else None
+            ),
         )
 
     def to_dto(self) -> dict[str, Any]:
@@ -47,4 +54,7 @@ class Device:
             "authorized_role": self.authorized_role.value,
             "manifest": self.manifest,
             "properties": self.properties,
+            "connectivity": (
+                self.connectivity.to_dto() if self.connectivity is not None else None
+            ),
         }
