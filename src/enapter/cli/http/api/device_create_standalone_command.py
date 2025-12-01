@@ -11,9 +11,7 @@ class DeviceCreateStandaloneCommand(cli.Command):
         parser = parent.add_parser(
             "create-standalone", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        parser.add_argument(
-            "name", help="ID or slug of the device to get information about"
-        )
+        parser.add_argument("name", help="Name of the standalone device to create")
         parser.add_argument(
             "-s", "--site-id", help="Site ID to create device in", default=None
         )
