@@ -3,6 +3,7 @@ import argparse
 from enapter import cli
 
 from .device_command import DeviceCommand
+from .site_command import SiteCommand
 
 
 class Command(cli.Command):
@@ -15,6 +16,7 @@ class Command(cli.Command):
         subparsers = parser.add_subparsers(dest="http_api_command", required=True)
         for command in [
             DeviceCommand,
+            SiteCommand,
         ]:
             command.register(subparsers)
 
@@ -23,5 +25,7 @@ class Command(cli.Command):
         match args.http_api_command:
             case "device":
                 await DeviceCommand.run(args)
+            case "site":
+                await SiteCommand.run(args)
             case _:
                 raise NotImplementedError(args.device_command)
