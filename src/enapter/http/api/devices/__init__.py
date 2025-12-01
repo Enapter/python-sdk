@@ -2,6 +2,7 @@ from .authorized_role import AuthorizedRole
 from .client import Client
 from .communication_config import CommunicationConfig
 from .device import Device
+from .device_connectivity import DeviceConnectivity, DeviceConnectivityStatus
 from .device_type import DeviceType
 from .mqtt_credentials import MQTTCredentials
 from .mqtt_protocol import MQTTProtocol
@@ -14,6 +15,8 @@ __all__ = [
     "CommunicationConfig",
     "Device",
     "DeviceType",
+    "DeviceConnectivity",
+    "DeviceConnectivityStatus",
     "MQTTCredentials",
     "MQTTProtocol",
     "MQTTSCredentials",

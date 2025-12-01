@@ -26,6 +26,12 @@ class DeviceGetCommand(cli.Command):
             action="store_true",
             help="Expand device properties information",
         )
+        parser.add_argument(
+            "-c",
+            "--connectivity",
+            action="store_true",
+            help="Expand device connectivity information",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -34,5 +40,6 @@ class DeviceGetCommand(cli.Command):
                 args.id,
                 expand_manifest=args.manifest,
                 expand_properties=args.properties,
+                expand_connectivity=args.connectivity,
             )
             print(json.dumps(device.to_dto()))
