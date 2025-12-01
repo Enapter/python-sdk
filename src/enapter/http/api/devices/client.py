@@ -21,9 +21,11 @@ class Client:
         api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
-    async def get(self, device_id: str) -> Device:
+    async def get(self, device_id: str, expand_manifest: bool = False) -> Device:
         url = f"v3/devices/{device_id}"
-        response = await self._client.get(url)
+        expand = {"manifest": expand_manifest}
+        params = {"expand": ",".join(k for k, v in expand.items() if v)}
+        response = await self._client.get(url, params=params)
         api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
