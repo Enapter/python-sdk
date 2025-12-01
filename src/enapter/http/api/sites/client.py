@@ -52,11 +52,24 @@ class Client:
                 yield Site.from_dto(dto)
             offset += limit
 
-    async def update(self, site_id: str | None, name: str | None = None) -> Site:
-        if name is None:
+    async def update(
+        self,
+        site_id: str | None,
+        name: str | None = None,
+        timezone: str | None = None,
+        location: Location | None = None,
+    ) -> Site:
+        if name is None and timezone is None and location is None:
             return await self.get(site_id)
         url = f"v3/sites/{site_id}" if site_id is not None else "v3/site"
-        response = await self._client.patch(url, json={"name": name})
+        response = await self._client.patch(
+            url,
+            json={
+                "name": name,
+                "timezone": timezone,
+                "location": location.to_dto() if location is not None else None,
+            },
+        )
         api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
