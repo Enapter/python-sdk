@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 import httpx
 
@@ -36,19 +36,32 @@ class Client:
             "connectivity": expand_connectivity,
             "communication": expand_communication,
         }
-        params = {"expand": ",".join(k for k, v in expand.items() if v)}
-        response = await self._client.get(url, params=params)
+        expand_string = ",".join(k for k, v in expand.items() if v)
+        response = await self._client.get(url, params={"expand": expand_string})
         api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
     @async_.generator
-    async def list(self) -> AsyncGenerator[Device, None]:
+    async def list(
+        self,
+        expand_manifest: bool = False,
+        expand_properties: bool = False,
+        expand_connectivity: bool = False,
+        expand_communication: bool = False,
+    ) -> AsyncGenerator[Device, None]:
         url = "v3/devices"
+        expand = {
+            "manifest": expand_manifest,
+            "properties": expand_properties,
+            "connectivity": expand_connectivity,
+            "communication": expand_communication,
+        }
+        expand_string = ",".join(k for k, v in expand.items() if v)
         limit = 50
         offset = 0
         while True:
             response = await self._client.get(
-                url, params={"limit": limit, "offset": offset}
+                url, params={"expand": expand_string, "limit": limit, "offset": offset}
             )
             api.check_error(response)
             payload = response.json()
