@@ -1,6 +1,7 @@
 import dataclasses
-import datetime
-from typing import Any, Self
+from typing import Any, Literal, Self
+
+from .location import Location
 
 
 @dataclasses.dataclass
@@ -8,22 +9,29 @@ class Site:
 
     id: str
     name: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    timezone: str
+    version: Literal["v3"]
+    location: Location | None = None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             id=dto["id"],
             name=dto["name"],
-            created_at=datetime.datetime.fromisoformat(dto["created_at"]),
-            updated_at=datetime.datetime.fromisoformat(dto["updated_at"]),
+            timezone=dto["timezone"],
+            version=dto["version"],
+            location=(
+                Location.from_dto(dto["location"])
+                if dto.get("location") is not None
+                else None
+            ),
         )
 
     def to_dto(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "timezone": self.timezone,
+            "version": self.version,
+            "location": self.location.to_dto() if self.location is not None else None,
         }
