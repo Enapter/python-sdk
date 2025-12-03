@@ -13,7 +13,7 @@ class Command(cli.Command):
         parser = parent.add_parser(
             "api", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        subparsers = parser.add_subparsers(dest="http_api_command", required=True)
+        subparsers = parser.add_subparsers(dest="api_command", required=True)
         for command in [
             DeviceCommand,
             SiteCommand,
@@ -22,7 +22,7 @@ class Command(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        match args.http_api_command:
+        match args.api_command:
             case "device":
                 await DeviceCommand.run(args)
             case "site":
