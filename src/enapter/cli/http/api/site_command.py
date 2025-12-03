@@ -16,7 +16,7 @@ class SiteCommand(cli.Command):
         parser = parent.add_parser(
             "site", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        subparsers = parser.add_subparsers(dest="http_api_site_command", required=True)
+        subparsers = parser.add_subparsers(dest="site_command", required=True)
         for command in [
             SiteCreateCommand,
             SiteDeleteCommand,
@@ -28,7 +28,7 @@ class SiteCommand(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        match args.http_api_site_command:
+        match args.site_command:
             case "create":
                 await SiteCreateCommand.run(args)
             case "delete":
@@ -40,4 +40,4 @@ class SiteCommand(cli.Command):
             case "update":
                 await SiteUpdateCommand.run(args)
             case _:
-                raise NotImplementedError(args.device_command)
+                raise NotImplementedError(args.site_command)

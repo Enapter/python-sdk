@@ -20,9 +20,7 @@ class DeviceCommand(cli.Command):
         parser = parent.add_parser(
             "device", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        subparsers = parser.add_subparsers(
-            dest="http_api_device_command", required=True
-        )
+        subparsers = parser.add_subparsers(dest="device_command", required=True)
         for command in [
             DeviceAssignBlueprintCommand,
             DeviceCreateStandaloneCommand,
@@ -36,7 +34,7 @@ class DeviceCommand(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        match args.http_api_device_command:
+        match args.device_command:
             case "assign-blueprint":
                 await DeviceAssignBlueprintCommand.run(args)
             case "create-standalone":
