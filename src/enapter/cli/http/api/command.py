@@ -2,6 +2,7 @@ import argparse
 
 from enapter import cli
 
+from .blueprint_command import BlueprintCommand
 from .device_command import DeviceCommand
 from .site_command import SiteCommand
 
@@ -15,6 +16,7 @@ class Command(cli.Command):
         )
         subparsers = parser.add_subparsers(dest="api_command", required=True)
         for command in [
+            BlueprintCommand,
             DeviceCommand,
             SiteCommand,
         ]:
@@ -23,6 +25,8 @@ class Command(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         match args.api_command:
+            case "blueprint":
+                await BlueprintCommand.run(args)
             case "device":
                 await DeviceCommand.run(args)
             case "site":
