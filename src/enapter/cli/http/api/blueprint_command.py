@@ -4,6 +4,7 @@ from enapter import cli
 
 from .blueprint_download_command import BlueprintDownloadCommand
 from .blueprint_upload_command import BlueprintUploadCommand
+from .blueprint_validate_command import BlueprintValidateCommand
 
 
 class BlueprintCommand(cli.Command):
@@ -17,6 +18,7 @@ class BlueprintCommand(cli.Command):
         for command in [
             BlueprintDownloadCommand,
             BlueprintUploadCommand,
+            BlueprintValidateCommand,
         ]:
             command.register(subparsers)
 
@@ -27,5 +29,7 @@ class BlueprintCommand(cli.Command):
                 await BlueprintDownloadCommand.run(args)
             case "upload":
                 await BlueprintUploadCommand.run(args)
+            case "validate":
+                await BlueprintValidateCommand.run(args)
             case _:
                 raise NotImplementedError(args.command_command)
