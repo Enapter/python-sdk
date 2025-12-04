@@ -3,7 +3,9 @@ import argparse
 from enapter import cli
 
 from .device_assign_blueprint_command import DeviceAssignBlueprintCommand
+from .device_create_lua_command import DeviceCreateLuaCommand
 from .device_create_standalone_command import DeviceCreateStandaloneCommand
+from .device_create_vucm_command import DeviceCreateVUCMCommand
 from .device_delete_command import DeviceDeleteCommand
 from .device_generate_communication_config_command import (
     DeviceGenerateCommunicationConfigCommand,
@@ -24,7 +26,9 @@ class DeviceCommand(cli.Command):
         for command in [
             DeviceAssignBlueprintCommand,
             DeviceCreateStandaloneCommand,
+            DeviceCreateVUCMCommand,
             DeviceDeleteCommand,
+            DeviceCreateLuaCommand,
             DeviceGenerateCommunicationConfigCommand,
             DeviceGetCommand,
             DeviceListCommand,
@@ -35,6 +39,8 @@ class DeviceCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         match args.device_command:
+            case "create-lua":
+                await DeviceCreateLuaCommand.run(args)
             case "assign-blueprint":
                 await DeviceAssignBlueprintCommand.run(args)
             case "create-standalone":
@@ -49,5 +55,7 @@ class DeviceCommand(cli.Command):
                 await DeviceListCommand.run(args)
             case "update":
                 await DeviceUpdateCommand.run(args)
+            case "create-vucm":
+                await DeviceCreateVUCMCommand.run(args)
             case _:
                 raise NotImplementedError(args.device_command)
