@@ -14,6 +14,12 @@ class Client:
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
 
+    async def get(self, blueprint_id: str) -> Blueprint:
+        url = f"v3/blueprints/{blueprint_id}"
+        response = await self._client.get(url)
+        api.check_error(response)
+        return Blueprint.from_dto(response.json()["blueprint"])
+
     async def upload_file(self, path: pathlib.Path) -> Blueprint:
         with path.open("rb") as file:
             data = file.read()
