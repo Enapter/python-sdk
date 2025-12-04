@@ -14,9 +14,39 @@ class DeviceGetCommand(cli.Command):
         parser.add_argument(
             "id", type=str, help="ID or slug of the device to get information about"
         )
+        parser.add_argument(
+            "-m",
+            "--manifest",
+            action="store_true",
+            help="Expand device manifest information",
+        )
+        parser.add_argument(
+            "-p",
+            "--properties",
+            action="store_true",
+            help="Expand device properties information",
+        )
+        parser.add_argument(
+            "-c",
+            "--connectivity",
+            action="store_true",
+            help="Expand device connectivity information",
+        )
+        parser.add_argument(
+            "-u",
+            "--communication",
+            action="store_true",
+            help="Expand device communication information",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices.get(args.id)
+            device = await client.devices.get(
+                args.id,
+                expand_manifest=args.manifest,
+                expand_properties=args.properties,
+                expand_connectivity=args.connectivity,
+                expand_communication=args.communication,
+            )
             print(json.dumps(device.to_dto()))

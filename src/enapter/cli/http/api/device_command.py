@@ -9,7 +9,6 @@ from .device_generate_communication_config_command import (
     DeviceGenerateCommunicationConfigCommand,
 )
 from .device_get_command import DeviceGetCommand
-from .device_get_manifest_command import DeviceGetManifestCommand
 from .device_list_command import DeviceListCommand
 from .device_update_command import DeviceUpdateCommand
 
@@ -21,16 +20,13 @@ class DeviceCommand(cli.Command):
         parser = parent.add_parser(
             "device", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        subparsers = parser.add_subparsers(
-            dest="http_api_device_command", required=True
-        )
+        subparsers = parser.add_subparsers(dest="device_command", required=True)
         for command in [
             DeviceAssignBlueprintCommand,
             DeviceCreateStandaloneCommand,
             DeviceDeleteCommand,
             DeviceGenerateCommunicationConfigCommand,
             DeviceGetCommand,
-            DeviceGetManifestCommand,
             DeviceListCommand,
             DeviceUpdateCommand,
         ]:
@@ -38,7 +34,7 @@ class DeviceCommand(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        match args.http_api_device_command:
+        match args.device_command:
             case "assign-blueprint":
                 await DeviceAssignBlueprintCommand.run(args)
             case "create-standalone":
@@ -49,8 +45,6 @@ class DeviceCommand(cli.Command):
                 await DeviceGenerateCommunicationConfigCommand.run(args)
             case "get":
                 await DeviceGetCommand.run(args)
-            case "get-manifest":
-                await DeviceGetManifestCommand.run(args)
             case "list":
                 await DeviceListCommand.run(args)
             case "update":

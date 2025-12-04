@@ -3,6 +3,8 @@ import datetime
 from typing import Any, Self
 
 from .authorized_role import AuthorizedRole
+from .device_communication import DeviceCommunication
+from .device_connectivity import DeviceConnectivity
 from .device_type import DeviceType
 
 
@@ -17,6 +19,10 @@ class Device:
     slug: str
     type: DeviceType
     authorized_role: AuthorizedRole
+    manifest: dict[str, Any] | None = None
+    properties: dict[str, Any] | None = None
+    connectivity: DeviceConnectivity | None = None
+    communication: DeviceCommunication | None = None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
@@ -29,6 +35,18 @@ class Device:
             slug=dto["slug"],
             type=DeviceType(dto["type"]),
             authorized_role=AuthorizedRole(dto["authorized_role"]),
+            manifest=dto.get("manifest"),
+            properties=dto.get("properties"),
+            connectivity=(
+                DeviceConnectivity.from_dto(dto["connectivity"])
+                if dto.get("connectivity") is not None
+                else None
+            ),
+            communication=(
+                DeviceCommunication.from_dto(dto["communication"])
+                if dto.get("communication") is not None
+                else None
+            ),
         )
 
     def to_dto(self) -> dict[str, Any]:
@@ -41,4 +59,12 @@ class Device:
             "slug": self.slug,
             "type": self.type.value,
             "authorized_role": self.authorized_role.value,
+            "manifest": self.manifest,
+            "properties": self.properties,
+            "connectivity": (
+                self.connectivity.to_dto() if self.connectivity is not None else None
+            ),
+            "communication": (
+                self.communication.to_dto() if self.communication is not None else None
+            ),
         }

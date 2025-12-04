@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 import httpx
 
@@ -21,26 +21,47 @@ class Client:
         api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
-    async def get(self, device_id: str) -> Device:
+    async def get(
+        self,
+        device_id: str,
+        expand_manifest: bool = False,
+        expand_properties: bool = False,
+        expand_connectivity: bool = False,
+        expand_communication: bool = False,
+    ) -> Device:
         url = f"v3/devices/{device_id}"
-        response = await self._client.get(url)
+        expand = {
+            "manifest": expand_manifest,
+            "properties": expand_properties,
+            "connectivity": expand_connectivity,
+            "communication": expand_communication,
+        }
+        expand_string = ",".join(k for k, v in expand.items() if v)
+        response = await self._client.get(url, params={"expand": expand_string})
         api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
-    async def get_manifest(self, device_id: str) -> dict[str, Any]:
-        url = f"v3/devices/{device_id}/manifest"
-        response = await self._client.get(url)
-        api.check_error(response)
-        return response.json()["manifest"]
-
     @async_.generator
-    async def list(self) -> AsyncGenerator[Device, None]:
+    async def list(
+        self,
+        expand_manifest: bool = False,
+        expand_properties: bool = False,
+        expand_connectivity: bool = False,
+        expand_communication: bool = False,
+    ) -> AsyncGenerator[Device, None]:
         url = "v3/devices"
+        expand = {
+            "manifest": expand_manifest,
+            "properties": expand_properties,
+            "connectivity": expand_connectivity,
+            "communication": expand_communication,
+        }
+        expand_string = ",".join(k for k, v in expand.items() if v)
         limit = 50
         offset = 0
         while True:
             response = await self._client.get(
-                url, params={"limit": limit, "offset": offset}
+                url, params={"expand": expand_string, "limit": limit, "offset": offset}
             )
             api.check_error(response)
             payload = response.json()
