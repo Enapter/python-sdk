@@ -2,7 +2,7 @@ from typing import Self
 
 import httpx
 
-from enapter.http.api import devices, sites
+from enapter.http.api import blueprints, commands, devices, sites
 
 from .config import Config
 
@@ -37,3 +37,11 @@ class Client:
     @property
     def sites(self) -> sites.Client:
         return sites.Client(client=self._client)
+
+    @property
+    def commands(self) -> commands.Client:
+        return commands.Client(client=self._client)
+
+    @property
+    def blueprints(self) -> blueprints.Client:
+        return blueprints.Client(client=self._client)
