@@ -1,3 +1,4 @@
+import random
 from typing import AsyncGenerator
 
 import httpx
@@ -17,7 +18,37 @@ class Client:
 
     async def create_standalone(self, name: str, site_id: str | None = None) -> Device:
         url = "v3/provisioning/standalone"
-        response = await self._client.post(url, json={"name": name, "site_id": site_id})
+        response = await self._client.post(url, json={"slug": name, "site_id": site_id})
+        api.check_error(response)
+        return await self.get(device_id=response.json()["device_id"])
+
+    async def create_vucm(
+        self, name: str, hardware_id: str | None = None, site_id: str | None = None
+    ) -> Device:
+        if hardware_id is None:
+            hardware_id = random_hardware_id()
+        url = "v3/provisioning/vucm"
+        response = await self._client.post(
+            url, json={"name": name, "hardware_id": hardware_id, "site_id": site_id}
+        )
+        api.check_error(response)
+        return await self.get(
+            device_id=response.json()["device_id"], expand_communication=True
+        )
+
+    async def create_lua(
+        self, name: str, runtime_id: str, blueprint_id: str, slug: str | None = None
+    ) -> Device:
+        url = "v3/provisioning/lua_device"
+        response = await self._client.post(
+            url,
+            json={
+                "name": name,
+                "runtime_id": runtime_id,
+                "blueprint_id": blueprint_id,
+                "slug": slug,
+            },
+        )
         api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
@@ -99,3 +130,7 @@ class Client:
         response = await self._client.post(url, json={"protocol": mqtt_protocol.value})
         api.check_error(response)
         return CommunicationConfig.from_dto(response.json()["config"])
+
+
+def random_hardware_id() -> str:
+    return "V" + "".join(f"{b:02X}" for b in random.randbytes(16))
