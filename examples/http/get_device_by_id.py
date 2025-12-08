@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 
 import enapter
@@ -9,7 +10,7 @@ async def main():
     device_id = os.environ["DEVICE_ID"]
     async with enapter.http.api.Client(config=config) as client:
         device = await client.devices.get(device_id)
-        print(device)
+        print(json.dumps(device.to_dto()))
 
 
 if __name__ == "__main__":
