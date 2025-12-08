@@ -1,4 +1,5 @@
 import random
+import time
 from typing import AsyncGenerator
 
 import httpx
@@ -8,6 +9,7 @@ from enapter.http import api
 
 from .communication_config import CommunicationConfig
 from .device import Device
+from .device_type import DeviceType
 from .mqtt_protocol import MQTTProtocol
 
 
@@ -17,8 +19,13 @@ class Client:
         self._client = client
 
     async def create_standalone(
-        self, name: str, site_id: str | None = None, slug: str | None = None
+        self,
+        name: str | None = None,
+        site_id: str | None = None,
+        slug: str | None = None,
     ) -> Device:
+        if name is None:
+            name = random_device_name(DeviceType.STANDALONE)
         url = "v3/provisioning/standalone"
         response = await self._client.post(
             url, json={"name": name, "site_id": site_id, "slug": slug}
@@ -27,8 +34,13 @@ class Client:
         return await self.get(device_id=response.json()["device_id"])
 
     async def create_vucm(
-        self, name: str, hardware_id: str | None = None, site_id: str | None = None
+        self,
+        name: str | None = None,
+        hardware_id: str | None = None,
+        site_id: str | None = None,
     ) -> Device:
+        if name is None:
+            name = random_device_name(DeviceType.VIRTUAL_UCM)
         if hardware_id is None:
             hardware_id = random_hardware_id()
         url = "v3/provisioning/vucm"
@@ -41,8 +53,14 @@ class Client:
         )
 
     async def create_lua(
-        self, name: str, runtime_id: str, blueprint_id: str, slug: str | None = None
+        self,
+        runtime_id: str,
+        blueprint_id: str,
+        name: str | None = None,
+        slug: str | None = None,
     ) -> Device:
+        if name is None:
+            name = random_device_name(DeviceType.LUA)
         url = "v3/provisioning/lua_device"
         response = await self._client.post(
             url,
@@ -134,6 +152,10 @@ class Client:
         response = await self._client.post(url, json={"protocol": mqtt_protocol.value})
         api.check_error(response)
         return CommunicationConfig.from_dto(response.json()["config"])
+
+
+def random_device_name(device_type: DeviceType) -> str:
+    return f"{device_type.value} ({time.time()})"
 
 
 def random_hardware_id() -> str:

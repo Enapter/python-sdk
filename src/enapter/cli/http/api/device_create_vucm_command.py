@@ -13,7 +13,7 @@ class DeviceCreateVUCMCommand(cli.Command):
         )
         parser.add_argument("-s", "--site-id", help="Site ID to create device in")
         parser.add_argument("--hardware-id", help="Hardware ID of the VUCM device")
-        parser.add_argument("name", help="Name of the VUCM device to create")
+        parser.add_argument("-n", "--name", help="Name of the VUCM device to create")
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
