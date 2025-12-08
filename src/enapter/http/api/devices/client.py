@@ -16,9 +16,13 @@ class Client:
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
 
-    async def create_standalone(self, name: str, site_id: str | None = None) -> Device:
+    async def create_standalone(
+        self, name: str, site_id: str | None = None, slug: str | None = None
+    ) -> Device:
         url = "v3/provisioning/standalone"
-        response = await self._client.post(url, json={"slug": name, "site_id": site_id})
+        response = await self._client.post(
+            url, json={"name": name, "site_id": site_id, "slug": slug}
+        )
         api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
