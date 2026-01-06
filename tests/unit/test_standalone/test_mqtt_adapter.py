@@ -183,8 +183,10 @@ async def test_execute_command():
         while True:
             yield await command_requests.get()
 
-    async def publish_command_response(r: enapter.mqtt.api.device.CommandResponse):
-        await command_responses.put(r)
+    async def publish_command_response(
+        response: enapter.mqtt.api.device.CommandResponse,
+    ):
+        await command_responses.put(response)
 
     device_channel.subscribe_to_command_requests = subscribe_to_command_requests
     device_channel.publish_command_response = publish_command_response
@@ -228,8 +230,10 @@ async def test_execute_command_not_implemented():
         while True:
             yield await command_requests.get()
 
-    async def publish_command_response(r: enapter.mqtt.api.device.CommandResponse):
-        await command_responses.put(r)
+    async def publish_command_response(
+        response: enapter.mqtt.api.device.CommandResponse,
+    ):
+        await command_responses.put(response)
 
     device_channel.subscribe_to_command_requests = subscribe_to_command_requests
     device_channel.publish_command_response = publish_command_response
@@ -273,8 +277,10 @@ async def test_execute_command_exception():
         while True:
             yield await command_requests.get()
 
-    async def publish_command_response(r: enapter.mqtt.api.device.CommandResponse):
-        await command_responses.put(r)
+    async def publish_command_response(
+        response: enapter.mqtt.api.device.CommandResponse,
+    ):
+        await command_responses.put(response)
 
     device_channel.subscribe_to_command_requests = subscribe_to_command_requests
     device_channel.publish_command_response = publish_command_response
