@@ -37,8 +37,8 @@ pip install enapter==0.13.1
 Explore the examples:
 
 - [Standalone Devices](examples/standalone)
-- [MQTT API](examples/mqtt)
-- [HTTP API](examples/http)
+- [MQTT API](examples/mqtt/api)
+- [HTTP API](examples/http/api)
 
 These provide a good overview of the available features and should give you
 enough to get started.
