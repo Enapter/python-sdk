@@ -105,7 +105,7 @@ class MQTTAdapter(async_.Routine):
                     tg.create_task(self._execute_command(request))
 
     async def _execute_command(self, request: mqtt.api.device.CommandRequest) -> None:
-        await self._device_channel.publish_command_response(
+        await self._publish_command_response(
             request.new_response(
                 mqtt.api.device.CommandState.LOG, {"message": "Executing command..."}
             )
@@ -115,20 +115,28 @@ class MQTTAdapter(async_.Routine):
                 request.name, request.arguments
             )
         except NotImplementedError:
-            await self._device_channel.publish_command_response(
+            await self._publish_command_response(
                 request.new_response(
                     mqtt.api.device.CommandState.ERROR,
                     {"message": "Command handler not implemented."},
                 )
             )
         except Exception:
-            await self._device_channel.publish_command_response(
+            await self._publish_command_response(
                 request.new_response(
                     mqtt.api.device.CommandState.ERROR,
                     {"message": traceback.format_exc()},
                 )
             )
         else:
-            await self._device_channel.publish_command_response(
+            await self._publish_command_response(
                 request.new_response(mqtt.api.device.CommandState.COMPLETED, payload)
             )
+
+    async def _publish_command_response(
+        self, response: mqtt.api.device.CommandResponse
+    ) -> None:
+        try:
+            await self._device_channel.publish_command_response(response=response)
+        except Exception as e:
+            self._logger.error("failed to publish command response: %s", e)
