@@ -66,15 +66,17 @@ dist.tar: dist
 dist:
 	pipenv run python setup.py bdist_wheel
 
+RE_SEMVER = [0-9]+.[0-9]+.[0-9]+(-[a-z0-9]+)?
+
 .PHONY: bump-version
 bump-version:
 ifndef V
 	$(error V is not defined)
 endif
-	sed -E -i 's/__version__ = "[0-9]+.[0-9]+.[0-9]+"/__version__ = "$(V)"/g' src/enapter/__init__.py
+	sed -E -i 's/__version__ = "$(RE_SEMVER)"/__version__ = "$(V)"/g' src/enapter/__init__.py
 
-	grep -E --files-with-matches --recursive 'enapter==[0-9]+.[0-9]+.[0-9]+' README.md examples \
-		| xargs -n 1 sed -E -i 's/enapter==[0-9]+.[0-9]+.[0-9]+/enapter==$(V)/g'
+	grep -E --files-with-matches --recursive "enapter==$(RE_SEMVER)" README.md examples \
+		| xargs -n 1 sed -E -i "s/enapter==$(RE_SEMVER)/enapter==$(V)/g"
 
 DOCKER_IMAGE_TAG ?= latest
 
