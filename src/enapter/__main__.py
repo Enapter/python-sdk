@@ -3,4 +3,7 @@ import asyncio
 from enapter import cli
 
 app = cli.App.new()
-asyncio.run(app.run())
+try:
+    asyncio.run(app.run())
+except KeyboardInterrupt:
+    pass
