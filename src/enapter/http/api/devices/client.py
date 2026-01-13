@@ -101,8 +101,9 @@ class Client:
         expand_properties: bool = False,
         expand_connectivity: bool = False,
         expand_communication: bool = False,
+        site_id: str | None = None,
     ) -> AsyncGenerator[Device, None]:
-        url = "v3/devices"
+        url = "v3/devices" if site_id is None else f"v3/sites/{site_id}/devices"
         expand = {
             "manifest": expand_manifest,
             "properties": expand_properties,

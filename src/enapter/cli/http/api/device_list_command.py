@@ -41,6 +41,7 @@ class DeviceListCommand(cli.Command):
             action="store_true",
             help="Expand device communication information",
         )
+        parser.add_argument("-s", "--site-id", help="Filter devices by site ID")
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -52,6 +53,7 @@ class DeviceListCommand(cli.Command):
                 expand_properties=args.properties,
                 expand_connectivity=args.connectivity,
                 expand_communication=args.communication,
+                site_id=args.site_id,
             ) as stream:
                 count = 0
                 async for device in stream:
