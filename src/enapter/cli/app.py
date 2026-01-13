@@ -3,7 +3,7 @@ import logging
 
 from enapter import log
 
-from . import http
+from . import http, mcp
 
 
 class App:
@@ -20,6 +20,7 @@ class App:
         subparsers = parser.add_subparsers(dest="command", required=True)
         for command in [
             http.Command,
+            mcp.Command,
         ]:
             command.register(subparsers)
         return cls(args=parser.parse_args())
@@ -29,5 +30,7 @@ class App:
         match self.args.command:
             case "http":
                 await http.Command.run(self.args)
+            case "mcp":
+                await mcp.Command.run(self.args)
             case _:
                 raise NotImplementedError(self.args.command)
