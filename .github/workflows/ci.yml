@@ -53,3 +53,78 @@ jobs:
         run: make upload-to-pypi
         env:
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+
+  push_to_docker_hub:
+    name: "Push To Docker Hub"
+    needs: run_checks
+    runs-on: "ubuntu-latest"
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build the image
+        run: make docker-image
+
+      - name: Login To DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker Meta
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: enapter/python-sdk
+          tags: |
+            type=raw,value=${{ github.ref_name }}
+
+      - name: Build And Push To DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+
+  push_to_enapter_docker_hub:
+    name: "Push To Enapter Docker Hub"
+    needs: run_checks
+    runs-on: "ubuntu-latest"
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build The Image
+        run: make docker-image
+
+      - name: Login To DockerHub
+        uses: docker/login-action@v1
+        with:
+          registry: docker.enapter.com
+          username: ${{ secrets.ENAPTER_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.ENAPTER_DOCKERHUB_TOKEN }}
+
+      - name: Docker Meta
+        id: enapter_docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: docker.enapter.com/python/sdk
+          tags: |
+            type=raw,value=${{ github.ref_name }}
+
+      - name: Build And Push To DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.enapter_docker_meta.outputs.tags }}
+          labels: ${{ steps.enapter_docker_meta.outputs.labels }}

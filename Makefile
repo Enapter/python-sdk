@@ -75,3 +75,9 @@ endif
 
 	grep -E --files-with-matches --recursive 'enapter==[0-9]+.[0-9]+.[0-9]+' README.md examples \
 		| xargs -n 1 sed -E -i 's/enapter==[0-9]+.[0-9]+.[0-9]+/enapter==$(V)/g'
+
+DOCKER_IMAGE_TAG ?= latest
+
+.PHONY: docker-image
+docker-image:
+	docker build -t enapter:latest .
