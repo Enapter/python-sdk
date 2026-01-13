@@ -1,2 +1,2 @@
-enapter==0.13.1
+enapter==0.14.0-rc1
 python-miio==0.5.12
