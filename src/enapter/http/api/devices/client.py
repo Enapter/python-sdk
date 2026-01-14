@@ -156,7 +156,8 @@ class Client:
 
 
 def random_device_name(device_type: DeviceType) -> str:
-    return f"{device_type.value} ({time.time()})"
+    timestamp = int(time.time())
+    return f"{device_type.value}_{timestamp}"
 
 
 def random_hardware_id() -> str:
