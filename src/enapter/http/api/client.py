@@ -2,7 +2,7 @@ from typing import Self
 
 import httpx
 
-from enapter.http.api import blueprints, commands, devices, sites
+from enapter.http.api import blueprints, commands, devices, sites, telemetry
 
 from .config import Config
 
@@ -45,3 +45,7 @@ class Client:
     @property
     def blueprints(self) -> blueprints.Client:
         return blueprints.Client(client=self._client)
+
+    @property
+    def telemetry(self) -> telemetry.Client:
+        return telemetry.Client(client=self._client)

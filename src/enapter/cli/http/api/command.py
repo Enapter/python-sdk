@@ -6,6 +6,7 @@ from .blueprint_command import BlueprintCommand
 from .command_command import CommandCommand
 from .device_command import DeviceCommand
 from .site_command import SiteCommand
+from .telemetry_command import TelemetryCommand
 
 
 class Command(cli.Command):
@@ -21,6 +22,7 @@ class Command(cli.Command):
             CommandCommand,
             DeviceCommand,
             SiteCommand,
+            TelemetryCommand,
         ]:
             command.register(subparsers)
 
@@ -35,5 +37,7 @@ class Command(cli.Command):
                 await DeviceCommand.run(args)
             case "site":
                 await SiteCommand.run(args)
+            case "telemetry":
+                await TelemetryCommand.run(args)
             case _:
                 raise NotImplementedError(args.device_command)
