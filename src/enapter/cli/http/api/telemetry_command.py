@@ -3,6 +3,7 @@ import argparse
 from enapter import cli
 
 from .telemetry_latest_command import TelemetryLatestCommand
+from .telemetry_timeseries_command import TelemetryTimeseriesCommand
 
 
 class TelemetryCommand(cli.Command):
@@ -15,6 +16,7 @@ class TelemetryCommand(cli.Command):
         subparsers = parser.add_subparsers(dest="telemetry_command", required=True)
         for command in [
             TelemetryLatestCommand,
+            TelemetryTimeseriesCommand,
         ]:
             command.register(subparsers)
 
@@ -23,5 +25,7 @@ class TelemetryCommand(cli.Command):
         match args.telemetry_command:
             case "latest":
                 await TelemetryLatestCommand.run(args)
+            case "timeseries":
+                await TelemetryTimeseriesCommand.run(args)
             case _:
                 raise NotImplementedError(args.telemetry_command)
