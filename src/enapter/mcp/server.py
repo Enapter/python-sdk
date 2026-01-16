@@ -44,6 +44,11 @@ class Server(async_.Routine):
             name="get_device",
             description="Get device by ID.",
         )
+        mcp.tool(
+            self._get_latest_telemetry,
+            name="get_latest_telemetry",
+            description="Get latest telemetry of multiple devices.",
+        )
 
     async def _list_sites(self) -> list:
         async with self._new_http_api_client() as client:
@@ -86,6 +91,19 @@ class Server(async_.Routine):
                 expand_connectivity=expand_connectivity,
             )
             return device.to_dto()
+
+    async def _get_latest_telemetry(
+        self, attributes_by_device: dict[str, list[str]]
+    ) -> dict[str, dict[str, str | int | float | None]]:
+        async with self._new_http_api_client() as client:
+            telemetry = await client.telemetry.latest(attributes_by_device)
+            return {
+                device: {
+                    attribute: datapoint.to_dto() if datapoint is not None else None  # type: ignore
+                    for attribute, datapoint in attributes.items()
+                }
+                for device, attributes in telemetry.items()
+            }
 
     def _new_http_api_client(self) -> AsyncContextManager[http.api.Client]:
         # FIXME: Client instance gets created for each request.
