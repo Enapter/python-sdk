@@ -94,12 +94,12 @@ class Server(async_.Routine):
 
     async def _get_latest_telemetry(
         self, attributes_by_device: dict[str, list[str]]
-    ) -> dict[str, dict[str, str | int | float | None]]:
+    ) -> dict[str, dict[str, str | int | float | bool | None]]:
         async with self._new_http_api_client() as client:
             telemetry = await client.telemetry.latest(attributes_by_device)
             return {
                 device: {
-                    attribute: datapoint.to_dto() if datapoint is not None else None  # type: ignore
+                    attribute: datapoint.value if datapoint is not None else None
                     for attribute, datapoint in attributes.items()
                 }
                 for device, attributes in telemetry.items()
