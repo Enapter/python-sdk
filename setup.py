@@ -18,6 +18,7 @@ def main() -> None:
             "dnspython==2.8.*",
             "json-log-formatter==1.1.*",
             "httpx==0.28.*",
+            "fastmcp==2.14.*",
         ],
     )
 
