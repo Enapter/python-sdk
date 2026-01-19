@@ -78,8 +78,8 @@ endif
 	grep -E --files-with-matches --recursive "enapter==$(RE_SEMVER)" README.md examples \
 		| xargs -n 1 sed -E -i "s/enapter==$(RE_SEMVER)/enapter==$(V)/g"
 
-DOCKER_IMAGE_TAG ?= latest
+DOCKER_IMAGE_TAG ?= enapter/python-sdk:dev
 
 .PHONY: docker-image
 docker-image:
-	docker build -t enapter:latest .
+	docker build -t $(DOCKER_IMAGE_TAG) .
