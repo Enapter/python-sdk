@@ -124,7 +124,7 @@ class EatonUPS(enapter.standalone.Device):
             self.transport_target,
             oid,
         )
-        (error_indication, error_status, error_index, var_binds) = result
+        error_indication, error_status, error_index, var_binds = result
 
         if error_indication:
             await self.log.error(f"error indication: {error_indication}")
