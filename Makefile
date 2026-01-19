@@ -17,7 +17,7 @@ lint: lint-black lint-isort lint-pyflakes lint-mypy
 
 .PHONY: lint-black
 lint-black:
-	pipenv run black --check .
+	pipenv run black --check --diff .
 
 .PHONY: lint-isort
 lint-isort:
