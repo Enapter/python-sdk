@@ -17,7 +17,7 @@ class Client:
     async def get(self, blueprint_id: str) -> Blueprint:
         url = f"v3/blueprints/{blueprint_id}"
         response = await self._client.get(url)
-        api.check_error(response)
+        await api.check_error(response)
         return Blueprint.from_dto(response.json()["blueprint"])
 
     async def upload_file(self, path: pathlib.Path) -> Blueprint:
@@ -32,7 +32,7 @@ class Client:
     async def upload(self, data: bytes) -> Blueprint:
         url = "v3/blueprints/upload"
         response = await self._client.post(url, content=data)
-        api.check_error(response)
+        await api.check_error(response)
         return Blueprint.from_dto(response.json()["blueprint"])
 
     async def download(
@@ -40,7 +40,7 @@ class Client:
     ) -> bytes:
         url = f"v3/blueprints/{blueprint_id}/zip"
         response = await self._client.get(url, params={"view": view.value})
-        api.check_error(response)
+        await api.check_error(response)
         return response.content
 
     async def validate_file(self, path: pathlib.Path) -> None:
@@ -55,7 +55,7 @@ class Client:
     async def validate(self, data: bytes) -> None:
         url = "v3/blueprints/validate"
         response = await self._client.post(url, content=data)
-        api.check_error(response)
+        await api.check_error(response)
         validation_errors = response.json().get("validation_errors", [])
         if validation_errors:
             raise api.MultiError(

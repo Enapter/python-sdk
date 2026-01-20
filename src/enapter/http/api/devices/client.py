@@ -30,7 +30,7 @@ class Client:
         response = await self._client.post(
             url, json={"name": name, "site_id": site_id, "slug": slug}
         )
-        api.check_error(response)
+        await api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
     async def create_vucm(
@@ -47,7 +47,7 @@ class Client:
         response = await self._client.post(
             url, json={"name": name, "hardware_id": hardware_id, "site_id": site_id}
         )
-        api.check_error(response)
+        await api.check_error(response)
         return await self.get(
             device_id=response.json()["device_id"], expand_communication=True
         )
@@ -71,7 +71,7 @@ class Client:
                 "slug": slug,
             },
         )
-        api.check_error(response)
+        await api.check_error(response)
         return await self.get(device_id=response.json()["device_id"])
 
     async def get(
@@ -91,7 +91,7 @@ class Client:
         }
         expand_string = ",".join(k for k, v in expand.items() if v)
         response = await self._client.get(url, params={"expand": expand_string})
-        api.check_error(response)
+        await api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
     @async_.generator
@@ -117,7 +117,7 @@ class Client:
             response = await self._client.get(
                 url, params={"expand": expand_string, "limit": limit, "offset": offset}
             )
-            api.check_error(response)
+            await api.check_error(response)
             payload = response.json()
             if not payload["devices"]:
                 return
@@ -132,18 +132,18 @@ class Client:
             return await self.get(device_id)
         url = f"v3/devices/{device_id}"
         response = await self._client.patch(url, json={"name": name, "slug": slug})
-        api.check_error(response)
+        await api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
     async def delete(self, device_id: str) -> None:
         url = f"v3/devices/{device_id}"
         response = await self._client.delete(url)
-        api.check_error(response)
+        await api.check_error(response)
 
     async def assign_blueprint(self, device_id: str, blueprint_id: str) -> Device:
         url = f"v3/devices/{device_id}/assign_blueprint"
         response = await self._client.post(url, json={"blueprint_id": blueprint_id})
-        api.check_error(response)
+        await api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
     async def generate_communication_config(
@@ -151,7 +151,7 @@ class Client:
     ) -> CommunicationConfig:
         url = f"v3/devices/{device_id}/generate_config"
         response = await self._client.post(url, json={"protocol": mqtt_protocol.value})
-        api.check_error(response)
+        await api.check_error(response)
         return CommunicationConfig.from_dto(response.json()["config"])
 
 

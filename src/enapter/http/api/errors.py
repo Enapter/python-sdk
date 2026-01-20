@@ -3,8 +3,9 @@ from typing import Any, Self
 import httpx
 
 
-def check_error(response: httpx.Response) -> None:
+async def check_error(response: httpx.Response) -> None:
     if not response.is_success:
+        await response.aread()
         try:
             dto = response.json()
         except Exception:
