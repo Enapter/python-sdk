@@ -12,7 +12,9 @@ class LatestDatapoint:
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
-            timestamp=datetime.datetime.fromtimestamp(dto["timestamp"]),
+            timestamp=datetime.datetime.fromtimestamp(
+                dto["timestamp"], tz=datetime.timezone.utc
+            ),
             value=dto.get("value"),
         )
 
