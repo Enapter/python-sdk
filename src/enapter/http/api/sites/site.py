@@ -10,7 +10,7 @@ class Site:
     id: str
     name: str
     timezone: str
-    version: Literal["v3"]
+    version: Literal["V3"]
     location: Location | None = None
 
     @classmethod
