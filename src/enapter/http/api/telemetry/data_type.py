@@ -1,4 +1,5 @@
 import enum
+import json
 
 
 class DataType(enum.Enum):
@@ -20,7 +21,7 @@ class DataType(enum.Enum):
             case DataType.STRING:
                 return s
             case DataType.STRING_ARRAY:
-                raise NotImplementedError(self)
+                return json.loads(s)
             case DataType.BOOLEAN:
                 if s.lower() in ("true", "1"):
                     return True
