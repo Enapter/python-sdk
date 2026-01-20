@@ -20,7 +20,7 @@ class Client:
         expand = {"log": expand_log}
         expand_string = ",".join(k for k, v in expand.items() if v)
         response = await self._client.get(url, params={"expand": expand_string})
-        api.check_error(response)
+        await api.check_error(response)
         return Execution.from_dto(response.json()["execution"])
 
     @async_.generator
@@ -36,7 +36,7 @@ class Client:
             response = await self._client.get(
                 url, params={"order": order.value, "limit": limit, "offset": offset}
             )
-            api.check_error(response)
+            await api.check_error(response)
             payload = response.json()
             if not payload["executions"]:
                 return
@@ -61,7 +61,7 @@ class Client:
             params={"expand": expand_string},
             json={"name": name, "arguments": arguments},
         )
-        api.check_error(response)
+        await api.check_error(response)
         return Execution.from_dto(response.json()["execution"])
 
     async def create_execution(
@@ -73,7 +73,7 @@ class Client:
         response = await self._client.post(
             url, json={"name": name, "arguments": arguments}
         )
-        api.check_error(response)
+        await api.check_error(response)
         return await self.get_execution(
             device_id=device_id, execution_id=response.json()["execution_id"]
         )

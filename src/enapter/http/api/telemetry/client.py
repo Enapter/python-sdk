@@ -34,7 +34,7 @@ class Client:
                 relevance_interval = int(relevance_interval.total_seconds())
             params["relevance_interval"] = str(relevance_interval) + "s"
         response = await self._client.get(url, params=params)
-        api.check_error(response)
+        await api.check_error(response)
         return {
             device: {
                 attribute: (
@@ -96,7 +96,7 @@ class Client:
             headers={"Accept": "text/csv"},
             json=payload,
         ) as response:
-            api.check_error(response)
+            await api.check_error(response)
             data_types = [
                 DataType(dt.strip().upper())
                 for dt in response.headers["X-Enapter-Timeseries-Data-Types"].split(",")

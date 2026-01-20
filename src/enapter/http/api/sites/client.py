@@ -26,13 +26,13 @@ class Client:
                 "location": location.to_dto() if location is not None else None,
             },
         )
-        api.check_error(response)
+        await api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
     async def get(self, site_id: str | None) -> Site:
         url = f"v3/sites/{site_id}" if site_id is not None else "v3/site"
         response = await self._client.get(url)
-        api.check_error(response)
+        await api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
     @async_.generator
@@ -44,7 +44,7 @@ class Client:
             response = await self._client.get(
                 url, params={"limit": limit, "offset": offset}
             )
-            api.check_error(response)
+            await api.check_error(response)
             payload = response.json()
             if not payload["sites"]:
                 return
@@ -70,10 +70,10 @@ class Client:
                 "location": location.to_dto() if location is not None else None,
             },
         )
-        api.check_error(response)
+        await api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
     async def delete(self, site_id: str) -> None:
         url = f"v3/sites/{site_id}"
         response = await self._client.delete(url)
-        api.check_error(response)
+        await api.check_error(response)
