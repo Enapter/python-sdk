@@ -28,7 +28,7 @@ jobs:
         run: make install-deps
 
       - name: Pull Docker images for integration tests
-        run: docker pull eclipse-mosquitto:latest
+        run: timeout 300 docker pull eclipse-mosquitto:latest
 
       - name: Run checks
         run: make check

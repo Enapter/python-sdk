@@ -10,6 +10,8 @@ import pytest
 import enapter
 
 MOSQUITTO_PORT = "1883/tcp"
+# Timeout for Docker image pull operations (in seconds)
+DOCKER_PULL_TIMEOUT = 300  # 5 minutes
 
 
 @pytest.fixture(name="enapter_mqtt_client")
@@ -40,14 +42,12 @@ def fixture_mosquitto_container(
     except docker.errors.ImageNotFound:
         # Pull the image if not available locally
         # This is handled by the CI workflow, but we keep it here for local testing
-        try:
-            docker_client.images.pull(image)
-        except docker.errors.APIError as e:
-            raise RuntimeError(
-                f"Failed to pull Docker image {image}. "
-                f"Please ensure Docker is running and you have network connectivity. "
-                f"Error: {e}"
-            ) from e
+        pull_docker_image_with_timeout(docker_client, image)
+    except docker.errors.APIError as e:
+        raise RuntimeError(
+            f"Failed to access Docker daemon or image {image}. "
+            f"Please ensure Docker is running. Error: {e}"
+        ) from e
 
     try:
         old_mosquitto = docker_client.containers.get(name)
@@ -77,6 +77,46 @@ def random_unused_port() -> int:
         s.bind(("", 0))
         addr = s.getsockname()
         return addr[1]
+
+
+def pull_docker_image_with_timeout(
+    docker_client: docker.DockerClient, image: str, timeout: int = DOCKER_PULL_TIMEOUT
+) -> None:
+    """Pull a Docker image with a timeout.
+
+    Args:
+        docker_client: Docker client instance
+        image: Image name to pull
+        timeout: Timeout in seconds (default: DOCKER_PULL_TIMEOUT)
+
+    Raises:
+        RuntimeError: If the image pull fails or times out
+        TimeoutError: If the operation exceeds the timeout
+    """
+    import concurrent.futures
+
+    def _pull_image() -> None:
+        try:
+            docker_client.images.pull(image)
+        except docker.errors.APIError as e:
+            raise RuntimeError(
+                f"Failed to pull Docker image {image}. "
+                f"Please ensure Docker is running and you have network connectivity. "
+                f"Error: {e}"
+            ) from e
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_pull_image)
+        try:
+            future.result(timeout=timeout)
+        except concurrent.futures.TimeoutError as e:
+            raise TimeoutError(
+                f"Timeout while pulling Docker image {image} after {timeout} seconds. "
+                f"Please check your network connection or increase the timeout."
+            ) from e
+        except Exception:
+            # Re-raise any other exceptions from the pull operation
+            raise
 
 
 @pytest.fixture(name="docker_client", scope="session")
