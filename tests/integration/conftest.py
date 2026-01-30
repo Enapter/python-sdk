@@ -32,6 +32,22 @@ def fixture_mosquitto_container(
     docker_client: docker.DockerClient,
 ) -> Generator[docker.models.containers.Container, None, None]:
     name = "enapter-python-sdk-integration-tests-mosquitto"
+    image = os.getenv("MOSQUITTO_IMAGE", "eclipse-mosquitto:latest")
+
+    # Ensure the image is available locally
+    try:
+        docker_client.images.get(image)
+    except docker.errors.ImageNotFound:
+        # Pull the image if not available locally
+        # This is handled by the CI workflow, but we keep it here for local testing
+        try:
+            docker_client.images.pull(image)
+        except docker.errors.APIError as e:
+            raise RuntimeError(
+                f"Failed to pull Docker image {image}. "
+                f"Please ensure Docker is running and you have network connectivity. "
+                f"Error: {e}"
+            ) from e
 
     try:
         old_mosquitto = docker_client.containers.get(name)
@@ -41,7 +57,7 @@ def fixture_mosquitto_container(
         old_mosquitto.remove(force=True)
 
     mosquitto = docker_client.containers.run(
-        os.getenv("MOSQUITTO_IMAGE", "eclipse-mosquitto:latest"),
+        image,
         ["mosquitto", "-c", "/mosquitto-no-auth.conf"],
         name=name,
         network="bridge",
