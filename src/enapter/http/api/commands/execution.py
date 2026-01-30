@@ -20,6 +20,7 @@ class ExecutionState(enum.Enum):
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
     TIMEOUT = "TIMEOUT"
+    UNSYNC = "UNSYNC"
 
 
 @dataclasses.dataclass
