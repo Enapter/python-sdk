@@ -6,13 +6,15 @@ from typing import Any
 class Location:
 
     name: str
-    latitude: float
-    longitude: float
+    latitude: float | None
+    longitude: float | None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> "Location":
         return cls(
-            name=dto["name"], latitude=dto["latitude"], longitude=dto["longitude"]
+            name=dto["name"],
+            latitude=dto.get("latitude"),
+            longitude=dto.get("longitude"),
         )
 
     def to_dto(self) -> dict[str, Any]:
