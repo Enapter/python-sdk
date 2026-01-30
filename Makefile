@@ -42,12 +42,7 @@ test-unit:
 
 .PHONY: test-integration
 test-integration:
-# TODO: Figure out why integration tests time out in CI environment.
-ifdef CI
-	$(warning skipping integration tests in CI environment)
-else
 	pipenv run pytest -vv --capture=no tests/integration
-endif
 
 .PHONY: get-pipenv
 get-pipenv:
