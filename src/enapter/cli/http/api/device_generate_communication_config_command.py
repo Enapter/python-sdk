@@ -26,7 +26,7 @@ class DeviceGenerateCommunicationConfigCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            config = await client.devices.generate_communication_config(
+            config = await client.devices().generate_communication_config(
                 args.id,
                 mqtt_protocol=http.api.devices.MQTTProtocol(args.protocol.upper()),
             )

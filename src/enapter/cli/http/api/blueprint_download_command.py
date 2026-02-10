@@ -29,7 +29,7 @@ class BlueprintDownloadCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            content = await client.blueprints.download(
+            content = await client.blueprints().download(
                 args.id, view=http.api.blueprints.BlueprintView(args.view.upper())
             )
             with open(args.output, "wb") as f:

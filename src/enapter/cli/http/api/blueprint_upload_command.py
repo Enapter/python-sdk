@@ -23,7 +23,7 @@ class BlueprintUploadCommand(cli.Command):
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
             if args.path.is_dir():
-                blueprint = await client.blueprints.upload_directory(args.path)
+                blueprint = await client.blueprints().upload_directory(args.path)
             else:
-                blueprint = await client.blueprints.upload_file(args.path)
+                blueprint = await client.blueprints().upload_file(args.path)
             print(json.dumps(blueprint.to_dto()))

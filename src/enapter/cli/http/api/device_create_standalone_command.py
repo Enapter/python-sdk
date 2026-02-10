@@ -20,7 +20,7 @@ class DeviceCreateStandaloneCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices.create_standalone(
+            device = await client.devices().create_standalone(
                 name=args.name, site_id=args.site_id, slug=args.slug
             )
             print(json.dumps(device.to_dto()))
