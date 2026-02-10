@@ -12,7 +12,7 @@ class Client:
 
     def __init__(self, config: Config) -> None:
         self._config = config
-        self._auth = Auth(token=self._config.token)
+        self._auth = Auth(token=self._config.token, user=self._config.user)
         self._headers = {}
         if self._config.allow_http:
             self._headers["X-Enapter-Allow-HTTP"] = "true"
