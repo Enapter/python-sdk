@@ -4,6 +4,7 @@ import httpx
 
 from enapter.http.api import blueprints, commands, devices, sites, telemetry
 
+from .auth import Auth
 from .config import Config
 
 
@@ -11,41 +12,43 @@ class Client:
 
     def __init__(self, config: Config) -> None:
         self._config = config
-        self._client = self._new_client()
+        self._auth = Auth(token=self._config.token)
+        self._headers = {}
+        if self._config.allow_http:
+            self._headers["X-Enapter-Allow-HTTP"] = "true"
+        self._transport = httpx.AsyncHTTPTransport()
 
     def _new_client(self) -> httpx.AsyncClient:
-        assert self._config.base_url is not None
-        headers = {"X-Enapter-Auth-Token": self._config.token}
-        if self._config.allow_http:
-            headers["X-Enapter-Allow-HTTP"] = "true"
         return httpx.AsyncClient(
-            headers=headers,
+            auth=self._auth,
+            headers=self._headers,
             base_url=self._config.base_url,
+            transport=self._transport,
         )
 
     async def __aenter__(self) -> Self:
-        await self._client.__aenter__()
+        await self._transport.__aenter__()
         return self
 
     async def __aexit__(self, *exc) -> None:
-        await self._client.__aexit__(*exc)
+        await self._transport.__aexit__(*exc)
 
     @property
     def devices(self) -> devices.Client:
-        return devices.Client(client=self._client)
+        return devices.Client(client=self._new_client())
 
     @property
     def sites(self) -> sites.Client:
-        return sites.Client(client=self._client)
+        return sites.Client(client=self._new_client())
 
     @property
     def commands(self) -> commands.Client:
-        return commands.Client(client=self._client)
+        return commands.Client(client=self._new_client())
 
     @property
     def blueprints(self) -> blueprints.Client:
-        return blueprints.Client(client=self._client)
+        return blueprints.Client(client=self._new_client())
 
     @property
     def telemetry(self) -> telemetry.Client:
-        return telemetry.Client(client=self._client)
+        return telemetry.Client(client=self._new_client())
