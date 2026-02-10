@@ -18,9 +18,10 @@ class Client:
             self._headers["X-Enapter-Allow-HTTP"] = "true"
         self._transport = httpx.AsyncHTTPTransport()
 
-    def _new_client(self) -> httpx.AsyncClient:
+    def _new_client(self, auth: Auth | None) -> httpx.AsyncClient:
+        auth = auth if auth is not None else self._auth
         return httpx.AsyncClient(
-            auth=self._auth,
+            auth=auth,
             headers=self._headers,
             base_url=self._config.base_url,
             transport=self._transport,
@@ -33,22 +34,17 @@ class Client:
     async def __aexit__(self, *exc) -> None:
         await self._transport.__aexit__(*exc)
 
-    @property
-    def devices(self) -> devices.Client:
-        return devices.Client(client=self._new_client())
+    def devices(self, auth: Auth | None = None) -> devices.Client:
+        return devices.Client(client=self._new_client(auth=auth))
 
-    @property
-    def sites(self) -> sites.Client:
-        return sites.Client(client=self._new_client())
+    def sites(self, auth: Auth | None = None) -> sites.Client:
+        return sites.Client(client=self._new_client(auth=auth))
 
-    @property
-    def commands(self) -> commands.Client:
-        return commands.Client(client=self._new_client())
+    def commands(self, auth: Auth | None = None) -> commands.Client:
+        return commands.Client(client=self._new_client(auth=auth))
 
-    @property
-    def blueprints(self) -> blueprints.Client:
-        return blueprints.Client(client=self._new_client())
+    def blueprints(self, auth: Auth | None = None) -> blueprints.Client:
+        return blueprints.Client(client=self._new_client(auth=auth))
 
-    @property
-    def telemetry(self) -> telemetry.Client:
-        return telemetry.Client(client=self._new_client())
+    def telemetry(self, auth: Auth | None = None) -> telemetry.Client:
+        return telemetry.Client(client=self._new_client(auth=auth))

@@ -24,7 +24,7 @@ class SiteListCommand(cli.Command):
         if args.limit == 0:
             return
         async with http.api.Client(http.api.Config.from_env()) as client:
-            async with client.sites.list() as stream:
+            async with client.sites().list() as stream:
                 count = 0
                 async for site in stream:
                     print(json.dumps(site.to_dto()))

@@ -23,7 +23,7 @@ class DeviceCreateLuaCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices.create_lua(
+            device = await client.devices().create_lua(
                 runtime_id=args.runtime_id,
                 blueprint_id=args.blueprint_id,
                 name=args.name,

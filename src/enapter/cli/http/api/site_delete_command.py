@@ -15,4 +15,4 @@ class SiteDeleteCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            await client.sites.delete(args.id)
+            await client.sites().delete(args.id)
