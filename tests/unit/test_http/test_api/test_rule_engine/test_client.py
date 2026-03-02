@@ -21,7 +21,7 @@ async def test_get_engine(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "rule_engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
+        "engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
     }
     mock_httpx_client.get = AsyncMock(return_value=mock_response)
 
@@ -37,7 +37,7 @@ async def test_get_engine_with_site_id(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "rule_engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
+        "engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
     }
     mock_httpx_client.get = AsyncMock(return_value=mock_response)
 
@@ -53,7 +53,7 @@ async def test_suspend_engine(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "rule_engine": {"id": "re_123", "state": "SUSPENDED", "timezone": "UTC"}
+        "engine": {"id": "re_123", "state": "SUSPENDED", "timezone": "UTC"}
     }
     mock_httpx_client.post = AsyncMock(return_value=mock_response)
 
@@ -70,7 +70,7 @@ async def test_resume_engine(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "rule_engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
+        "engine": {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
     }
     mock_httpx_client.post = AsyncMock(return_value=mock_response)
 
