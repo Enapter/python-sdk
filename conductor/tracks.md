@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Add basic unit-tests for the HTTP client.**
+- [x] **Track: Add basic unit-tests for the HTTP client.**
   *Link: [./tracks/http_client_tests_20260302/](./tracks/http_client_tests_20260302/)*
