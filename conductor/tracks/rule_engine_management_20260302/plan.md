@@ -2,7 +2,7 @@
 
 ## Phase 1: HTTP API Client Implementation
 - [x] Task: Create `Engine` data model in `src/enapter/http/api/rule_engine/engine.py`. fc7bab4
-- [ ] Task: Implement `rule_engine.Client` with `get`, `suspend`, and `resume` methods in `src/enapter/http/api/rule_engine/client.py`.
+- [x] Task: Implement `rule_engine.Client` with `get`, `suspend`, and `resume` methods in `src/enapter/http/api/rule_engine/client.py`. cee06dc
 - [ ] Task: Integrate `rule_engine` module into the main `api.Client` in `src/enapter/http/api/client.py`.
 - [ ] Task: Write unit tests for `rule_engine.Client` methods in `tests/unit/test_http/test_api/test_rule_engine/test_client.py`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: HTTP API Client' (Protocol in workflow.md)
