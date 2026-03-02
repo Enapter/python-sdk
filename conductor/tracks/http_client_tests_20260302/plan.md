@@ -1,6 +1,6 @@
 # Implementation Plan: Add basic unit-tests for the HTTP client.
 
-## Phase 1: Setup and Basic Client Initialization Tests
+## Phase 1: Setup and Basic Client Initialization Tests [checkpoint: e1a76d5]
 - [x] Task: Create test file `tests/unit/test_http/test_api/test_client.py` fcd7dee
     - [ ] Write tests for HTTP client initialization with valid and invalid tokens.
     - [ ] Write tests for client default configurations and headers.
