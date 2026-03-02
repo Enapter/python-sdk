@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from enapter.http.api.rule_engine import Client, EngineState
+import enapter
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def mock_httpx_client():
 
 @pytest.fixture
 def client(mock_httpx_client):
-    return Client(client=mock_httpx_client)
+    return enapter.http.api.rule_engine.Client(client=mock_httpx_client)
 
 
 @pytest.mark.asyncio
@@ -28,7 +28,7 @@ async def test_get_engine(client, mock_httpx_client):
     engine = await client.get()
 
     assert engine.id == "re_123"
-    assert engine.state == EngineState.ACTIVE
+    assert engine.state == enapter.http.api.rule_engine.EngineState.ACTIVE
     mock_httpx_client.get.assert_called_once_with("v3/site/rule_engine")
 
 
@@ -44,7 +44,7 @@ async def test_get_engine_with_site_id(client, mock_httpx_client):
     engine = await client.get(site_id="site_123")
 
     assert engine.id == "re_123"
-    assert engine.state == EngineState.ACTIVE
+    assert engine.state == enapter.http.api.rule_engine.EngineState.ACTIVE
     mock_httpx_client.get.assert_called_once_with("v3/sites/site_123/rule_engine")
 
 
@@ -59,7 +59,7 @@ async def test_suspend_engine(client, mock_httpx_client):
 
     engine = await client.suspend(site_id="site_123")
 
-    assert engine.state == EngineState.SUSPENDED
+    assert engine.state == enapter.http.api.rule_engine.EngineState.SUSPENDED
     mock_httpx_client.post.assert_called_once_with(
         "v3/sites/site_123/rule_engine/suspend"
     )
@@ -76,5 +76,5 @@ async def test_resume_engine(client, mock_httpx_client):
 
     engine = await client.resume()
 
-    assert engine.state == EngineState.ACTIVE
+    assert engine.state == enapter.http.api.rule_engine.EngineState.ACTIVE
     mock_httpx_client.post.assert_called_once_with("v3/site/rule_engine/resume")

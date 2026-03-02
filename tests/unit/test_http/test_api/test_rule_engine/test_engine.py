@@ -1,15 +1,19 @@
-from enapter.http.api.rule_engine import Engine, EngineState
+import enapter
 
 
 def test_engine_from_dto():
     dto = {"id": "re_123", "state": "ACTIVE", "timezone": "UTC"}
-    engine = Engine.from_dto(dto)
+    engine = enapter.http.api.rule_engine.Engine.from_dto(dto)
     assert engine.id == "re_123"
-    assert engine.state == EngineState.ACTIVE
+    assert engine.state == enapter.http.api.rule_engine.EngineState.ACTIVE
     assert engine.timezone == "UTC"
 
 
 def test_engine_to_dto():
-    engine = Engine(id="re_123", state=EngineState.SUSPENDED, timezone="UTC")
+    engine = enapter.http.api.rule_engine.Engine(
+        id="re_123",
+        state=enapter.http.api.rule_engine.EngineState.SUSPENDED,
+        timezone="UTC",
+    )
     dto = engine.to_dto()
     assert dto == {"id": "re_123", "state": "SUSPENDED", "timezone": "UTC"}
