@@ -1,6 +1,6 @@
 # Implementation Plan: Rule Engine Management
 
-## Phase 1: HTTP API Client Implementation
+## Phase 1: HTTP API Client Implementation [checkpoint: 2d7be60]
 - [x] Task: Create `Engine` data model in `src/enapter/http/api/rule_engine/engine.py`. fc7bab4
 - [x] Task: Implement `rule_engine.Client` with `get`, `suspend`, and `resume` methods in `src/enapter/http/api/rule_engine/client.py`. cee06dc
 - [x] Task: Integrate `rule_engine` module into the main `api.Client` in `src/enapter/http/api/client.py`. 4eda240
