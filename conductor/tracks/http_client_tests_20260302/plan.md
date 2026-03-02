@@ -6,7 +6,7 @@
     - [ ] Write tests for client default configurations and headers.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Setup and Basic Client Initialization Tests' (Protocol in workflow.md)
 
-## Phase 2: Sites API Tests
+## Phase 2: Sites API Tests [checkpoint: bf93d5a]
 - [x] Task: Create test file `tests/unit/test_http/test_api/test_sites/test_client.py` 14ff304
     - [ ] Write tests for fetching site details and listing sites.
     - [ ] Mock the HTTP responses for site endpoints.
