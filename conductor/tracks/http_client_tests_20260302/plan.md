@@ -12,3 +12,6 @@
     - [ ] Mock the HTTP responses for site endpoints.
     - [ ] Verify that the returned site objects (`Site`, `SiteLocation`) are correctly parsed.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Sites API Tests' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 9470c8b
