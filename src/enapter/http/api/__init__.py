@@ -3,7 +3,7 @@ from .config import Config
 from .errors import Error, MultiError, check_error
 from .transport import Transport
 
-from . import devices, sites, commands, blueprints  # isort: skip
+from . import devices, sites, commands, blueprints, rule_engine  # isort: skip
 
 __all__ = [
     "Client",
@@ -12,6 +12,7 @@ __all__ = [
     "blueprints",
     "sites",
     "commands",
+    "rule_engine",
     "Error",
     "MultiError",
     "check_error",

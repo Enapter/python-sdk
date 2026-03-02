@@ -2,7 +2,14 @@ from typing import Self
 
 import httpx
 
-from enapter.http.api import blueprints, commands, devices, sites, telemetry
+from enapter.http.api import (
+    blueprints,
+    commands,
+    devices,
+    rule_engine,
+    sites,
+    telemetry,
+)
 
 from .auth import Auth
 from .config import Config
@@ -66,3 +73,7 @@ class Client:
     @property
     def telemetry(self) -> telemetry.Client:
         return telemetry.Client(client=self._client)
+
+    @property
+    def rule_engine(self) -> rule_engine.Client:
+        return rule_engine.Client(client=self._client)
