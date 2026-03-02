@@ -9,7 +9,7 @@ A software development kit (SDK) for building applications and integrations with
 ## Core Features
 - **Standalone Devices Framework:** Tools and utilities for developing standalone device integrations.
 - **MQTT API Client:** Seamless communication with the Enapter MQTT broker for real-time device control and telemetry data.
-- **HTTP API Client:** Easy-to-use client for interacting with the Enapter Cloud HTTP API to manage sites, devices, and access historical data.
+- **HTTP API Client:** Easy-to-use client for interacting with the Enapter Cloud HTTP API to manage sites, devices, historical data, and the Rule Engine.
 
 ## Key Goals
 - Provide an idiomatic, modern Python 3.11+ interface for the Enapter ecosystem.
