@@ -37,7 +37,7 @@ class CommandListExecutionsCommand(cli.Command):
         if args.limit == 0:
             return
         async with http.api.Client(http.api.Config.from_env()) as client:
-            async with client.commands().list_executions(
+            async with client.commands.list_executions(
                 device_id=args.device_id,
                 order=http.api.commands.ListExecutionsOrder(args.order.upper()),
             ) as stream:

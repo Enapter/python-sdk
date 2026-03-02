@@ -22,6 +22,6 @@ class BlueprintValidateCommand(cli.Command):
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
             if args.path.is_dir():
-                await client.blueprints().validate_directory(args.path)
+                await client.blueprints.validate_directory(args.path)
             else:
-                await client.blueprints().validate_file(args.path)
+                await client.blueprints.validate_file(args.path)

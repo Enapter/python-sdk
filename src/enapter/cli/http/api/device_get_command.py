@@ -42,7 +42,7 @@ class DeviceGetCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices().get(
+            device = await client.devices.get(
                 args.id,
                 expand_manifest=args.manifest,
                 expand_properties=args.properties,

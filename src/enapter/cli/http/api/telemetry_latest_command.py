@@ -25,7 +25,7 @@ class TelemetryLatestCommand(cli.Command):
             device, attributes = selector.split(":", 1)
             attributes_by_device[device] = attributes.split(",")
         async with http.api.Client(http.api.Config.from_env()) as client:
-            telemetry = await client.telemetry().latest(attributes_by_device)
+            telemetry = await client.telemetry.latest(attributes_by_device)
             dto = {
                 device: {
                     attribute: datapoint.to_dto() if datapoint is not None else None

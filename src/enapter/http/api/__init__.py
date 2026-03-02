@@ -1,12 +1,11 @@
-from .auth import Auth
 from .client import Client
 from .config import Config
 from .errors import Error, MultiError, check_error
+from .transport import Transport
 
 from . import devices, sites, commands, blueprints  # isort: skip
 
 __all__ = [
-    "Auth",
     "Client",
     "Config",
     "devices",
@@ -16,4 +15,5 @@ __all__ = [
     "Error",
     "MultiError",
     "check_error",
+    "Transport",
 ]

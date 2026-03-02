@@ -19,5 +19,5 @@ class BlueprintGetCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            blueprint = await client.blueprints().get(blueprint_id=args.id)
+            blueprint = await client.blueprints.get(blueprint_id=args.id)
             print(json.dumps(blueprint.to_dto()))

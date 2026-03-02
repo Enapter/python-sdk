@@ -6,45 +6,63 @@ from enapter.http.api import blueprints, commands, devices, sites, telemetry
 
 from .auth import Auth
 from .config import Config
+from .transport import Transport
 
 
 class Client:
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, transport: Transport | None = None) -> None:
         self._config = config
-        self._auth = Auth(token=self._config.token, user=self._config.user)
-        self._headers = {}
-        if self._config.allow_http:
-            self._headers["X-Enapter-Allow-HTTP"] = "true"
-        self._transport = httpx.AsyncHTTPTransport()
+        self._own_transport = transport is None
+        self._transport = transport if transport is not None else Transport()
+        self._client = self._new_client()
 
-    def _new_client(self, auth: Auth | None) -> httpx.AsyncClient:
-        auth = auth if auth is not None else self._auth
+    def _new_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(
-            auth=auth,
-            headers=self._headers,
+            auth=self._new_auth(),
+            headers=self._new_headers(),
             base_url=self._config.base_url,
             transport=self._transport,
         )
 
+    def _new_auth(self) -> Auth:
+        return Auth(token=self._config.token, user=self._config.user)
+
+    def _new_headers(self) -> dict[str, str]:
+        headers = {}
+        if self._config.allow_http:
+            headers["X-Enapter-Allow-HTTP"] = "true"
+        return headers
+
     async def __aenter__(self) -> Self:
-        await self._transport.__aenter__()
+        if self._own_transport:
+            await self._transport.__aenter__()
         return self
 
     async def __aexit__(self, *exc) -> None:
-        await self._transport.__aexit__(*exc)
+        if self._own_transport:
+            await self._transport.__aexit__(*exc)
 
-    def devices(self, auth: Auth | None = None) -> devices.Client:
-        return devices.Client(client=self._new_client(auth=auth))
+    @property
+    def transport(self) -> Transport:
+        return self._transport
 
-    def sites(self, auth: Auth | None = None) -> sites.Client:
-        return sites.Client(client=self._new_client(auth=auth))
+    @property
+    def devices(self) -> devices.Client:
+        return devices.Client(client=self._client)
 
-    def commands(self, auth: Auth | None = None) -> commands.Client:
-        return commands.Client(client=self._new_client(auth=auth))
+    @property
+    def sites(self) -> sites.Client:
+        return sites.Client(client=self._client)
 
-    def blueprints(self, auth: Auth | None = None) -> blueprints.Client:
-        return blueprints.Client(client=self._new_client(auth=auth))
+    @property
+    def commands(self) -> commands.Client:
+        return commands.Client(client=self._client)
 
-    def telemetry(self, auth: Auth | None = None) -> telemetry.Client:
-        return telemetry.Client(client=self._new_client(auth=auth))
+    @property
+    def blueprints(self) -> blueprints.Client:
+        return blueprints.Client(client=self._client)
+
+    @property
+    def telemetry(self) -> telemetry.Client:
+        return telemetry.Client(client=self._client)

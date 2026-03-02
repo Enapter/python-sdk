@@ -18,5 +18,5 @@ class SiteGetCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            site = await client.sites().get(args.id)
+            site = await client.sites.get(args.id)
             print(json.dumps(site.to_dto()))
