@@ -30,7 +30,6 @@ class Channel:
     ) -> AsyncGenerator[CommandRequest, None]:
         async with self._subscribe("v1/command/requests") as messages:
             async for msg in messages:
-                assert isinstance(msg.payload, str) or isinstance(msg.payload, bytes)
                 yield CommandRequest.from_json(msg.payload)
 
     async def publish_command_response(self, response: CommandResponse) -> None:
