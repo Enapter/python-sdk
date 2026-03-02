@@ -48,7 +48,7 @@ class DeviceListCommand(cli.Command):
         if args.limit == 0:
             return
         async with http.api.Client(http.api.Config.from_env()) as client:
-            async with client.devices().list(
+            async with client.devices.list(
                 expand_manifest=args.manifest,
                 expand_properties=args.properties,
                 expand_connectivity=args.connectivity,

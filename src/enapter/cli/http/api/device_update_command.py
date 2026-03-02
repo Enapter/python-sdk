@@ -22,7 +22,7 @@ class DeviceUpdateCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices().update(
+            device = await client.devices.update(
                 args.id, name=args.name, slug=args.slug
             )
             print(json.dumps(device.to_dto()))

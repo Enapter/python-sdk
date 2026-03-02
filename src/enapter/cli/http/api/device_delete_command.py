@@ -22,6 +22,6 @@ class DeviceDeleteCommand(cli.Command):
         async with http.api.Client(http.api.Config.from_env()) as client:
             for id in args.ids:
                 try:
-                    await client.devices().delete(id)
+                    await client.devices.delete(id)
                 except http.api.Error as e:
                     LOGGER.error("failed to delete device %s: %s", id, e)

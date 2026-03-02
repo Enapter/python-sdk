@@ -22,7 +22,7 @@ class DeviceAssignBlueprintCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices().assign_blueprint(
+            device = await client.devices.assign_blueprint(
                 device_id=args.id, blueprint_id=args.blueprint_id
             )
             print(json.dumps(device.to_dto()))

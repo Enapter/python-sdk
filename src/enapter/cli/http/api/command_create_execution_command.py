@@ -33,7 +33,7 @@ class CommandCreateExecutionCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            execution = await client.commands().create_execution(
+            execution = await client.commands.create_execution(
                 device_id=args.device_id, name=args.name, arguments=args.arguments
             )
             print(json.dumps(execution.to_dto()))

@@ -18,7 +18,7 @@ class DeviceCreateVUCMCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            device = await client.devices().create_vucm(
+            device = await client.devices.create_vucm(
                 name=args.name, site_id=args.site_id, hardware_id=args.hardware_id
             )
             print(json.dumps(device.to_dto()))

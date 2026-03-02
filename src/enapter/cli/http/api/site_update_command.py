@@ -28,7 +28,7 @@ class SiteUpdateCommand(cli.Command):
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            site = await client.sites().update(
+            site = await client.sites.update(
                 site_id=args.id,
                 name=args.name,
                 timezone=args.timezone,

@@ -79,7 +79,7 @@ class TelemetryTimeseriesCommand(cli.Command):
         time_to: datetime.datetime,
         attributes_by_device: dict[str, list[str]],
     ) -> None:
-        async with client.telemetry().long_timeseries(
+        async with client.telemetry.long_timeseries(
             from_=time_from,
             to=time_to,
             granularity=args.granularity,
@@ -99,7 +99,7 @@ class TelemetryTimeseriesCommand(cli.Command):
         time_to: datetime.datetime,
         attributes_by_device: dict[str, list[str]],
     ) -> None:
-        wide_timeseries = await client.telemetry().wide_timeseries(
+        wide_timeseries = await client.telemetry.wide_timeseries(
             from_=time_from,
             to=time_to,
             granularity=args.granularity,
