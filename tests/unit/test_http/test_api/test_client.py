@@ -29,6 +29,7 @@ def test_client_properties():
     assert isinstance(client.commands, enapter.http.api.commands.Client)
     assert isinstance(client.blueprints, enapter.http.api.blueprints.Client)
     assert isinstance(client.telemetry, enapter.http.api.telemetry.Client)
+    assert isinstance(client.rule_engine, enapter.http.api.rule_engine.Client)
 
 
 @pytest.mark.asyncio
