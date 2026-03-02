@@ -5,6 +5,7 @@ from enapter import cli
 from .blueprint_command import BlueprintCommand
 from .command_command import CommandCommand
 from .device_command import DeviceCommand
+from .rule_engine_command import RuleEngineCommand
 from .site_command import SiteCommand
 from .telemetry_command import TelemetryCommand
 
@@ -21,6 +22,7 @@ class Command(cli.Command):
             BlueprintCommand,
             CommandCommand,
             DeviceCommand,
+            RuleEngineCommand,
             SiteCommand,
             TelemetryCommand,
         ]:
@@ -35,9 +37,11 @@ class Command(cli.Command):
                 await CommandCommand.run(args)
             case "device":
                 await DeviceCommand.run(args)
+            case "rule-engine":
+                await RuleEngineCommand.run(args)
             case "site":
                 await SiteCommand.run(args)
             case "telemetry":
                 await TelemetryCommand.run(args)
             case _:
-                raise NotImplementedError(args.device_command)
+                raise NotImplementedError(args.api_command)
