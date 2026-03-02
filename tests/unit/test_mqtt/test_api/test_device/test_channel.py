@@ -12,7 +12,7 @@ async def test_subscribe_to_command_requests() -> None:
         )
         yield enapter.mqtt.Message(
             topic=topic,
-            payload='{"id": "bbe17a10-3107-47cb-b0ec-99648debade6", "name": "my_command", "arguments": {"foo": "bar"}}',
+            payload=b'{"id": "bbe17a10-3107-47cb-b0ec-99648debade6", "name": "my_command", "arguments": {"foo": "bar"}}',
             qos=0,
             retain=False,
             mid=1,

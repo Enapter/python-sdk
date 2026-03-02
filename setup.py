@@ -14,7 +14,7 @@ def main() -> None:
         author="Roman Novatorov",
         author_email="rnovatorov@enapter.com",
         install_requires=[
-            "aiomqtt==2.4.*",
+            "aiomqtt==2.5.*",
             "dnspython==2.8.*",
             "json-log-formatter==1.1.*",
             "httpx==0.28.*",
