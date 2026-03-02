@@ -12,7 +12,7 @@ async def main():
         # Get current rule engine status for the default site
         engine = await client.rule_engine.get()
         print(f"Rule engine ID: {engine.id}")
-        print(f"Current state: {engine.state}")
+        print(f"Current state: {engine.state.value}")
         print(f"Timezone: {engine.timezone}")
 
         # Suspend the rule engine
