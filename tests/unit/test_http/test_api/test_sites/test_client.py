@@ -1,3 +1,5 @@
+"""Unit tests for the Sites HTTP API client."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
@@ -8,16 +10,19 @@ import enapter
 
 @pytest.fixture
 def mock_client():
+    """Fixture to provide a mocked httpx.AsyncClient."""
     return MagicMock(spec=httpx.AsyncClient)
 
 
 @pytest.fixture
 def sites_client(mock_client):
+    """Fixture to provide a Sites API client with a mocked internal client."""
     return enapter.http.api.sites.Client(client=mock_client)
 
 
 @pytest.mark.asyncio
 async def test_create_site(sites_client, mock_client):
+    """Test creating a new site."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 201
     mock_response.json.return_value = {
@@ -53,6 +58,7 @@ async def test_create_site(sites_client, mock_client):
 
 @pytest.mark.asyncio
 async def test_get_site(sites_client, mock_client):
+    """Test getting a specific site by ID."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -73,6 +79,7 @@ async def test_get_site(sites_client, mock_client):
 
 @pytest.mark.asyncio
 async def test_list_sites(sites_client, mock_client):
+    """Test listing all sites."""
     mock_response_1 = MagicMock(spec=httpx.Response)
     mock_response_1.status_code = 200
     mock_response_1.json.return_value = {
@@ -101,6 +108,7 @@ async def test_list_sites(sites_client, mock_client):
 
 @pytest.mark.asyncio
 async def test_update_site(sites_client, mock_client):
+    """Test updating an existing site."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -124,6 +132,7 @@ async def test_update_site(sites_client, mock_client):
 
 @pytest.mark.asyncio
 async def test_delete_site(sites_client, mock_client):
+    """Test deleting a site."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 204
     mock_client.delete = AsyncMock(return_value=mock_response)
