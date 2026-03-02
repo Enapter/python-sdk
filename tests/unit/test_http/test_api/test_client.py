@@ -65,7 +65,9 @@ async def test_client_does_not_manage_custom_transport():
     custom_transport.__aenter__ = AsyncMock()
     custom_transport.__aexit__ = AsyncMock()
 
-    async with enapter.http.api.client.Client(config=config, transport=custom_transport):
+    async with enapter.http.api.client.Client(
+        config=config, transport=custom_transport
+    ):
         pass
 
     assert not custom_transport.__aenter__.called
