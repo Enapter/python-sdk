@@ -1,3 +1,5 @@
+"""Unit tests for the Rule Engine HTTP API client."""
+
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
@@ -8,16 +10,19 @@ import enapter
 
 @pytest.fixture
 def mock_httpx_client():
+    """Fixture to provide a mocked httpx.AsyncClient."""
     return MagicMock(spec=httpx.AsyncClient)
 
 
 @pytest.fixture
 def client(mock_httpx_client):
+    """Fixture to provide a Rule Engine API client with a mocked internal client."""
     return enapter.http.api.rule_engine.Client(client=mock_httpx_client)
 
 
 @pytest.mark.asyncio
 async def test_get_engine(client, mock_httpx_client):
+    """Test getting the rule engine state."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -34,6 +39,7 @@ async def test_get_engine(client, mock_httpx_client):
 
 @pytest.mark.asyncio
 async def test_get_engine_with_site_id(client, mock_httpx_client):
+    """Test getting the rule engine state for a specific site ID."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -50,6 +56,7 @@ async def test_get_engine_with_site_id(client, mock_httpx_client):
 
 @pytest.mark.asyncio
 async def test_suspend_engine(client, mock_httpx_client):
+    """Test suspending the rule engine."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -67,6 +74,7 @@ async def test_suspend_engine(client, mock_httpx_client):
 
 @pytest.mark.asyncio
 async def test_resume_engine(client, mock_httpx_client):
+    """Test resuming the rule engine."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
