@@ -1,3 +1,5 @@
+"""Unit tests for the HTTP API client."""
+
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -7,6 +9,7 @@ import enapter
 
 @pytest.mark.asyncio
 async def test_client_context_manager():
+    """Test that the client can be used as an asynchronous context manager."""
     config = enapter.http.api.config.Config(
         base_url="https://api.enapter.com", token="test_token"
     )
@@ -15,6 +18,7 @@ async def test_client_context_manager():
 
 
 def test_client_properties():
+    """Test that the client provides access to sub-clients."""
     config = enapter.http.api.config.Config(
         base_url="https://api.enapter.com", token="test_token"
     )
@@ -29,6 +33,7 @@ def test_client_properties():
 
 @pytest.mark.asyncio
 async def test_client_custom_transport():
+    """Test that a custom transport can be provided to the client."""
     config = enapter.http.api.config.Config(
         base_url="https://api.enapter.com", token="test_token"
     )
@@ -41,6 +46,7 @@ async def test_client_custom_transport():
 
 @pytest.mark.asyncio
 async def test_client_manages_own_transport():
+    """Test that the client manages the lifecycle of its own transport."""
     config = enapter.http.api.config.Config(
         base_url="https://api.enapter.com", token="test_token"
     )
@@ -58,6 +64,7 @@ async def test_client_manages_own_transport():
 
 @pytest.mark.asyncio
 async def test_client_does_not_manage_custom_transport():
+    """Test that the client does not manage the lifecycle of a custom transport."""
     config = enapter.http.api.config.Config(
         base_url="https://api.enapter.com", token="test_token"
     )
