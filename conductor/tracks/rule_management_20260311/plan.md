@@ -14,15 +14,15 @@ This plan outlines the implementation of Rule management (create, list, get, upd
 
 ## Phase 2: Rule Management Implementation (Read Operations)
 
-- [ ] Task: Implement `List Rules` method
-    - [ ] Add `list` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests in `tests/unit/test_http/test_api/test_rule_engine/test_client.py`
-    - [ ] Implement method to pass tests
-- [ ] Task: Implement `Get Rule` method
-    - [ ] Add `get_rule` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests
-    - [ ] Implement method to pass tests
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Rule Management Implementation (Read Operations)' (Protocol in workflow.md)
+- [x] Task: Implement `List Rules` method
+    - [x] Add `list_rules` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests in `tests/unit/test_http/test_api/test_rule_engine/test_client.py`
+    - [x] Implement method to pass tests
+- [x] Task: Implement `Get Rule` method
+    - [x] Add `get_rule` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests
+    - [x] Implement method to pass tests
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Rule Management Implementation (Read Operations)' (Protocol in workflow.md)
 
 ## Phase 3: Rule Management Implementation (Write Operations)
 
