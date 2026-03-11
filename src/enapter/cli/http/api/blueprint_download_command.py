@@ -16,7 +16,11 @@ class BlueprintDownloadCommand(cli.Command):
         )
         parser.add_argument("id", help="ID of the blueprint to download")
         parser.add_argument(
-            "-o", "--output", type=pathlib.Path, help="Output file path", required=True
+            "-o",
+            "--output",
+            type=pathlib.Path,
+            help="Output directory path",
+            default=pathlib.Path.cwd(),
         )
         parser.add_argument(
             "-v",
@@ -32,5 +36,6 @@ class BlueprintDownloadCommand(cli.Command):
             content = await client.blueprints.download(
                 args.id, view=http.api.blueprints.BlueprintView(args.view.upper())
             )
-            with open(args.output, "wb") as f:
+            output_path = args.output / f"{args.id}.zip"
+            with output_path.open("wb") as f:
                 f.write(content)
