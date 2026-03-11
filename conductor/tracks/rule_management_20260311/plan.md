@@ -2,15 +2,15 @@
 
 This plan outlines the implementation of Rule management (create, list, get, update, enable/disable, delete) in the Enapter HTTP API Rule Engine client.
 
-## Phase 1: Models and Foundation
+## Phase 1: Models and Foundation [checkpoint: c888a5d]
 
-- [x] Task: Define `Rule`, `RuleScript`, `RuntimeVersion`, and `RuleState` data models
+- [x] Task: Define `Rule`, `RuleScript`, and `RuntimeVersion`, and `RuleState` data models
     - [x] Create `src/enapter/http/api/rule_engine/rule.py`, `src/enapter/http/api/rule_engine/rule_script.py`, `src/enapter/http/api/rule_engine/runtime_version.py`, and `src/enapter/http/api/rule_engine/rule_state.py`
     - [x] Implement `Rule` and `RuleScript` dataclasses and `RuntimeVersion` and `RuleState` enums
     - [x] Implement `from_dto` and `to_dto` methods for all models
     - [x] Add unit tests for models in `tests/unit/test_http/test_api/test_rule_engine/test_rule.py`
 - [x] Task: Export models in `src/enapter/http/api/rule_engine/__init__.py`
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Models and Foundation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Models and Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Rule Management Implementation (Read Operations)
 
