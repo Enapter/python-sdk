@@ -12,7 +12,7 @@ This plan outlines the implementation of Rule management (create, list, get, upd
 - [x] Task: Export models in `src/enapter/http/api/rule_engine/__init__.py`
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Models and Foundation' (Protocol in workflow.md)
 
-## Phase 2: Rule Management Implementation (Read Operations)
+## Phase 2: Rule Management Implementation (Read Operations) [checkpoint: 6745120]
 
 - [x] Task: Implement `List Rules` method
     - [x] Add `list_rules` method to `src/enapter/http/api/rule_engine/client.py`
@@ -22,7 +22,7 @@ This plan outlines the implementation of Rule management (create, list, get, upd
     - [x] Add `get_rule` method to `src/enapter/http/api/rule_engine/client.py`
     - [x] Write failing tests
     - [x] Implement method to pass tests
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Rule Management Implementation (Read Operations)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Rule Management Implementation (Read Operations)' (Protocol in workflow.md)
 
 ## Phase 3: Rule Management Implementation (Write Operations)
 
