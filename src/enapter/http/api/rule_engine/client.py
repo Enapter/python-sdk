@@ -5,6 +5,7 @@ import httpx
 from enapter.http import api
 
 from .engine import Engine
+from .rule import Rule
 
 
 class Client:
@@ -34,6 +35,20 @@ class Client:
         response = await self._client.post(url)
         await api.check_error(response)
         return Engine.from_dto(response.json()["engine"])
+
+    async def list_rules(self, site_id: str | None = None) -> list[Rule]:
+        """List all rules."""
+        url = f"{self._url(site_id)}/rules"
+        response = await self._client.get(url)
+        await api.check_error(response)
+        return [Rule.from_dto(dto) for dto in response.json()["rules"]]
+
+    async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
+        """Get a single rule."""
+        url = f"{self._url(site_id)}/rules/{rule_id}"
+        response = await self._client.get(url)
+        await api.check_error(response)
+        return Rule.from_dto(response.json()["rule"])
 
     def _url(self, site_id: str | None) -> str:
         """Construct the URL for the rule engine endpoint."""
