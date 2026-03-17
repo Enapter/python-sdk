@@ -26,23 +26,23 @@ This plan outlines the implementation of Rule management (create, list, get, upd
 
 ## Phase 3: Rule Management Implementation (Write Operations)
 
-- [ ] Task: Implement `Create Rule` method
-    - [ ] Add `create` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests (including base64 encoding check)
-    - [ ] Implement method to pass tests
-- [ ] Task: Implement `Update Rule` (slug) method
-    - [ ] Add `update` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests
-    - [ ] Implement method to pass tests
-- [ ] Task: Implement `Update Rule Script` method
-    - [ ] Add `update_script` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests
-    - [ ] Implement method to pass tests
-- [ ] Task: Implement `Delete Rule` method
-    - [ ] Add `delete` method to `src/enapter/http/api/rule_engine/client.py`
-    - [ ] Write failing tests
-    - [ ] Implement method to pass tests
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Rule Management Implementation (Write Operations)' (Protocol in workflow.md)
+- [x] Task: Implement `Create Rule` method
+    - [x] Add `create_rule` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests (including base64 encoding check)
+    - [x] Implement method to pass tests
+- [x] Task: Implement `Update Rule` (slug) method
+    - [x] Add `update_rule` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests
+    - [x] Implement method to pass tests
+- [x] Task: Implement `Update Rule Script` method
+    - [x] Add `update_rule_script` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests
+    - [x] Implement method to pass tests
+- [x] Task: Implement `Delete Rule` method
+    - [x] Add `delete_rule` method to `src/enapter/http/api/rule_engine/client.py`
+    - [x] Write failing tests
+    - [x] Implement method to pass tests
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Rule Management Implementation (Write Operations)' (Protocol in workflow.md)
 
 ## Phase 4: Rule State Management
 
