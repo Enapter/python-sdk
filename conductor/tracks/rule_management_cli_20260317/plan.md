@@ -2,11 +2,11 @@
 
 ## Phase 1: CLI Infrastructure and Registration
 
-- [ ] Task: Create `RuleCommand` group and register it
-    - [ ] Create `src/enapter/cli/http/api/rule_command.py`
-    - [ ] Register `RuleCommand` in `src/enapter/cli/http/api/rule_engine_command.py`
-    - [ ] Implement registration of sub-commands (placeholders for now)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: CLI Infrastructure and Registration' (Protocol in workflow.md)
+- [x] Task: Create `RuleCommand` group and register it
+    - [x] Create `src/enapter/cli/http/api/rule_command.py`
+    - [x] Register `RuleCommand` in `src/enapter/cli/http/api/rule_engine_command.py`
+    - [x] Implement registration of sub-commands (placeholders for now)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: CLI Infrastructure and Registration' (Protocol in workflow.md)
 
 ## Phase 2: Read Operations (List and Get)
 
