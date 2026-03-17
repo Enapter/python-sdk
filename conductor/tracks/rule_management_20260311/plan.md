@@ -52,10 +52,10 @@ This plan outlines the implementation of Rule management (create, list, get, upd
     - [x] Implement methods to pass tests
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Rule State Management' (Protocol in workflow.md)
 
-## Phase 5: Integration and Finalization
+## Phase 5: Integration and Finalization [checkpoint: 90987b4]
 
-- [ ] Task: Add integration tests for all new Rule management methods
-    - [ ] Create `tests/integration/test_rule_engine_management.py` (or similar)
-    - [ ] Verify full flows against a mock or real environment if possible
-- [ ] Task: Final code quality check (linting, coverage)
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Integration and Finalization' (Protocol in workflow.md)
+- [x] Task: Add integration tests for all new Rule management methods
+    - [x] Create `tests/integration/test_rule_engine_management.py` (or similar)
+    - [x] Verify full flows against a mock or real environment if possible
+- [x] Task: Final code quality check (linting, coverage)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Integration and Finalization' (Protocol in workflow.md)
