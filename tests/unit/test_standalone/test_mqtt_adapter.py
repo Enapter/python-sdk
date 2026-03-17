@@ -59,7 +59,7 @@ async def test_publish_properties():
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_properties.assert_called()
             last_call = device_channel.publish_properties.call_args
             published_properties = last_call.kwargs["properties"]
@@ -80,7 +80,7 @@ async def test_publish_telemetry():
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_telemetry.assert_called()
             last_call = device_channel.publish_telemetry.call_args
             published_telemetry = last_call.kwargs["telemetry"]
@@ -103,7 +103,7 @@ async def test_publish_logs(log_severity, persist_logs) -> None:
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_log.assert_called()
             last_call = device_channel.publish_log.call_args
             published_log = last_call.kwargs["log"]
@@ -129,7 +129,7 @@ async def test_publish_properties_exception():
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_properties.assert_called()
 
 
@@ -147,7 +147,7 @@ async def test_publish_telemetry_exception():
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_telemetry.assert_called()
 
 
@@ -165,7 +165,7 @@ async def test_publish_logs_exception():
             device=device,
             task_group=tg,
         ):
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.1)
             device_channel.publish_log.assert_called()
 
 
