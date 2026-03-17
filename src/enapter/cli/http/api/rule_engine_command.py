@@ -4,6 +4,7 @@ import argparse
 
 from enapter import cli
 
+from .rule_command import RuleCommand
 from .rule_engine_get_command import RuleEngineGetCommand
 from .rule_engine_resume_command import RuleEngineResumeCommand
 from .rule_engine_suspend_command import RuleEngineSuspendCommand
@@ -23,6 +24,7 @@ class RuleEngineCommand(cli.Command):
             RuleEngineGetCommand,
             RuleEngineSuspendCommand,
             RuleEngineResumeCommand,
+            RuleCommand,
         ]:
             command.register(subparsers)
 
@@ -36,5 +38,7 @@ class RuleEngineCommand(cli.Command):
                 await RuleEngineSuspendCommand.run(args)
             case "resume":
                 await RuleEngineResumeCommand.run(args)
+            case "rule":
+                await RuleCommand.run(args)
             case _:
                 raise NotImplementedError(args.rule_engine_command)
