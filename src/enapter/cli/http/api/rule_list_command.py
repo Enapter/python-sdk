@@ -21,6 +21,6 @@ class RuleListCommand(cli.Command):
     async def run(args: argparse.Namespace) -> None:
         """Run the command."""
         async with http.api.Client(http.api.Config.from_env()) as client:
-            rules = await client.rule_engine.list_rules(site_id=args.site_id)
-            for rule in rules:
-                print(json.dumps(rule.to_dto()))
+            async with client.rule_engine.list_rules(site_id=args.site_id) as stream:
+                async for rule in stream:
+                    print(json.dumps(rule.to_dto()))
