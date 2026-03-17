@@ -108,6 +108,20 @@ class Client:
         await api.check_error(response)
         return Rule.from_dto(response.json()["rule"])
 
+    async def enable_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
+        """Enable a rule."""
+        url = f"{self._url(site_id)}/rules/{rule_id}/enable"
+        response = await self._client.post(url)
+        await api.check_error(response)
+        return Rule.from_dto(response.json()["rule"])
+
+    async def disable_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
+        """Disable a rule."""
+        url = f"{self._url(site_id)}/rules/{rule_id}/disable"
+        response = await self._client.post(url)
+        await api.check_error(response)
+        return Rule.from_dto(response.json()["rule"])
+
     async def delete_rule(self, rule_id: str, site_id: str | None = None) -> None:
         """Delete a rule."""
         url = f"{self._url(site_id)}/rules/{rule_id}"
