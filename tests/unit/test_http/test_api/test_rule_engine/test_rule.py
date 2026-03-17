@@ -21,6 +21,22 @@ def test_rule_script_to_dto():
     assert dto == {"code": "cHJpbnQoJ2hlbGxvJyk=", "runtime_version": "V3"}
 
 
+def test_rule_script_with_exec_interval():
+    """Test RuleScript with exec_interval."""
+    dto = {
+        "code": "cHJpbnQoJ3YxJyk=",
+        "runtime_version": "V1",
+        "exec_interval": "1m",
+    }
+    script = enapter.http.api.rule_engine.RuleScript.from_dto(dto)
+    assert script.code == "print('v1')"
+    assert script.runtime_version == enapter.http.api.rule_engine.RuntimeVersion.V1
+    assert script.exec_interval == "1m"
+
+    dto_back = script.to_dto()
+    assert dto_back == dto
+
+
 def test_rule_from_dto():
     """Test creating a Rule from a DTO."""
     dto = {
