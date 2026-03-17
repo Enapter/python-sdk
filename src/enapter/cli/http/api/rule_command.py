@@ -4,6 +4,15 @@ import argparse
 
 from enapter import cli
 
+from .rule_create_command import RuleCreateCommand
+from .rule_delete_command import RuleDeleteCommand
+from .rule_disable_command import RuleDisableCommand
+from .rule_enable_command import RuleEnableCommand
+from .rule_get_command import RuleGetCommand
+from .rule_list_command import RuleListCommand
+from .rule_update_command import RuleUpdateCommand
+from .rule_update_script_command import RuleUpdateScriptCommand
+
 
 class RuleCommand(cli.Command):
     """Command group for Rule management."""
@@ -15,15 +24,37 @@ class RuleCommand(cli.Command):
             "rule", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         subparsers = parser.add_subparsers(dest="rule_command", required=True)
-        # TODO: Register sub-commands here
-        # For now, we'll add a dummy sub-parser so it doesn't fail on registration
-        subparsers.add_parser("list")
+        for command in [
+            RuleListCommand,
+            RuleGetCommand,
+            RuleCreateCommand,
+            RuleUpdateCommand,
+            RuleUpdateScriptCommand,
+            RuleEnableCommand,
+            RuleDisableCommand,
+            RuleDeleteCommand,
+        ]:
+            command.register(subparsers)
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         """Run the sub-command."""
         match args.rule_command:
             case "list":
-                print("List rules command placeholder")
+                await RuleListCommand.run(args)
+            case "get":
+                await RuleGetCommand.run(args)
+            case "create":
+                await RuleCreateCommand.run(args)
+            case "update":
+                await RuleUpdateCommand.run(args)
+            case "update-script":
+                await RuleUpdateScriptCommand.run(args)
+            case "enable":
+                await RuleEnableCommand.run(args)
+            case "disable":
+                await RuleDisableCommand.run(args)
+            case "delete":
+                await RuleDeleteCommand.run(args)
             case _:
                 raise NotImplementedError(args.rule_command)
