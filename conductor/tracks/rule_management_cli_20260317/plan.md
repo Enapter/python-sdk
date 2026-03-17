@@ -1,6 +1,6 @@
 # Implementation Plan: Rule Management CLI
 
-## Phase 1: CLI Infrastructure and Registration
+## Phase 1: CLI Infrastructure and Registration [checkpoint: 5de1d89]
 
 - [x] Task: Create `RuleCommand` group and register it
     - [x] Create `src/enapter/cli/http/api/rule_command.py`
