@@ -113,7 +113,10 @@ async def test_list_rules(client, mock_httpx_client):
     }
     mock_httpx_client.get = AsyncMock(return_value=mock_response)
 
-    rules = await client.list_rules(site_id="site_123")
+    rules = []
+    async with client.list_rules(site_id="site_123") as stream:
+        async for rule in stream:
+            rules.append(rule)
 
     assert len(rules) == 2
     assert rules[0].id == "rule_1"

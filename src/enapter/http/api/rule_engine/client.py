@@ -1,10 +1,11 @@
 """Rule Engine HTTP API client."""
 
 import time
-from typing import Any, Callable
+from typing import Any, AsyncGenerator, Callable
 
 import httpx
 
+from enapter import async_
 from enapter.http import api
 
 from .engine import Engine
@@ -45,12 +46,16 @@ class Client:
         await api.check_error(response)
         return Engine.from_dto(response.json()["engine"])
 
-    async def list_rules(self, site_id: str | None = None) -> list[Rule]:
+    @async_.generator
+    async def list_rules(
+        self, site_id: str | None = None
+    ) -> AsyncGenerator[Rule, None]:
         """List all rules."""
         url = f"{self._url(site_id)}/rules"
         response = await self._client.get(url)
         await api.check_error(response)
-        return [Rule.from_dto(dto) for dto in response.json()["rules"]]
+        for dto in response.json()["rules"]:
+            yield Rule.from_dto(dto)
 
     async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
         """Get a single rule."""
