@@ -24,7 +24,7 @@ This plan outlines the implementation of Rule management (create, list, get, upd
     - [x] Implement method to pass tests
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Rule Management Implementation (Read Operations)' (Protocol in workflow.md)
 
-## Phase 3: Rule Management Implementation (Write Operations)
+## Phase 3: Rule Management Implementation (Write Operations) [checkpoint: 15e657c]
 
 - [x] Task: Implement `Create Rule` method
     - [x] Add `create_rule` method to `src/enapter/http/api/rule_engine/client.py`
