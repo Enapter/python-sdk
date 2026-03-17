@@ -1,7 +1,18 @@
 import io
 import logging
 
-import enapter
+import pytest
+
+import enapter.log
+
+
+@pytest.fixture(autouse=True)
+def reset_logger():
+    original_level = enapter.log.LOGGER.level
+    original_handlers = enapter.log.LOGGER.handlers.copy()
+    yield
+    enapter.log.LOGGER.setLevel(original_level)
+    enapter.log.LOGGER.handlers = original_handlers
 
 
 def test_configure_level_none():
