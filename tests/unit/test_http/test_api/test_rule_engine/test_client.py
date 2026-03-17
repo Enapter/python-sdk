@@ -304,3 +304,51 @@ async def test_delete_rule(client, mock_httpx_client):
     mock_httpx_client.delete.assert_called_once_with(
         "v3/sites/site_123/rule_engine/rules/rule_123"
     )
+
+
+@pytest.mark.asyncio
+async def test_enable_rule(client, mock_httpx_client):
+    """Test enabling a rule."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "rule": {
+            "id": "rule_123",
+            "slug": "test-rule",
+            "disabled": False,
+            "state": "STARTED",
+            "script": {"code": "cHJpbnQoJ2hlbGxvJyk=", "runtime_version": "V3"},
+        }
+    }
+    mock_httpx_client.post = AsyncMock(return_value=mock_response)
+
+    rule = await client.enable_rule(rule_id="rule_123", site_id="site_123")
+
+    assert rule.disabled is False
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/sites/site_123/rule_engine/rules/rule_123/enable"
+    )
+
+
+@pytest.mark.asyncio
+async def test_disable_rule(client, mock_httpx_client):
+    """Test disabling a rule."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "rule": {
+            "id": "rule_123",
+            "slug": "test-rule",
+            "disabled": True,
+            "state": "STOPPED",
+            "script": {"code": "cHJpbnQoJ2hlbGxvJyk=", "runtime_version": "V3"},
+        }
+    }
+    mock_httpx_client.post = AsyncMock(return_value=mock_response)
+
+    rule = await client.disable_rule(rule_id="rule_123", site_id="site_123")
+
+    assert rule.disabled is True
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/sites/site_123/rule_engine/rules/rule_123/disable"
+    )
