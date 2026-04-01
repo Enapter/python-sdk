@@ -10,9 +10,9 @@ def test_parse_site_location_valid():
 
 
 def test_parse_site_location_with_spaces():
-    # Note: name keeps whitespace, float() handles surrounding whitespace
+    # Note: name strips whitespace, float() handles surrounding whitespace
     assert parse_site_location(" Berlin , 52.52 , 13.405 ") == (
-        " Berlin ",
+        "Berlin",
         52.52,
         13.405,
     )
