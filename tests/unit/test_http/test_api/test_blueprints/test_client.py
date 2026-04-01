@@ -2,7 +2,6 @@
 
 import datetime
 import io
-import pathlib
 import zipfile
 from unittest.mock import AsyncMock, MagicMock
 
