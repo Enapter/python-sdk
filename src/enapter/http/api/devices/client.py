@@ -1,4 +1,4 @@
-import random
+import secrets
 import time
 from typing import AsyncGenerator
 
@@ -161,4 +161,4 @@ def random_device_name(device_type: DeviceType) -> str:
 
 
 def random_hardware_id() -> str:
-    return "V" + "".join(f"{b:02X}" for b in random.randbytes(16))
+    return "V" + secrets.token_hex(16).upper()
