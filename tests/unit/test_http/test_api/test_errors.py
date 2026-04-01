@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import httpx
 import pytest
 
@@ -80,3 +82,18 @@ def test_multi_error_from_dto_empty_list():
     """Test MultiError.from_dto raises ValueError on empty error list."""
     with pytest.raises(ValueError, match="empty error list"):
         MultiError.from_dto({"errors": []})
+
+
+@pytest.mark.asyncio
+async def test_check_error_reads_body():
+    """Test that check_error reads the response body."""
+    response = httpx.Response(
+        status_code=500,
+        content=b"Internal Server Error",
+        request=httpx.Request("GET", "https://example.com"),
+    )
+    response.aread = AsyncMock()
+    with pytest.raises(httpx.HTTPStatusError):
+        await check_error(response)
+
+    response.aread.assert_awaited_once()
