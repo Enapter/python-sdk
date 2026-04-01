@@ -7,14 +7,20 @@ from enapter.http.api.errors import Error, MultiError, check_error
 @pytest.mark.asyncio
 async def test_check_error_success():
     """Test that check_error does nothing when response is successful."""
-    response = httpx.Response(status_code=200, request=httpx.Request("GET", "https://example.com"))
+    response = httpx.Response(
+        status_code=200, request=httpx.Request("GET", "https://example.com")
+    )
     await check_error(response)
 
 
 @pytest.mark.asyncio
 async def test_check_error_non_json():
     """Test that check_error calls raise_for_status when response is not JSON."""
-    response = httpx.Response(status_code=500, content=b"Internal Server Error", request=httpx.Request("GET", "https://example.com"))
+    response = httpx.Response(
+        status_code=500,
+        content=b"Internal Server Error",
+        request=httpx.Request("GET", "https://example.com"),
+    )
     with pytest.raises(httpx.HTTPStatusError):
         await check_error(response)
 
@@ -31,7 +37,9 @@ async def test_check_error_api_error_single():
             }
         ]
     }
-    response = httpx.Response(status_code=404, json=dto, request=httpx.Request("GET", "https://example.com"))
+    response = httpx.Response(
+        status_code=404, json=dto, request=httpx.Request("GET", "https://example.com")
+    )
     with pytest.raises(Error) as exc_info:
         await check_error(response)
 
@@ -49,7 +57,9 @@ async def test_check_error_api_error_multiple():
             {"message": "Invalid parameter B", "code": "INVALID_PARAM"},
         ]
     }
-    response = httpx.Response(status_code=400, json=dto, request=httpx.Request("GET", "https://example.com"))
+    response = httpx.Response(
+        status_code=400, json=dto, request=httpx.Request("GET", "https://example.com")
+    )
     with pytest.raises(MultiError) as exc_info:
         await check_error(response)
 
