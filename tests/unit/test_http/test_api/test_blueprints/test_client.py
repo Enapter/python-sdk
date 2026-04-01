@@ -121,7 +121,9 @@ async def test_download_blueprint(blueprints_client, mock_client):
     content = await blueprints_client.download(blueprint_id="bp_123")
 
     assert content == b"blueprint zip content"
-    mock_client.get.assert_called_once_with("v3/blueprints/bp_123/zip", params={"view": "ORIGINAL"})
+    mock_client.get.assert_called_once_with(
+        "v3/blueprints/bp_123/zip", params={"view": "ORIGINAL"}
+    )
 
 
 @pytest.mark.asyncio
@@ -132,10 +134,14 @@ async def test_download_blueprint_compiled(blueprints_client, mock_client):
     mock_response.content = b"compiled blueprint zip content"
     mock_client.get = AsyncMock(return_value=mock_response)
 
-    content = await blueprints_client.download(blueprint_id="bp_123", view=BlueprintView.COMPILED)
+    content = await blueprints_client.download(
+        blueprint_id="bp_123", view=BlueprintView.COMPILED
+    )
 
     assert content == b"compiled blueprint zip content"
-    mock_client.get.assert_called_once_with("v3/blueprints/bp_123/zip", params={"view": "COMPILED"})
+    mock_client.get.assert_called_once_with(
+        "v3/blueprints/bp_123/zip", params={"view": "COMPILED"}
+    )
 
 
 @pytest.mark.asyncio
@@ -157,9 +163,7 @@ async def test_validate_blueprint_with_errors(blueprints_client, mock_client):
     """Test validating a blueprint with errors."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
-    mock_response.json.return_value = {
-        "validation_errors": ["Error 1", "Error 2"]
-    }
+    mock_response.json.return_value = {"validation_errors": ["Error 1", "Error 2"]}
     mock_client.post = AsyncMock(return_value=mock_response)
 
     data = b"invalid blueprint data"
