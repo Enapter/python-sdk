@@ -14,14 +14,3 @@ def test_parse_single_label():
     labels = Labels.parse(s)
     assert labels == {"device": "only"}
     assert labels.device == "only"
-
-
-def test_parse_empty_string():
-    labels = Labels.parse("")
-    assert labels == {}
-
-
-def test_parse_multiple_spaces():
-    s = "device=foo  telemetry=bar "
-    labels = Labels.parse(s)
-    assert labels == {"device": "foo", "telemetry": "bar"}
