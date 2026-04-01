@@ -1,13 +1,12 @@
 """Unit tests for the Blueprints HTTP API client."""
 
-import pathlib
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
 import pytest
 
 import enapter
-from enapter.http.api.blueprints.blueprint import Blueprint, BlueprintView
+from enapter.http.api.blueprints.blueprint import BlueprintView
 
 
 @pytest.fixture
