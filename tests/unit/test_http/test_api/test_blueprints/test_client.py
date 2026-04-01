@@ -1,9 +1,9 @@
 """Unit tests for the Blueprints HTTP API client."""
 
+import datetime
+import io
 import pathlib
 import zipfile
-import io
-import datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
@@ -30,17 +30,16 @@ async def test_get_blueprint(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "blueprint": {
-            "id": "bp_123",
-            "created_at": "2024-04-01T12:00:00+00:00"
-        }
+        "blueprint": {"id": "bp_123", "created_at": "2024-04-01T12:00:00+00:00"}
     }
     mock_httpx_client.get = AsyncMock(return_value=mock_response)
 
     blueprint = await client.get("bp_123")
 
     assert blueprint.id == "bp_123"
-    assert blueprint.created_at == datetime.datetime.fromisoformat("2024-04-01T12:00:00+00:00")
+    assert blueprint.created_at == datetime.datetime.fromisoformat(
+        "2024-04-01T12:00:00+00:00"
+    )
     mock_httpx_client.get.assert_called_once_with("v3/blueprints/bp_123")
 
 
@@ -50,10 +49,7 @@ async def test_upload_data(client, mock_httpx_client):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "blueprint": {
-            "id": "bp_new",
-            "created_at": "2024-04-01T12:00:00+00:00"
-        }
+        "blueprint": {"id": "bp_new", "created_at": "2024-04-01T12:00:00+00:00"}
     }
     mock_httpx_client.post = AsyncMock(return_value=mock_response)
 
@@ -61,7 +57,9 @@ async def test_upload_data(client, mock_httpx_client):
     blueprint = await client.upload(data)
 
     assert blueprint.id == "bp_new"
-    assert blueprint.created_at == datetime.datetime.fromisoformat("2024-04-01T12:00:00+00:00")
+    assert blueprint.created_at == datetime.datetime.fromisoformat(
+        "2024-04-01T12:00:00+00:00"
+    )
     mock_httpx_client.post.assert_called_once_with("v3/blueprints/upload", content=data)
 
 
@@ -71,10 +69,7 @@ async def test_upload_file(client, mock_httpx_client, tmp_path):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "blueprint": {
-            "id": "bp_file",
-            "created_at": "2024-04-01T12:00:00+00:00"
-        }
+        "blueprint": {"id": "bp_file", "created_at": "2024-04-01T12:00:00+00:00"}
     }
     mock_httpx_client.post = AsyncMock(return_value=mock_response)
 
@@ -84,7 +79,9 @@ async def test_upload_file(client, mock_httpx_client, tmp_path):
     blueprint = await client.upload_file(file_path)
 
     assert blueprint.id == "bp_file"
-    mock_httpx_client.post.assert_called_once_with("v3/blueprints/upload", content=b"manifest content")
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/blueprints/upload", content=b"manifest content"
+    )
 
 
 @pytest.mark.asyncio
@@ -93,10 +90,7 @@ async def test_upload_directory(client, mock_httpx_client, tmp_path):
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "blueprint": {
-            "id": "bp_dir",
-            "created_at": "2024-04-01T12:00:00+00:00"
-        }
+        "blueprint": {"id": "bp_dir", "created_at": "2024-04-01T12:00:00+00:00"}
     }
     mock_httpx_client.post = AsyncMock(return_value=mock_response)
 
@@ -148,7 +142,9 @@ async def test_validate_success(client, mock_httpx_client):
 
     await client.validate(b"blueprint content")
 
-    mock_httpx_client.post.assert_called_once_with("v3/blueprints/validate", content=b"blueprint content")
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/blueprints/validate", content=b"blueprint content"
+    )
 
 
 @pytest.mark.asyncio
@@ -168,7 +164,9 @@ async def test_validate_error(client, mock_httpx_client):
     assert len(errors) == 2
     assert errors[0].message == "Invalid manifest"
     assert errors[1].message == "Missing field"
-    mock_httpx_client.post.assert_called_once_with("v3/blueprints/validate", content=b"blueprint content")
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/blueprints/validate", content=b"blueprint content"
+    )
 
 
 @pytest.mark.asyncio
@@ -184,7 +182,9 @@ async def test_validate_file(client, mock_httpx_client, tmp_path):
 
     await client.validate_file(file_path)
 
-    mock_httpx_client.post.assert_called_once_with("v3/blueprints/validate", content=b"manifest content")
+    mock_httpx_client.post.assert_called_once_with(
+        "v3/blueprints/validate", content=b"manifest content"
+    )
 
 
 @pytest.mark.asyncio
