@@ -6,9 +6,7 @@ class Labels(collections.UserDict):
 
     @classmethod
     def parse(cls, s: str) -> Self:
-        if not s:
-            return cls()
-        return cls(kv.split("=") for kv in s.split(" ") if kv)
+        return cls(kv.split("=") for kv in s.split())
 
     @property
     def device(self) -> str:
