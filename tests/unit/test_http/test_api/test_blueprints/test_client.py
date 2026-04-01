@@ -1,5 +1,7 @@
 """Unit tests for the Blueprints HTTP API client."""
 
+import io
+import zipfile
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
@@ -103,10 +105,14 @@ async def test_upload_directory(blueprints_client, mock_client, tmp_path):
     blueprint = await blueprints_client.upload_directory(path=bp_dir)
 
     assert blueprint.id == "bp_123"
-    assert mock_client.post.call_count == 1
+    mock_client.post.assert_called_once()
     args, kwargs = mock_client.post.call_args
     assert args[0] == "v3/blueprints/upload"
-    assert isinstance(kwargs["content"], bytes)
+
+    zipped_content = kwargs["content"]
+    with zipfile.ZipFile(io.BytesIO(zipped_content)) as zf:
+        assert "main.lua" in zf.namelist()
+        assert zf.read("main.lua") == b"print('hello')"
 
 
 @pytest.mark.asyncio
@@ -205,7 +211,11 @@ async def test_validate_directory(blueprints_client, mock_client, tmp_path):
 
     await blueprints_client.validate_directory(path=bp_dir)
 
-    assert mock_client.post.call_count == 1
+    mock_client.post.assert_called_once()
     args, kwargs = mock_client.post.call_args
     assert args[0] == "v3/blueprints/validate"
-    assert isinstance(kwargs["content"], bytes)
+
+    zipped_content = kwargs["content"]
+    with zipfile.ZipFile(io.BytesIO(zipped_content)) as zf:
+        assert "main.lua" in zf.namelist()
+        assert zf.read("main.lua") == b"print('hello')"
