@@ -37,9 +37,16 @@ class DeviceListCommand(cli.Command):
             help="Expand device connectivity information",
         )
         parser.add_argument(
+            "-u",
             "--communication",
             action="store_true",
             help="Expand device communication information",
+        )
+        parser.add_argument(
+            "-a",
+            "--raised-alert-names",
+            action="store_true",
+            help="Expand device raised alert names information",
         )
         parser.add_argument("-s", "--site-id", help="Filter devices by site ID")
 
@@ -53,6 +60,7 @@ class DeviceListCommand(cli.Command):
                 expand_properties=args.properties,
                 expand_connectivity=args.connectivity,
                 expand_communication=args.communication,
+                expand_raised_alert_names=args.raised_alert_names,
                 site_id=args.site_id,
             ) as stream:
                 count = 0

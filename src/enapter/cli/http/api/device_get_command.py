@@ -38,6 +38,12 @@ class DeviceGetCommand(cli.Command):
             action="store_true",
             help="Expand device communication information",
         )
+        parser.add_argument(
+            "-a",
+            "--raised-alert-names",
+            action="store_true",
+            help="Expand device raised alert names information",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -48,5 +54,6 @@ class DeviceGetCommand(cli.Command):
                 expand_properties=args.properties,
                 expand_connectivity=args.connectivity,
                 expand_communication=args.communication,
+                expand_raised_alert_names=args.raised_alert_names,
             )
             print(json.dumps(device.to_dto()))

@@ -61,7 +61,9 @@ async def test_get_device_expand_raised_alert_names(devices_client, mock_client)
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "device": create_mock_device_dto("dev_2", raised_alert_names=["alert_1", "alert_2"])
+        "device": create_mock_device_dto(
+            "dev_2", raised_alert_names=["alert_1", "alert_2"]
+        )
     }
     mock_client.get = AsyncMock(return_value=mock_response)
 
