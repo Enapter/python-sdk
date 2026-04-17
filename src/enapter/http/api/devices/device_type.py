@@ -12,3 +12,4 @@ class DeviceType(enum.Enum):
     LINK_SLAVE_UCM = "LINK_SLAVE_UCM"
     EMBEDDED_UCM = "EMBEDDED_UCM"
     NATIVE = "NATIVE"
+    CHILD = "CHILD"

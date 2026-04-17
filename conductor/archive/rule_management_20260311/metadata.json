@@ -1,8 +1,0 @@
-{
-  "track_id": "rule_management_20260311",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-03-11T12:00:00Z",
-  "updated_at": "2026-03-11T12:00:00Z",
-  "description": "Implement automation rule management using Enapter HTTP API for Rule Engine (Create, List, Get, Update, Enable, Disable, Delete)."
-}

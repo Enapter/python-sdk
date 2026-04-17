@@ -1,4 +1,4 @@
-import random
+import secrets
 import time
 from typing import AsyncGenerator
 
@@ -81,6 +81,7 @@ class Client:
         expand_properties: bool = False,
         expand_connectivity: bool = False,
         expand_communication: bool = False,
+        expand_raised_alert_names: bool = False,
     ) -> Device:
         url = f"v3/devices/{device_id}"
         expand = {
@@ -88,6 +89,7 @@ class Client:
             "properties": expand_properties,
             "connectivity": expand_connectivity,
             "communication": expand_communication,
+            "raised_alert_names": expand_raised_alert_names,
         }
         expand_string = ",".join(k for k, v in expand.items() if v)
         response = await self._client.get(url, params={"expand": expand_string})
@@ -101,6 +103,7 @@ class Client:
         expand_properties: bool = False,
         expand_connectivity: bool = False,
         expand_communication: bool = False,
+        expand_raised_alert_names: bool = False,
         site_id: str | None = None,
     ) -> AsyncGenerator[Device, None]:
         url = "v3/devices" if site_id is None else f"v3/sites/{site_id}/devices"
@@ -109,6 +112,7 @@ class Client:
             "properties": expand_properties,
             "connectivity": expand_connectivity,
             "communication": expand_communication,
+            "raised_alert_names": expand_raised_alert_names,
         }
         expand_string = ",".join(k for k, v in expand.items() if v)
         limit = 50
@@ -161,4 +165,4 @@ def random_device_name(device_type: DeviceType) -> str:
 
 
 def random_hardware_id() -> str:
-    return "V" + "".join(f"{b:02X}" for b in random.randbytes(16))
+    return "V" + secrets.token_hex(16).upper()

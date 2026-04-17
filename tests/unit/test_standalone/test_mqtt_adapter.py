@@ -50,6 +50,8 @@ async def test_publish_properties():
     device = Device()
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
+    event = asyncio.Event()
+    device_channel.publish_properties.side_effect = lambda *args, **kwargs: event.set()
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(
@@ -71,6 +73,8 @@ async def test_publish_telemetry():
     device = Device()
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
+    event = asyncio.Event()
+    device_channel.publish_telemetry.side_effect = lambda *args, **kwargs: event.set()
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(
@@ -94,6 +98,8 @@ async def test_publish_logs(log_severity, persist_logs) -> None:
     device = Device(log_severity=log_severity, persist_logs=persist_logs)
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
+    event = asyncio.Event()
+    device_channel.publish_log.side_effect = lambda *args, **kwargs: event.set()
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(
@@ -119,7 +125,13 @@ async def test_publish_properties_exception():
     device = Device()
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
-    device_channel.publish_properties.side_effect = RuntimeError("Publish error")
+    event = asyncio.Event()
+
+    def publish_properties_mock(*args, **kwargs):
+        event.set()
+        raise RuntimeError("Publish error")
+
+    device_channel.publish_properties.side_effect = publish_properties_mock
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(
@@ -137,7 +149,13 @@ async def test_publish_telemetry_exception():
     device = Device()
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
-    device_channel.publish_telemetry.side_effect = RuntimeError("Publish error")
+    event = asyncio.Event()
+
+    def publish_telemetry_mock(*args, **kwargs):
+        event.set()
+        raise RuntimeError("Publish error")
+
+    device_channel.publish_telemetry.side_effect = publish_telemetry_mock
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(
@@ -155,7 +173,13 @@ async def test_publish_logs_exception():
     device = Device(log_severity="error")
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
     device_channel = mock.AsyncMock(spec=enapter.mqtt.api.device.Channel)
-    device_channel.publish_log.side_effect = RuntimeError("Publish error")
+    event = asyncio.Event()
+
+    def publish_log_mock(*args, **kwargs):
+        event.set()
+        raise RuntimeError("Publish error")
+
+    device_channel.publish_log.side_effect = publish_log_mock
     mqtt_api_client.device_channel.return_value = device_channel
     async with asyncio.TaskGroup() as tg:
         async with enapter.standalone.mqtt_adapter.MQTTAdapter(

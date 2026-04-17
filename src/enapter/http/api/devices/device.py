@@ -23,6 +23,7 @@ class Device:
     properties: dict[str, Any] | None = None
     connectivity: DeviceConnectivity | None = None
     communication: DeviceCommunication | None = None
+    raised_alert_names: list[str] | None = None
 
     @classmethod
     def from_dto(cls, dto: dict[str, Any]) -> Self:
@@ -47,6 +48,7 @@ class Device:
                 if dto.get("communication") is not None
                 else None
             ),
+            raised_alert_names=dto.get("raised_alert_names"),
         )
 
     def to_dto(self) -> dict[str, Any]:
@@ -67,4 +69,5 @@ class Device:
             "communication": (
                 self.communication.to_dto() if self.communication is not None else None
             ),
+            "raised_alert_names": self.raised_alert_names,
         }
