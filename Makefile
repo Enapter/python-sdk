@@ -76,10 +76,10 @@ endif
 	sed -E -i 's/__version__ = "$(RE_SEMVER)"/__version__ = "$(V)"/g' src/enapter/__init__.py
 	grep -E --files-with-matches --recursive "enapter==$(RE_SEMVER)" README.md examples \
 		| xargs -n 1 sed -E -i "s/enapter==$(RE_SEMVER)/enapter==$(V)/g"
+	git cliff --tag "v$(V)" -o CHANGELOG.md
 	git add .
-	git commit -m "bump version to $(V)"
+	git commit -m "chore(release): bump version to $(V)"
 	git tag "v$(V)"
-
 
 DOCKER_IMAGE_TAG ?= enapter/python-sdk:dev
 
