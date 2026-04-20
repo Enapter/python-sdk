@@ -1,2 +1,2 @@
-enapter==0.17.2
+enapter==0.17.3
 psutil==7.1.2
