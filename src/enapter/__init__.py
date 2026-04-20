@@ -1,4 +1,4 @@
-__version__ = "0.17.3"
+__version__ = "0.17.4"
 
 from . import async_, log, mdns, mqtt, http, standalone  # isort: skip
 
