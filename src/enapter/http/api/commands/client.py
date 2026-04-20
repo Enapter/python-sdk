@@ -26,10 +26,20 @@ class Client:
     @async_.generator
     async def list_executions(
         self,
-        device_id: str,
+        device_id: str | None = None,
+        site_id: str | None = None,
         order: ListExecutionsOrder = ListExecutionsOrder.CREATED_AT_ASC,
     ) -> AsyncGenerator[Execution, None]:
-        url = f"v3/devices/{device_id}/command_executions"
+        if device_id is not None and site_id is not None:
+            raise ValueError("device_id and site_id are mutually exclusive")
+
+        if device_id is not None:
+            url = f"v3/devices/{device_id}/command_executions"
+        elif site_id is not None:
+            url = f"v3/sites/{site_id}/commands/executions"
+        else:
+            raise ValueError("either device_id or site_id must be provided")
+
         limit = 50
         offset = 0
         while True:
