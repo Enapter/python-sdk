@@ -27,6 +27,7 @@ class ExecutionState(enum.Enum):
 class Execution:
 
     id: str
+    device_id: str
     state: ExecutionState
     created_at: datetime.datetime
     request: Request
@@ -37,6 +38,7 @@ class Execution:
     def from_dto(cls, dto: dict[str, Any]) -> Self:
         return cls(
             id=dto["id"],
+            device_id=dto["device_id"],
             state=ExecutionState(dto["state"]),
             created_at=datetime.datetime.fromisoformat(dto["created_at"]),
             request=Request.from_dto(dto["request"]),
@@ -55,6 +57,7 @@ class Execution:
     def to_dto(self) -> dict[str, Any]:
         return {
             "id": self.id,
+            "device_id": self.device_id,
             "state": self.state.value,
             "created_at": self.created_at.isoformat(),
             "request": self.request.to_dto(),

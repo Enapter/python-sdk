@@ -29,6 +29,7 @@ async def test_list_executions_with_device_id(commands_client, mock_client):
         "executions": [
             {
                 "id": "exec_1",
+                "device_id": "dev_123",
                 "state": "SUCCESS",
                 "created_at": "2023-01-01T00:00:00Z",
                 "request": {"name": "ping", "arguments": {}},
@@ -73,6 +74,7 @@ async def test_list_executions_with_site_id(commands_client, mock_client):
         "executions": [
             {
                 "id": "exec_1",
+                "device_id": "dev_123",
                 "state": "SUCCESS",
                 "created_at": "2023-01-01T00:00:00Z",
                 "request": {"name": "ping", "arguments": {}},
@@ -105,6 +107,109 @@ async def test_list_executions_with_site_id(commands_client, mock_client):
     mock_client.get.assert_any_call(
         "v3/sites/site_123/commands/executions",
         params={"order": "CREATED_AT_ASC", "limit": 50, "offset": 50},
+    )
+
+
+@pytest.mark.asyncio
+async def test_get_execution(commands_client, mock_client):
+    """Test getting a specific command execution."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "execution": {
+            "id": "exec_1",
+            "device_id": "dev_123",
+            "state": "SUCCESS",
+            "created_at": "2023-01-01T00:00:00Z",
+            "request": {"name": "ping", "arguments": {}},
+            "response": {
+                "state": "SUCCEEDED",
+                "payload": {"value": "pong"},
+                "received_at": "2023-01-01T00:00:01Z",
+            },
+        }
+    }
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    execution = await commands_client.get_execution(
+        device_id="dev_123", execution_id="exec_1"
+    )
+
+    assert execution.id == "exec_1"
+    assert execution.device_id == "dev_123"
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions/exec_1", params={"expand": ""}
+    )
+
+
+@pytest.mark.asyncio
+async def test_execute(commands_client, mock_client):
+    """Test executing a command."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "execution": {
+            "id": "exec_1",
+            "device_id": "dev_123",
+            "state": "SUCCESS",
+            "created_at": "2023-01-01T00:00:00Z",
+            "request": {"name": "ping", "arguments": {}},
+            "response": {
+                "state": "SUCCEEDED",
+                "payload": {"value": "pong"},
+                "received_at": "2023-01-01T00:00:01Z",
+            },
+        }
+    }
+    mock_client.post = AsyncMock(return_value=mock_response)
+
+    execution = await commands_client.execute(device_id="dev_123", name="ping")
+
+    assert execution.id == "exec_1"
+    assert execution.device_id == "dev_123"
+    mock_client.post.assert_called_once_with(
+        "v3/devices/dev_123/execute_command",
+        params={"expand": ""},
+        json={"name": "ping", "arguments": {}},
+    )
+
+
+@pytest.mark.asyncio
+async def test_create_execution(commands_client, mock_client):
+    """Test creating a command execution."""
+    mock_post_response = MagicMock(spec=httpx.Response)
+    mock_post_response.status_code = 201
+    mock_post_response.json.return_value = {"execution_id": "exec_1"}
+
+    mock_get_response = MagicMock(spec=httpx.Response)
+    mock_get_response.status_code = 200
+    mock_get_response.json.return_value = {
+        "execution": {
+            "id": "exec_1",
+            "device_id": "dev_123",
+            "state": "SUCCESS",
+            "created_at": "2023-01-01T00:00:00Z",
+            "request": {"name": "ping", "arguments": {}},
+            "response": {
+                "state": "SUCCEEDED",
+                "payload": {"value": "pong"},
+                "received_at": "2023-01-01T00:00:01Z",
+            },
+        }
+    }
+
+    mock_client.post = AsyncMock(return_value=mock_post_response)
+    mock_client.get = AsyncMock(return_value=mock_get_response)
+
+    execution = await commands_client.create_execution(device_id="dev_123", name="ping")
+
+    assert execution.id == "exec_1"
+    assert execution.device_id == "dev_123"
+    mock_client.post.assert_called_once_with(
+        "v3/devices/dev_123/command_executions", json={"name": "ping", "arguments": {}}
+    )
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions/exec_1", params={"expand": ""}
     )
 
 
