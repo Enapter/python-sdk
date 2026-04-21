@@ -36,6 +36,13 @@ class TelemetryTimeseriesCommand(cli.Command):
             help="Granularity of the telemetry data in seconds",
         )
         parser.add_argument(
+            "-a",
+            "--aggregation",
+            choices=["auto", "avg", "min", "max", "last"],
+            default="auto",
+            help="Aggregation method to use for the telemetry data",
+        )
+        parser.add_argument(
             "selectors",
             metavar="device:attr1,attr2,...,attrN",
             nargs="+",
@@ -84,7 +91,13 @@ class TelemetryTimeseriesCommand(cli.Command):
             to=time_to,
             granularity=args.granularity,
             selectors=[
-                http.api.telemetry.Selector(device=device, attributes=attributes)
+                http.api.telemetry.Selector(
+                    device=device,
+                    attributes=attributes,
+                    aggregation=http.api.telemetry.Aggregation(
+                        args.aggregation.upper()
+                    ),
+                )
                 for device, attributes in attributes_by_device.items()
             ],
         ) as stream:
@@ -104,7 +117,13 @@ class TelemetryTimeseriesCommand(cli.Command):
             to=time_to,
             granularity=args.granularity,
             selectors=[
-                http.api.telemetry.Selector(device=device, attributes=attributes)
+                http.api.telemetry.Selector(
+                    device=device,
+                    attributes=attributes,
+                    aggregation=http.api.telemetry.Aggregation(
+                        args.aggregation.upper()
+                    ),
+                )
                 for device, attributes in attributes_by_device.items()
             ],
         )
