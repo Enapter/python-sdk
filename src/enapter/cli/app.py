@@ -4,6 +4,7 @@ import logging
 from enapter import log
 
 from . import http
+from .version_command import VersionCommand
 
 
 class App:
@@ -20,6 +21,7 @@ class App:
         subparsers = parser.add_subparsers(dest="command", required=True)
         for command in [
             http.Command,
+            VersionCommand,
         ]:
             command.register(subparsers)
         return cls(args=parser.parse_args())
@@ -29,5 +31,7 @@ class App:
         match self.args.command:
             case "http":
                 await http.Command.run(self.args)
+            case "version":
+                await VersionCommand.run(self.args)
             case _:
                 raise NotImplementedError(self.args.command)
