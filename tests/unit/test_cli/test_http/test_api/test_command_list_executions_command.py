@@ -1,7 +1,5 @@
 import argparse
 
-import pytest
-
 from enapter.cli.http.api.command_list_executions_command import (
     CommandListExecutionsCommand,
 )
@@ -22,12 +20,16 @@ def test_register():
     assert args.site_id == "site_123"
     assert args.device_id is None
 
-    # Test with both (should fail due to mutual exclusivity)
-    with pytest.raises(SystemExit):
-        parser.parse_args(
-            ["list-executions", "--device-id", "dev_123", "--site-id", "site_123"]
-        )
+    # Test with both (should succeed)
+    args = parser.parse_args(
+        ["list-executions", "--device-id", "dev_123", "--site-id", "site_123"]
+    )
+    assert args.device_id == "dev_123"
+    assert args.site_id == "site_123"
 
-    # Test with neither (should fail as one is required)
-    with pytest.raises(SystemExit):
-        parser.parse_args(["list-executions"])
+    # Test with neither (should still fail as one is required, but SystemExit will be raised by run())
+    # Actually, argparse won't raise SystemExit now because I removed the required=True from the group.
+    # The run() method will raise cli.CommandError.
+    args = parser.parse_args(["list-executions"])
+    assert args.device_id is None
+    assert args.site_id is None

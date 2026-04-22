@@ -30,13 +30,14 @@ class Client:
         site_id: str | None = None,
         order: ListExecutionsOrder = ListExecutionsOrder.CREATED_AT_ASC,
     ) -> AsyncGenerator[Execution, None]:
-        if device_id is not None and site_id is not None:
-            raise ValueError("device_id and site_id are mutually exclusive")
+        params = {"order": order.value}
 
-        if device_id is not None:
-            url = f"v3/devices/{device_id}/command_executions"
-        elif site_id is not None:
+        if site_id is not None:
             url = f"v3/sites/{site_id}/commands/executions"
+            if device_id is not None:
+                params["device_id.in"] = device_id
+        elif device_id is not None:
+            url = f"v3/devices/{device_id}/command_executions"
         else:
             raise ValueError("either device_id or site_id must be provided")
 
@@ -44,7 +45,7 @@ class Client:
         offset = 0
         while True:
             response = await self._client.get(
-                url, params={"order": order.value, "limit": limit, "offset": offset}
+                url, params={**params, "limit": limit, "offset": offset}
             )
             await api.check_error(response)
             payload = response.json()

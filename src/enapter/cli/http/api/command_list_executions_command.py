@@ -25,13 +25,12 @@ class CommandListExecutionsCommand(cli.Command):
             help="Order of the listed command executions",
             default="created_at_asc",
         )
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument(
+        parser.add_argument(
             "-d",
             "--device-id",
             help="ID or slug of the device to list command executions for",
         )
-        group.add_argument(
+        parser.add_argument(
             "-s",
             "--site-id",
             help="ID of the site to list command executions for",
@@ -41,6 +40,9 @@ class CommandListExecutionsCommand(cli.Command):
     async def run(args: argparse.Namespace) -> None:
         if args.limit == 0:
             return
+
+        if args.device_id is None and args.site_id is None:
+            raise ValueError("either --device-id or --site-id must be provided")
 
         async with http.api.Client(http.api.Config.from_env()) as client:
             async with client.commands.list_executions(

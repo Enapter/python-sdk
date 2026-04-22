@@ -214,16 +214,50 @@ async def test_create_execution(commands_client, mock_client):
 
 
 @pytest.mark.asyncio
-async def test_list_executions_with_both_ids_raises_error(commands_client):
-    """Test that list_executions raises ValueError if both device_id and site_id are provided."""
-    with pytest.raises(
-        ValueError, match="device_id and site_id are mutually exclusive"
-    ):
-        async with commands_client.list_executions(
-            device_id="dev_123", site_id="site_123"
-        ) as stream:
-            async for _ in stream:
-                pass
+async def test_list_executions_with_both_ids(commands_client, mock_client):
+    """Test that list_executions passes device_id.in when both site_id and device_id are provided."""
+    mock_response_1 = MagicMock(spec=httpx.Response)
+    mock_response_1.status_code = 200
+    mock_response_1.json.return_value = {
+        "executions": [
+            {
+                "id": "exec_1",
+                "device_id": "dev_123",
+                "state": "SUCCESS",
+                "created_at": "2023-01-01T00:00:00Z",
+                "request": {"name": "ping", "arguments": {}},
+                "response": {
+                    "state": "SUCCEEDED",
+                    "payload": {"value": "pong"},
+                    "received_at": "2023-01-01T00:00:01Z",
+                },
+            }
+        ]
+    }
+    mock_response_2 = MagicMock(spec=httpx.Response)
+    mock_response_2.status_code = 200
+    mock_response_2.json.return_value = {"executions": []}
+
+    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+
+    executions = []
+    async with commands_client.list_executions(
+        site_id="site_123", device_id="dev_123"
+    ) as stream:
+        async for exec in stream:
+            executions.append(exec)
+
+    assert len(executions) == 1
+    assert executions[0].id == "exec_1"
+    mock_client.get.assert_any_call(
+        "v3/sites/site_123/commands/executions",
+        params={
+            "order": "CREATED_AT_ASC",
+            "limit": 50,
+            "offset": 0,
+            "device_id.in": "dev_123",
+        },
+    )
 
 
 @pytest.mark.asyncio
