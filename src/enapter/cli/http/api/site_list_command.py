@@ -16,18 +16,11 @@ class SiteListCommand(cli.Command):
             "--limit",
             type=int,
             help="Maximum number of sites to list",
-            default=-1,
         )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        if args.limit == 0:
-            return
         async with http.api.Client(http.api.Config.from_env()) as client:
-            async with client.sites.list() as stream:
-                count = 0
+            async with client.sites.list(limit=args.limit) as stream:
                 async for site in stream:
                     print(json.dumps(site.to_dto()))
-                    count += 1
-                    if args.limit > 0 and count == args.limit:
-                        break

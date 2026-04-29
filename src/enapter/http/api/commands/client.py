@@ -1,9 +1,8 @@
 import datetime
-from typing import AsyncGenerator
+from typing import AsyncContextManager, AsyncGenerator, List
 
 import httpx
 
-from enapter import async_
 from enapter.http import api
 
 from .execution import Execution, ListExecutionsOrder
@@ -24,15 +23,39 @@ class Client:
         await api.check_error(response)
         return Execution.from_dto(response.json()["execution"])
 
-    @async_.generator
-    async def list_executions(
+    def list_executions(
         self,
         device_id: str | None = None,
         site_id: str | None = None,
         order: ListExecutionsOrder = ListExecutionsOrder.CREATED_AT_ASC,
         created_at_gte: datetime.datetime | None = None,
         created_at_lt: datetime.datetime | None = None,
-    ) -> AsyncGenerator[Execution, None]:
+        offset: int = 0,
+        limit: int | None = None,
+    ) -> AsyncContextManager[AsyncGenerator[Execution, None]]:
+        async def fetch_page(query: api.PageQuery) -> List[Execution]:
+            return await self._list_executions(
+                device_id=device_id,
+                site_id=site_id,
+                order=order,
+                created_at_gte=created_at_gte,
+                created_at_lt=created_at_lt,
+                offset=query.offset,
+                limit=query.limit,
+            )
+
+        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+
+    async def _list_executions(
+        self,
+        device_id: str | None,
+        site_id: str | None,
+        order: ListExecutionsOrder,
+        created_at_gte: datetime.datetime | None,
+        created_at_lt: datetime.datetime | None,
+        offset: int,
+        limit: int,
+    ) -> List[Execution]:
         params = {"order": order.value}
 
         if created_at_gte is not None:
@@ -50,19 +73,12 @@ class Client:
         else:
             raise ValueError("either device_id or site_id must be provided")
 
-        limit = 50
-        offset = 0
-        while True:
-            response = await self._client.get(
-                url, params={**params, "limit": limit, "offset": offset}
-            )
-            await api.check_error(response)
-            payload = response.json()
-            if not payload["executions"]:
-                return
-            for dto in payload["executions"]:
-                yield Execution.from_dto(dto)
-            offset += limit
+        response = await self._client.get(
+            url, params={**params, "offset": offset, "limit": limit}
+        )
+        await api.check_error(response)
+        payload = response.json()
+        return [Execution.from_dto(dto) for dto in payload.get("executions", [])]
 
     async def execute(
         self,

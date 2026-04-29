@@ -1,8 +1,7 @@
-from typing import AsyncGenerator
+from typing import AsyncContextManager, AsyncGenerator, List
 
 import httpx
 
-from enapter import async_
 from enapter.http import api
 
 from .location import Location
@@ -35,22 +34,22 @@ class Client:
         await api.check_error(response)
         return Site.from_dto(response.json()["site"])
 
-    @async_.generator
-    async def list(self) -> AsyncGenerator[Site, None]:
+    def list(
+        self, offset: int = 0, limit: int | None = None
+    ) -> AsyncContextManager[AsyncGenerator[Site, None]]:
+        async def fetch_page(query: api.PageQuery) -> List[Site]:
+            return await self._list(offset=query.offset, limit=query.limit)
+
+        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+
+    async def _list(self, offset: int, limit: int) -> List[Site]:
         url = "v3/sites"
-        limit = 50
-        offset = 0
-        while True:
-            response = await self._client.get(
-                url, params={"limit": limit, "offset": offset}
-            )
-            await api.check_error(response)
-            payload = response.json()
-            if not payload["sites"]:
-                return
-            for dto in payload["sites"]:
-                yield Site.from_dto(dto)
-            offset += limit
+        response = await self._client.get(
+            url, params={"offset": offset, "limit": limit}
+        )
+        await api.check_error(response)
+        payload = response.json()
+        return [Site.from_dto(dto) for dto in payload.get("sites", [])]
 
     async def update(
         self,

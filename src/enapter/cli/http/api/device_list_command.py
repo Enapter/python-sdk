@@ -16,7 +16,6 @@ class DeviceListCommand(cli.Command):
             "--limit",
             type=int,
             help="Maximum number of devices to list",
-            default=-1,
         )
         parser.add_argument(
             "-m",
@@ -52,8 +51,6 @@ class DeviceListCommand(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        if args.limit == 0:
-            return
         async with http.api.Client(http.api.Config.from_env()) as client:
             async with client.devices.list(
                 expand_manifest=args.manifest,
@@ -62,10 +59,7 @@ class DeviceListCommand(cli.Command):
                 expand_communication=args.communication,
                 expand_raised_alert_names=args.raised_alert_names,
                 site_id=args.site_id,
+                limit=args.limit,
             ) as stream:
-                count = 0
                 async for device in stream:
                     print(json.dumps(device.to_dto()))
-                    count += 1
-                    if args.limit > 0 and count == args.limit:
-                        break

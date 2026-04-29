@@ -17,7 +17,6 @@ class CommandListExecutionsCommand(cli.Command):
             "--limit",
             type=int,
             help="Maximum number of command executions to list",
-            default=-1,
         )
         parser.add_argument(
             "-o",
@@ -47,9 +46,6 @@ class CommandListExecutionsCommand(cli.Command):
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
-        if args.limit == 0:
-            return
-
         if args.device_id is None and args.site_id is None:
             raise ValueError("either --device-id or --site-id must be provided")
 
@@ -71,10 +67,7 @@ class CommandListExecutionsCommand(cli.Command):
                 order=http.api.commands.ListExecutionsOrder(args.order.upper()),
                 created_at_gte=created_at_gte,
                 created_at_lt=created_at_lt,
+                limit=args.limit,
             ) as stream:
-                count = 0
                 async for execution in stream:
                     print(json.dumps(execution.to_dto()))
-                    count += 1
-                    if args.limit > 0 and count == args.limit:
-                        break

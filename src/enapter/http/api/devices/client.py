@@ -1,10 +1,9 @@
 import secrets
 import time
-from typing import AsyncGenerator
+from typing import AsyncContextManager, AsyncGenerator, List
 
 import httpx
 
-from enapter import async_
 from enapter.http import api
 
 from .communication_config import CommunicationConfig
@@ -96,8 +95,7 @@ class Client:
         await api.check_error(response)
         return Device.from_dto(response.json()["device"])
 
-    @async_.generator
-    async def list(
+    def list(
         self,
         expand_manifest: bool = False,
         expand_properties: bool = False,
@@ -105,8 +103,36 @@ class Client:
         expand_communication: bool = False,
         expand_raised_alert_names: bool = False,
         site_id: str | None = None,
-    ) -> AsyncGenerator[Device, None]:
+        offset: int = 0,
+        limit: int | None = None,
+    ) -> AsyncContextManager[AsyncGenerator[Device, None]]:
+        async def fetch_page(query: api.PageQuery) -> List[Device]:
+            return await self._list(
+                expand_manifest=expand_manifest,
+                expand_properties=expand_properties,
+                expand_connectivity=expand_connectivity,
+                expand_communication=expand_communication,
+                expand_raised_alert_names=expand_raised_alert_names,
+                site_id=site_id,
+                offset=query.offset,
+                limit=query.limit,
+            )
+
+        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+
+    async def _list(
+        self,
+        expand_manifest: bool,
+        expand_properties: bool,
+        expand_connectivity: bool,
+        expand_communication: bool,
+        expand_raised_alert_names: bool,
+        site_id: str | None,
+        offset: int,
+        limit: int,
+    ) -> List[Device]:
         url = "v3/devices" if site_id is None else f"v3/sites/{site_id}/devices"
+
         expand = {
             "manifest": expand_manifest,
             "properties": expand_properties,
@@ -115,19 +141,13 @@ class Client:
             "raised_alert_names": expand_raised_alert_names,
         }
         expand_string = ",".join(k for k, v in expand.items() if v)
-        limit = 50
-        offset = 0
-        while True:
-            response = await self._client.get(
-                url, params={"expand": expand_string, "limit": limit, "offset": offset}
-            )
-            await api.check_error(response)
-            payload = response.json()
-            if not payload["devices"]:
-                return
-            for dto in payload["devices"]:
-                yield Device.from_dto(dto)
-            offset += limit
+
+        response = await self._client.get(
+            url, params={"expand": expand_string, "offset": offset, "limit": limit}
+        )
+        await api.check_error(response)
+        payload = response.json()
+        return [Device.from_dto(dto) for dto in payload.get("devices", [])]
 
     async def update(
         self, device_id: str, name: str | None = None, slug: str | None = None
