@@ -1,5 +1,6 @@
 """Unit tests for the Commands HTTP API client."""
 
+import datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
@@ -256,6 +257,35 @@ async def test_list_executions_with_both_ids(commands_client, mock_client):
             "limit": 50,
             "offset": 0,
             "device_id.in": "dev_123",
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_executions_with_time_filters(commands_client, mock_client):
+    """Test that list_executions passes created_at filter parameters."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"executions": []}
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    created_at_gte = datetime.datetime(2023, 1, 1, 10, 0, 0)
+    created_at_lt = datetime.datetime(2023, 1, 1, 18, 0, 0)
+
+    async with commands_client.list_executions(
+        device_id="dev_123", created_at_gte=created_at_gte, created_at_lt=created_at_lt
+    ) as stream:
+        async for _ in stream:
+            pass
+
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions",
+        params={
+            "order": "CREATED_AT_ASC",
+            "limit": 50,
+            "offset": 0,
+            "created_at.gte": created_at_gte.isoformat(),
+            "created_at.lt": created_at_lt.isoformat(),
         },
     )
 

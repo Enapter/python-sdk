@@ -1,3 +1,4 @@
+import datetime
 from typing import AsyncGenerator
 
 import httpx
@@ -29,8 +30,16 @@ class Client:
         device_id: str | None = None,
         site_id: str | None = None,
         order: ListExecutionsOrder = ListExecutionsOrder.CREATED_AT_ASC,
+        created_at_gte: datetime.datetime | None = None,
+        created_at_lt: datetime.datetime | None = None,
     ) -> AsyncGenerator[Execution, None]:
         params = {"order": order.value}
+
+        if created_at_gte is not None:
+            params["created_at.gte"] = created_at_gte.isoformat()
+
+        if created_at_lt is not None:
+            params["created_at.lt"] = created_at_lt.isoformat()
 
         if site_id is not None:
             url = f"v3/sites/{site_id}/commands/executions"

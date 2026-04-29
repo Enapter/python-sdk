@@ -33,3 +33,18 @@ def test_register():
     args = parser.parse_args(["list-executions"])
     assert args.device_id is None
     assert args.site_id is None
+
+    # Test with time filters
+    args = parser.parse_args(
+        [
+            "list-executions",
+            "--device-id",
+            "dev_123",
+            "--created-at-gte",
+            "2023-01-01T10:00:00",
+            "--created-at-lt",
+            "2023-01-01T18:00:00",
+        ]
+    )
+    assert args.created_at_gte == "2023-01-01T10:00:00"
+    assert args.created_at_lt == "2023-01-01T18:00:00"
