@@ -31,6 +31,7 @@ class Client:
         created_at_gte: datetime.datetime | None = None,
         created_at_lt: datetime.datetime | None = None,
         state: ExecutionState | list[ExecutionState] | None = None,
+        name: str | list[str] | None = None,
         offset: int = 0,
         limit: int | None = None,
     ) -> AsyncContextManager[AsyncGenerator[Execution, None]]:
@@ -42,6 +43,7 @@ class Client:
                 created_at_gte=created_at_gte,
                 created_at_lt=created_at_lt,
                 state=state,
+                name=name,
                 offset=query.offset,
                 limit=query.limit,
             )
@@ -56,6 +58,7 @@ class Client:
         created_at_gte: datetime.datetime | None,
         created_at_lt: datetime.datetime | None,
         state: ExecutionState | list[ExecutionState] | None,
+        name: str | list[str] | None,
         offset: int,
         limit: int,
     ) -> List[Execution]:
@@ -71,6 +74,11 @@ class Client:
             if isinstance(state, ExecutionState):
                 state = [state]
             params["state.in"] = ",".join(s.value for s in state)
+
+        if name is not None:
+            if isinstance(name, str):
+                name = [name]
+            params["name.in"] = ",".join(name)
 
         if site_id is not None:
             url = f"v3/sites/{site_id}/commands/executions"

@@ -49,6 +49,11 @@ class CommandListExecutionsCommand(cli.Command):
             choices=[s.value.lower() for s in http.api.commands.ExecutionState],
             help="Filter command executions by state (can be used multiple times)",
         )
+        parser.add_argument(
+            "--name",
+            action="append",
+            help="Filter command executions by command name (can be used multiple times)",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -80,6 +85,7 @@ class CommandListExecutionsCommand(cli.Command):
                 created_at_gte=created_at_gte,
                 created_at_lt=created_at_lt,
                 state=state,
+                name=args.name,
                 limit=args.limit,
             ) as stream:
                 async for execution in stream:

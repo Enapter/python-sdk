@@ -329,22 +329,17 @@ async def test_list_executions_with_state_filter(commands_client, mock_client):
 
 
 @pytest.mark.asyncio
-async def test_list_executions_with_multiple_state_filters(
-    commands_client, mock_client
-):
-    """Test that list_executions passes multiple state filter parameters as a comma-separated string."""
+async def test_list_executions_with_name_filter(commands_client, mock_client):
+    """Test that list_executions passes the name filter parameter."""
     mock_response = MagicMock(spec=httpx.Response)
     mock_response.status_code = 200
     mock_response.json.return_value = {"executions": []}
     mock_client.get = AsyncMock(return_value=mock_response)
 
-    state = [
-        enapter.http.api.commands.ExecutionState.SUCCESS,
-        enapter.http.api.commands.ExecutionState.ERROR,
-    ]
+    name = "ping"
 
     async with commands_client.list_executions(
-        device_id="dev_123", state=state
+        device_id="dev_123", name=name
     ) as stream:
         async for _ in stream:
             pass
@@ -355,6 +350,33 @@ async def test_list_executions_with_multiple_state_filters(
             "order": "CREATED_AT_ASC",
             "limit": 50,
             "offset": 0,
-            "state.in": "SUCCESS,ERROR",
+            "name.in": "ping",
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_executions_with_multiple_name_filters(commands_client, mock_client):
+    """Test that list_executions passes multiple name filter parameters."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"executions": []}
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    names = ["ping", "pong"]
+
+    async with commands_client.list_executions(
+        device_id="dev_123", name=names
+    ) as stream:
+        async for _ in stream:
+            pass
+
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions",
+        params={
+            "order": "CREATED_AT_ASC",
+            "limit": 50,
+            "offset": 0,
+            "name.in": "ping,pong",
         },
     )
