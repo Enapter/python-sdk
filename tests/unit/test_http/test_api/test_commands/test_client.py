@@ -299,3 +299,62 @@ async def test_list_executions_without_id_raises_error(commands_client):
         async with commands_client.list_executions() as stream:
             async for _ in stream:
                 pass
+
+
+@pytest.mark.asyncio
+async def test_list_executions_with_state_filter(commands_client, mock_client):
+    """Test that list_executions passes the state filter parameter."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"executions": []}
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    state = enapter.http.api.commands.ExecutionState.SUCCESS
+
+    async with commands_client.list_executions(
+        device_id="dev_123", state=state
+    ) as stream:
+        async for _ in stream:
+            pass
+
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions",
+        params={
+            "order": "CREATED_AT_ASC",
+            "limit": 50,
+            "offset": 0,
+            "state.in": "SUCCESS",
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_executions_with_multiple_state_filters(
+    commands_client, mock_client
+):
+    """Test that list_executions passes multiple state filter parameters as a comma-separated string."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"executions": []}
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    state = [
+        enapter.http.api.commands.ExecutionState.SUCCESS,
+        enapter.http.api.commands.ExecutionState.ERROR,
+    ]
+
+    async with commands_client.list_executions(
+        device_id="dev_123", state=state
+    ) as stream:
+        async for _ in stream:
+            pass
+
+    mock_client.get.assert_called_once_with(
+        "v3/devices/dev_123/command_executions",
+        params={
+            "order": "CREATED_AT_ASC",
+            "limit": 50,
+            "offset": 0,
+            "state.in": "SUCCESS,ERROR",
+        },
+    )

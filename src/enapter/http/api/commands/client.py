@@ -5,7 +5,7 @@ import httpx
 
 from enapter.http import api
 
-from .execution import Execution, ListExecutionsOrder
+from .execution import Execution, ExecutionState, ListExecutionsOrder
 
 
 class Client:
@@ -30,6 +30,7 @@ class Client:
         order: ListExecutionsOrder = ListExecutionsOrder.CREATED_AT_ASC,
         created_at_gte: datetime.datetime | None = None,
         created_at_lt: datetime.datetime | None = None,
+        state: ExecutionState | list[ExecutionState] | None = None,
         offset: int = 0,
         limit: int | None = None,
     ) -> AsyncContextManager[AsyncGenerator[Execution, None]]:
@@ -40,6 +41,7 @@ class Client:
                 order=order,
                 created_at_gte=created_at_gte,
                 created_at_lt=created_at_lt,
+                state=state,
                 offset=query.offset,
                 limit=query.limit,
             )
@@ -53,6 +55,7 @@ class Client:
         order: ListExecutionsOrder,
         created_at_gte: datetime.datetime | None,
         created_at_lt: datetime.datetime | None,
+        state: ExecutionState | list[ExecutionState] | None,
         offset: int,
         limit: int,
     ) -> List[Execution]:
@@ -63,6 +66,11 @@ class Client:
 
         if created_at_lt is not None:
             params["created_at.lt"] = created_at_lt.isoformat()
+
+        if state is not None:
+            if isinstance(state, ExecutionState):
+                state = [state]
+            params["state.in"] = ",".join(s.value for s in state)
 
         if site_id is not None:
             url = f"v3/sites/{site_id}/commands/executions"

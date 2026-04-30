@@ -43,6 +43,12 @@ class CommandListExecutionsCommand(cli.Command):
             "--created-at-lt",
             help="Don't retrieve command executions newer than provided date (ISO 8601 format)",
         )
+        parser.add_argument(
+            "--state",
+            action="append",
+            choices=[s.value.lower() for s in http.api.commands.ExecutionState],
+            help="Filter command executions by state (can be used multiple times)",
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
@@ -60,6 +66,12 @@ class CommandListExecutionsCommand(cli.Command):
             else None
         )
 
+        state = (
+            [http.api.commands.ExecutionState(s.upper()) for s in args.state]
+            if args.state is not None
+            else None
+        )
+
         async with http.api.Client(http.api.Config.from_env()) as client:
             async with client.commands.list_executions(
                 device_id=args.device_id,
@@ -67,6 +79,7 @@ class CommandListExecutionsCommand(cli.Command):
                 order=http.api.commands.ListExecutionsOrder(args.order.upper()),
                 created_at_gte=created_at_gte,
                 created_at_lt=created_at_lt,
+                state=state,
                 limit=args.limit,
             ) as stream:
                 async for execution in stream:
