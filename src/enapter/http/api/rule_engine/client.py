@@ -1,11 +1,10 @@
 """Rule Engine HTTP API client."""
 
 import time
-from typing import Any, AsyncGenerator, Callable
+from typing import Any, AsyncContextManager, AsyncGenerator, Callable
 
 import httpx
 
-from enapter import async_
 from enapter.http import api
 
 from .engine import Engine
@@ -46,16 +45,26 @@ class Client:
         await api.check_error(response)
         return Engine.from_dto(response.json()["engine"])
 
-    @async_.generator
-    async def list_rules(
-        self, site_id: str | None = None
-    ) -> AsyncGenerator[Rule, None]:
+    def list_rules(
+        self, site_id: str | None = None, offset: int = 0, limit: int | None = None
+    ) -> AsyncContextManager[AsyncGenerator[Rule, None]]:
         """List all rules."""
+
+        async def fetch_page(query: api.PageQuery) -> list[Rule]:
+            return await self._list_rules(
+                site_id=site_id, offset=query.offset, limit=query.limit
+            )
+
+        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+
+    async def _list_rules(
+        self, site_id: str | None, offset: int, limit: int
+    ) -> list[Rule]:
         url = f"{self._url(site_id)}/rules"
-        response = await self._client.get(url)
+        params = {"offset": offset, "limit": limit}
+        response = await self._client.get(url, params=params)
         await api.check_error(response)
-        for dto in response.json()["rules"]:
-            yield Rule.from_dto(dto)
+        return [Rule.from_dto(dto) for dto in response.json()["rules"]]
 
     async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
         """Get a single rule."""

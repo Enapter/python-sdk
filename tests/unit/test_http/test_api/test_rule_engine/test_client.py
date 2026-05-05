@@ -111,7 +111,12 @@ async def test_list_rules(client, mock_httpx_client):
             },
         ]
     }
-    mock_httpx_client.get = AsyncMock(return_value=mock_response)
+    mock_httpx_client.get = AsyncMock(
+        side_effect=[
+            mock_response,
+            MagicMock(spec=httpx.Response, status_code=200, json=lambda: {"rules": []}),
+        ]
+    )
 
     rules = []
     async with client.list_rules(site_id="site_123") as stream:
@@ -125,7 +130,74 @@ async def test_list_rules(client, mock_httpx_client):
     assert rules[1].id == "rule_2"
     assert rules[1].disabled is True
     assert rules[1].state == enapter.http.api.rule_engine.RuleState.STOPPED
-    mock_httpx_client.get.assert_called_once_with("v3/sites/site_123/rule_engine/rules")
+    assert mock_httpx_client.get.call_count == 2
+    mock_httpx_client.get.assert_any_call(
+        "v3/sites/site_123/rule_engine/rules", params={"offset": 0, "limit": 50}
+    )
+    mock_httpx_client.get.assert_any_call(
+        "v3/sites/site_123/rule_engine/rules", params={"offset": 50, "limit": 50}
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_rules_pagination(client, mock_httpx_client):
+    """Test listing rules with pagination."""
+    mock_response_1 = MagicMock(spec=httpx.Response)
+    mock_response_1.status_code = 200
+    mock_response_1.json.return_value = {
+        "rules": [
+            {
+                "id": f"rule_{i}",
+                "slug": f"rule-{i}",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "cHJpbnQoJzEnKQ==", "runtime_version": "V3"},
+            }
+            for i in range(50)
+        ]
+    }
+
+    mock_response_2 = MagicMock(spec=httpx.Response)
+    mock_response_2.status_code = 200
+    mock_response_2.json.return_value = {
+        "rules": [
+            {
+                "id": "rule_50",
+                "slug": "rule-50",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "cHJpbnQoJzEnKQ==", "runtime_version": "V3"},
+            }
+        ]
+    }
+
+    mock_response_3 = MagicMock(spec=httpx.Response)
+    mock_response_3.status_code = 200
+    mock_response_3.json.return_value = {"rules": []}
+
+    mock_httpx_client.get = AsyncMock(
+        side_effect=[mock_response_1, mock_response_2, mock_response_3]
+    )
+
+    rules = []
+    async with client.list_rules(site_id="site_123") as stream:
+        async for rule in stream:
+            rules.append(rule)
+
+    assert len(rules) == 51
+    assert rules[0].id == "rule_0"
+    assert rules[50].id == "rule_50"
+
+    assert mock_httpx_client.get.call_count == 3
+    mock_httpx_client.get.assert_any_call(
+        "v3/sites/site_123/rule_engine/rules", params={"offset": 0, "limit": 50}
+    )
+    mock_httpx_client.get.assert_any_call(
+        "v3/sites/site_123/rule_engine/rules", params={"offset": 50, "limit": 50}
+    )
+    mock_httpx_client.get.assert_any_call(
+        "v3/sites/site_123/rule_engine/rules", params={"offset": 100, "limit": 50}
+    )
 
 
 @pytest.mark.asyncio
