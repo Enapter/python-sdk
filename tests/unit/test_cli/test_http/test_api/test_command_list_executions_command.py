@@ -48,3 +48,13 @@ def test_register():
     )
     assert args.created_at_gte == "2023-01-01T10:00:00"
     assert args.created_at_lt == "2023-01-01T18:00:00"
+
+
+def test_pagination():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+    CommandListExecutionsCommand.register(subparsers)
+
+    args = parser.parse_args(["list-executions", "--limit", "10", "--offset", "20"])
+    assert args.limit == 10
+    assert args.offset == 20

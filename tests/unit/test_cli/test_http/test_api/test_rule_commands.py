@@ -24,6 +24,16 @@ def test_rule_list_command_alias():
     assert args.site_id == "site_123"
 
 
+def test_rule_list_command_pagination():
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+    RuleListCommand.register(subparsers)
+
+    args = parser.parse_args(["list", "--limit", "10", "--offset", "20"])
+    assert args.limit == 10
+    assert args.offset == 20
+
+
 def test_rule_create_command_alias():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()

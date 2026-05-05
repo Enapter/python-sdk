@@ -18,6 +18,12 @@ class DeviceListCommand(cli.Command):
             help="Maximum number of devices to list",
         )
         parser.add_argument(
+            "--offset",
+            type=int,
+            help="Number of devices to skip",
+            default=0,
+        )
+        parser.add_argument(
             "-m",
             "--manifest",
             action="store_true",
@@ -60,6 +66,7 @@ class DeviceListCommand(cli.Command):
                 expand_raised_alert_names=args.raised_alert_names,
                 site_id=args.site_id,
                 limit=args.limit,
+                offset=args.offset,
             ) as stream:
                 async for device in stream:
                     print(json.dumps(device.to_dto()))

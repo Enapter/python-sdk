@@ -19,6 +19,12 @@ class CommandListExecutionsCommand(cli.Command):
             help="Maximum number of command executions to list",
         )
         parser.add_argument(
+            "--offset",
+            type=int,
+            help="Number of command executions to skip",
+            default=0,
+        )
+        parser.add_argument(
             "-o",
             "--order",
             choices=["created_at_asc", "created_at_desc"],
@@ -87,6 +93,7 @@ class CommandListExecutionsCommand(cli.Command):
                 state=state,
                 name=args.name,
                 limit=args.limit,
+                offset=args.offset,
             ) as stream:
                 async for execution in stream:
                     print(json.dumps(execution.to_dto()))

@@ -17,10 +17,18 @@ class SiteListCommand(cli.Command):
             type=int,
             help="Maximum number of sites to list",
         )
+        parser.add_argument(
+            "--offset",
+            type=int,
+            help="Number of sites to skip",
+            default=0,
+        )
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
         async with http.api.Client(http.api.Config.from_env()) as client:
-            async with client.sites.list(limit=args.limit) as stream:
+            async with client.sites.list(
+                limit=args.limit, offset=args.offset
+            ) as stream:
                 async for site in stream:
                     print(json.dumps(site.to_dto()))
