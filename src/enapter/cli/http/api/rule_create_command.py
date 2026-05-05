@@ -21,7 +21,7 @@ class RuleCreateCommand(cli.Command):
             help="Path to the rule script file, or '-' to read from stdin",
         )
         parser.add_argument("--slug", help="Rule slug (optional)")
-        parser.add_argument("--site-id", help="Site ID")
+        parser.add_argument("-s", "--site-id", help="Site ID")
         parser.add_argument(
             "--disable", action="store_true", help="Create the rule in disabled state"
         )

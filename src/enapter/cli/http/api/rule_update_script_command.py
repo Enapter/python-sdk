@@ -21,7 +21,7 @@ class RuleUpdateScriptCommand(cli.Command):
             "script",
             help="Path to the rule script file, or '-' to read from stdin",
         )
-        parser.add_argument("--site-id", help="Site ID")
+        parser.add_argument("-s", "--site-id", help="Site ID")
         parser.add_argument(
             "--runtime-version",
             choices=["V1", "V3"],

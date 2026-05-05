@@ -15,7 +15,7 @@ class RuleListCommand(cli.Command):
         parser = parent.add_parser(
             "list", formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
-        parser.add_argument("--site-id", help="Site ID")
+        parser.add_argument("-s", "--site-id", help="Site ID")
 
     @staticmethod
     async def run(args: argparse.Namespace) -> None:
