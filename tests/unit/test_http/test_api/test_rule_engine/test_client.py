@@ -109,12 +109,17 @@ async def test_list_rules(client, mock_httpx_client):
                 "state": "STOPPED",
                 "script": {"code": "cHJpbnQoJzInKQ==", "runtime_version": "V3"},
             },
-        ]
+        ],
+        "total_count": 2,
     }
     mock_httpx_client.get = AsyncMock(
         side_effect=[
             mock_response,
-            MagicMock(spec=httpx.Response, status_code=200, json=lambda: {"rules": []}),
+            MagicMock(
+                spec=httpx.Response,
+                status_code=200,
+                json=lambda: {"rules": [], "total_count": 2},
+            ),
         ]
     )
 
@@ -154,7 +159,8 @@ async def test_list_rules_pagination(client, mock_httpx_client):
                 "script": {"code": "cHJpbnQoJzEnKQ==", "runtime_version": "V3"},
             }
             for i in range(50)
-        ]
+        ],
+        "total_count": 51,
     }
 
     mock_response_2 = MagicMock(spec=httpx.Response)
@@ -168,12 +174,13 @@ async def test_list_rules_pagination(client, mock_httpx_client):
                 "state": "STARTED",
                 "script": {"code": "cHJpbnQoJzEnKQ==", "runtime_version": "V3"},
             }
-        ]
+        ],
+        "total_count": 51,
     }
 
     mock_response_3 = MagicMock(spec=httpx.Response)
     mock_response_3.status_code = 200
-    mock_response_3.json.return_value = {"rules": []}
+    mock_response_3.json.return_value = {"rules": [], "total_count": 51}
 
     mock_httpx_client.get = AsyncMock(
         side_effect=[mock_response_1, mock_response_2, mock_response_3]
@@ -198,6 +205,43 @@ async def test_list_rules_pagination(client, mock_httpx_client):
     mock_httpx_client.get.assert_any_call(
         "v3/sites/site_123/rule_engine/rules", params={"offset": 100, "limit": 50}
     )
+
+
+@pytest.mark.asyncio
+async def test_list_rules_unpaginated_workaround(client, mock_httpx_client):
+    """Test listing rules when the API ignores pagination and total_count is missing."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    # No "total_count" in the payload
+    mock_response.json.return_value = {
+        "rules": [
+            {
+                "id": "rule_1",
+                "slug": "rule-1",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "cHJpbnQoJzEnKQ==", "runtime_version": "V3"},
+            }
+        ]
+    }
+    mock_httpx_client.get = AsyncMock(return_value=mock_response)
+
+    rules = []
+    # If the workaround is NOT implemented, this will loop forever because paginate()
+    # will keep calling _list_rules with increasing offsets, and _list_rules will
+    # keep returning the same rule_1.
+    async with client.list_rules(site_id="site_123") as stream:
+        async for rule in stream:
+            rules.append(rule)
+            if len(rules) > 10:
+                pytest.fail("Infinite loop detected in list_rules")
+
+    # With the workaround, it should only return the rule once (for offset 0)
+    # and then return an empty list for offset 50 (sliced [50:100]).
+    assert len(rules) == 1
+    assert rules[0].id == "rule_1"
+    # It should have been called twice: once for offset 0, and once for offset 50 (which returns empty)
+    assert mock_httpx_client.get.call_count == 2
 
 
 @pytest.mark.asyncio

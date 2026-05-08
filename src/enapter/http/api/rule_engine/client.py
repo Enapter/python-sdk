@@ -64,7 +64,18 @@ class Client:
         params = {"offset": offset, "limit": limit}
         response = await self._client.get(url, params=params)
         await api.check_error(response)
-        return [Rule.from_dto(dto) for dto in response.json()["rules"]]
+
+        payload = response.json()
+        rules = [Rule.from_dto(dto) for dto in payload["rules"]]
+
+        # NOTE: Some older versions of the rule engine ignore pagination parameters
+        # (offset and limit) and return all rules without a "total_count" field.
+        # In such cases, we slice the list locally to simulate pagination and
+        # prevent an infinite loop in the `paginate` utility.
+        if "total_count" not in payload:
+            return rules[offset : offset + limit]
+
+        return rules
 
     async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
         """Get a single rule."""
