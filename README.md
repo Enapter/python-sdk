@@ -29,7 +29,7 @@ with Enapter using Python.
 Install from PyPI:
 
 ```bash
-pip install enapter==0.20.0
+pip install enapter==0.20.1
 ```
 
 ## Usage
