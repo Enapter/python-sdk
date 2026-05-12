@@ -1,10 +1,11 @@
 """Rule Engine HTTP API client."""
 
 import time
-from typing import Any, AsyncContextManager, AsyncGenerator, Callable
+from typing import Any, AsyncGenerator, Callable
 
 import httpx
 
+from enapter import async_
 from enapter.http import api
 
 from .engine import Engine
@@ -45,37 +46,54 @@ class Client:
         await api.check_error(response)
         return Engine.from_dto(response.json()["engine"])
 
-    def list_rules(
+    @async_.generator
+    async def list_rules(
         self, site_id: str | None = None, offset: int = 0, limit: int | None = None
-    ) -> AsyncContextManager[AsyncGenerator[Rule, None]]:
+    ) -> AsyncGenerator[Rule, None]:
         """List all rules."""
 
-        async def fetch_page(query: api.PageQuery) -> list[Rule]:
-            return await self._list_rules(
-                site_id=site_id, offset=query.offset, limit=query.limit
-            )
+        # 1. Probe request: Older gateways will reject requests with unknown parameters
+        # like 'offset'. We make an initial request with offset=0 (which is omitted
+        # from params) to safely check if the gateway supports pagination.
+        probe_page = await self._list_rules(site_id=site_id, offset=0)
 
-        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+        if not probe_page.items:
+            return
 
-    async def _list_rules(
-        self, site_id: str | None, offset: int, limit: int
-    ) -> list[Rule]:
+        # 2. Legacy gateway fallback: If the API returns rules but omits 'total_count',
+        # we know it's an old, unpaginated rule engine. It returns all rules at once.
+        # We simulate pagination locally and return immediately to avoid making
+        # subsequent requests with offset > 0, which would result in an error.
+        if not probe_page.total_count:
+            sliced_rules = probe_page.items[offset:]
+            if limit is not None:
+                sliced_rules = sliced_rules[:limit]
+
+            for rule in sliced_rules:
+                yield rule
+            return
+
+        # 3. Modern gateway: The gateway returned a 'total_count', indicating it
+        # supports standard pagination parameters. We delegate to the paginate utility.
+        async def fetch(current_offset: int) -> api.Page[Rule]:
+            return await self._list_rules(site_id=site_id, offset=current_offset)
+
+        async with api.paginate(fetch, offset=offset, limit=limit) as stream:
+            async for rule in stream:
+                yield rule
+
+    async def _list_rules(self, site_id: str | None, offset: int) -> api.Page[Rule]:
         url = f"{self._url(site_id)}/rules"
-        params = {"offset": offset, "limit": limit}
+        params = {}
+        if offset != 0:
+            params["offset"] = offset
         response = await self._client.get(url, params=params)
         await api.check_error(response)
 
         payload = response.json()
         rules = [Rule.from_dto(dto) for dto in payload["rules"]]
 
-        # NOTE: Some older versions of the rule engine ignore pagination parameters
-        # (offset and limit) and return all rules without a "total_count" field.
-        # In such cases, we slice the list locally to simulate pagination and
-        # prevent an infinite loop in the `paginate` utility.
-        if "total_count" not in payload:
-            return rules[offset : offset + limit]
-
-        return rules
+        return api.Page(items=rules, total_count=payload.get("total_count") or 0)
 
     async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
         """Get a single rule."""

@@ -115,6 +115,7 @@ async def test_list_rules(client, mock_httpx_client):
     mock_httpx_client.get = AsyncMock(
         side_effect=[
             mock_response,
+            mock_response,
             MagicMock(
                 spec=httpx.Response,
                 status_code=200,
@@ -136,12 +137,6 @@ async def test_list_rules(client, mock_httpx_client):
     assert rules[1].disabled is True
     assert rules[1].state == enapter.http.api.rule_engine.RuleState.STOPPED
     assert mock_httpx_client.get.call_count == 2
-    mock_httpx_client.get.assert_any_call(
-        "v3/sites/site_123/rule_engine/rules", params={"offset": 0, "limit": 50}
-    )
-    mock_httpx_client.get.assert_any_call(
-        "v3/sites/site_123/rule_engine/rules", params={"offset": 50, "limit": 50}
-    )
 
 
 @pytest.mark.asyncio
@@ -183,7 +178,12 @@ async def test_list_rules_pagination(client, mock_httpx_client):
     mock_response_3.json.return_value = {"rules": [], "total_count": 51}
 
     mock_httpx_client.get = AsyncMock(
-        side_effect=[mock_response_1, mock_response_2, mock_response_3]
+        side_effect=[
+            mock_response_1,
+            mock_response_1,
+            mock_response_2,
+            mock_response_3,
+        ]
     )
 
     rules = []
@@ -196,15 +196,6 @@ async def test_list_rules_pagination(client, mock_httpx_client):
     assert rules[50].id == "rule_50"
 
     assert mock_httpx_client.get.call_count == 3
-    mock_httpx_client.get.assert_any_call(
-        "v3/sites/site_123/rule_engine/rules", params={"offset": 0, "limit": 50}
-    )
-    mock_httpx_client.get.assert_any_call(
-        "v3/sites/site_123/rule_engine/rules", params={"offset": 50, "limit": 50}
-    )
-    mock_httpx_client.get.assert_any_call(
-        "v3/sites/site_123/rule_engine/rules", params={"offset": 100, "limit": 50}
-    )
 
 
 @pytest.mark.asyncio
@@ -237,11 +228,10 @@ async def test_list_rules_unpaginated_workaround(client, mock_httpx_client):
                 pytest.fail("Infinite loop detected in list_rules")
 
     # With the workaround, it should only return the rule once (for offset 0)
-    # and then return an empty list for offset 50 (sliced [50:100]).
+    # and then terminate because yielded_count >= total_count (1 >= 1).
     assert len(rules) == 1
     assert rules[0].id == "rule_1"
-    # It should have been called twice: once for offset 0, and once for offset 50 (which returns empty)
-    assert mock_httpx_client.get.call_count == 2
+    assert mock_httpx_client.get.call_count == 1
 
 
 @pytest.mark.asyncio
@@ -471,3 +461,103 @@ async def test_disable_rule(client, mock_httpx_client):
     mock_httpx_client.post.assert_called_once_with(
         "v3/sites/site_123/rule_engine/rules/rule_123/disable"
     )
+
+
+@pytest.mark.asyncio
+async def test_list_rules_legacy_with_offset(client, mock_httpx_client):
+    """Test legacy gateway with a non-zero offset."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    # Legacy: items present, total_count missing
+    mock_response.json.return_value = {
+        "rules": [
+            {
+                "id": "r1",
+                "slug": "s1",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "", "runtime_version": "V3"},
+            },
+            {
+                "id": "r2",
+                "slug": "s2",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "", "runtime_version": "V3"},
+            },
+            {
+                "id": "r3",
+                "slug": "s3",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "", "runtime_version": "V3"},
+            },
+        ]
+    }
+    mock_httpx_client.get = AsyncMock(return_value=mock_response)
+
+    rules = []
+    # Request offset 1
+    async with client.list_rules(site_id="site_123", offset=1) as stream:
+        async for rule in stream:
+            rules.append(rule)
+
+    assert len(rules) == 2
+    assert rules[0].id == "r2"
+    assert rules[1].id == "r3"
+    # Should only make one request (the probe)
+    assert mock_httpx_client.get.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_list_rules_modern_empty_no_total_count(client, mock_httpx_client):
+    """Test modern gateway returning empty results and omitting total_count."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"rules": []}
+    mock_httpx_client.get = AsyncMock(return_value=mock_response)
+
+    rules = []
+    async with client.list_rules(site_id="site_123") as stream:
+        async for rule in stream:
+            rules.append(rule)
+
+    assert len(rules) == 0
+    assert mock_httpx_client.get.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_list_rules_modern_offset_beyond_total(client, mock_httpx_client):
+    """Test modern gateway when offset is beyond total rules."""
+    mock_response_probe = MagicMock(spec=httpx.Response)
+    mock_response_probe.status_code = 200
+    mock_response_probe.json.return_value = {
+        "rules": [
+            {
+                "id": "r1",
+                "slug": "s1",
+                "disabled": False,
+                "state": "STARTED",
+                "script": {"code": "", "runtime_version": "V3"},
+            }
+        ],
+        "total_count": 1,
+    }
+
+    mock_response_empty = MagicMock(spec=httpx.Response)
+    mock_response_empty.status_code = 200
+    mock_response_empty.json.return_value = {"rules": [], "total_count": 1}
+
+    mock_httpx_client.get = AsyncMock(
+        side_effect=[mock_response_probe, mock_response_empty]
+    )
+
+    rules = []
+    # Offset 10 on a site with only 1 rule
+    async with client.list_rules(site_id="site_123", offset=10) as stream:
+        async for rule in stream:
+            rules.append(rule)
+
+    assert len(rules) == 0
+    # 1 probe + 1 actual fetch
+    assert mock_httpx_client.get.call_count == 2

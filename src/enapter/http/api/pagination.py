@@ -1,6 +1,5 @@
 import dataclasses
-import itertools
-from typing import AsyncGenerator, Awaitable, Callable, TypeVar
+from typing import AsyncGenerator, Awaitable, Callable, Generic, TypeVar
 
 from enapter import async_
 
@@ -8,15 +7,14 @@ T = TypeVar("T")
 
 
 @dataclasses.dataclass(frozen=True)
-class PageQuery:
-    offset: int
-    limit: int
+class Page(Generic[T]):
+    items: list[T]
+    total_count: int
 
 
 @async_.generator
 async def paginate(
-    fetch_page: Callable[[PageQuery], Awaitable[list[T]]],
-    chunk_size: int,
+    fetch: Callable[[int], Awaitable[Page[T]]],
     offset: int,
     limit: int | None,
 ) -> AsyncGenerator[T, None]:
@@ -27,16 +25,22 @@ async def paginate(
         limit = None
 
     yielded_count = 0
+    total_count: int | None = None
 
-    for i in itertools.count():
-        query = PageQuery(offset=offset + (i * chunk_size), limit=chunk_size)
-        items = await fetch_page(query)
+    while True:
+        current_offset = offset + yielded_count
 
-        if not items:
+        if total_count is not None and current_offset >= total_count:
             break
 
-        for item in items:
-            if limit is not None and yielded_count >= limit:
-                return
+        page = await fetch(current_offset)
+        total_count = page.total_count
+
+        if not page.items:
+            break
+
+        for item in page.items:
             yield item
             yielded_count += 1
+            if limit is not None and yielded_count >= limit:
+                return

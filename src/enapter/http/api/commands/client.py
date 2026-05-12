@@ -1,5 +1,5 @@
 import datetime
-from typing import AsyncContextManager, AsyncGenerator, List
+from typing import AsyncContextManager, AsyncGenerator
 
 import httpx
 
@@ -35,7 +35,7 @@ class Client:
         offset: int = 0,
         limit: int | None = None,
     ) -> AsyncContextManager[AsyncGenerator[Execution, None]]:
-        async def fetch_page(query: api.PageQuery) -> List[Execution]:
+        async def fetch(current_offset: int) -> api.Page[Execution]:
             return await self._list_executions(
                 device_id=device_id,
                 site_id=site_id,
@@ -44,11 +44,10 @@ class Client:
                 created_at_lt=created_at_lt,
                 state=state,
                 name=name,
-                offset=query.offset,
-                limit=query.limit,
+                offset=current_offset,
             )
 
-        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+        return api.paginate(fetch, offset=offset, limit=limit)
 
     async def _list_executions(
         self,
@@ -60,8 +59,7 @@ class Client:
         state: ExecutionState | list[ExecutionState] | None,
         name: str | list[str] | None,
         offset: int,
-        limit: int,
-    ) -> List[Execution]:
+    ) -> api.Page[Execution]:
         params = {"order": order.value}
 
         if created_at_gte is not None:
@@ -89,12 +87,11 @@ class Client:
         else:
             raise ValueError("either device_id or site_id must be provided")
 
-        response = await self._client.get(
-            url, params={**params, "offset": offset, "limit": limit}
-        )
+        response = await self._client.get(url, params={**params, "offset": offset})
         await api.check_error(response)
         payload = response.json()
-        return [Execution.from_dto(dto) for dto in payload.get("executions", [])]
+        items = [Execution.from_dto(dto) for dto in payload.get("executions", [])]
+        return api.Page(items=items, total_count=payload.get("total_count") or 0)
 
     async def execute(
         self,

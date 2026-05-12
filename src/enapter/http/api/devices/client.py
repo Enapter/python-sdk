@@ -1,6 +1,6 @@
 import secrets
 import time
-from typing import AsyncContextManager, AsyncGenerator, List
+from typing import AsyncContextManager, AsyncGenerator
 
 import httpx
 
@@ -106,7 +106,7 @@ class Client:
         offset: int = 0,
         limit: int | None = None,
     ) -> AsyncContextManager[AsyncGenerator[Device, None]]:
-        async def fetch_page(query: api.PageQuery) -> List[Device]:
+        async def fetch(current_offset: int) -> api.Page[Device]:
             return await self._list(
                 expand_manifest=expand_manifest,
                 expand_properties=expand_properties,
@@ -114,11 +114,10 @@ class Client:
                 expand_communication=expand_communication,
                 expand_raised_alert_names=expand_raised_alert_names,
                 site_id=site_id,
-                offset=query.offset,
-                limit=query.limit,
+                offset=current_offset,
             )
 
-        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+        return api.paginate(fetch, offset=offset, limit=limit)
 
     async def _list(
         self,
@@ -129,8 +128,7 @@ class Client:
         expand_raised_alert_names: bool,
         site_id: str | None,
         offset: int,
-        limit: int,
-    ) -> List[Device]:
+    ) -> api.Page[Device]:
         url = "v3/devices" if site_id is None else f"v3/sites/{site_id}/devices"
 
         expand = {
@@ -143,11 +141,12 @@ class Client:
         expand_string = ",".join(k for k, v in expand.items() if v)
 
         response = await self._client.get(
-            url, params={"expand": expand_string, "offset": offset, "limit": limit}
+            url, params={"expand": expand_string, "offset": offset}
         )
         await api.check_error(response)
         payload = response.json()
-        return [Device.from_dto(dto) for dto in payload.get("devices", [])]
+        items = [Device.from_dto(dto) for dto in payload.get("devices", [])]
+        return api.Page(items=items, total_count=payload.get("total_count") or 0)
 
     async def update(
         self, device_id: str, name: str | None = None, slug: str | None = None

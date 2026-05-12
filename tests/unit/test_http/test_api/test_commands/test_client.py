@@ -40,13 +40,11 @@ async def test_list_executions_with_device_id(commands_client, mock_client):
                     "received_at": "2023-01-01T00:00:01Z",
                 },
             }
-        ]
+        ],
+        "total_count": 1,
     }
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"executions": []}
 
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     executions = []
     async with commands_client.list_executions(device_id="dev_123") as stream:
@@ -55,14 +53,10 @@ async def test_list_executions_with_device_id(commands_client, mock_client):
 
     assert len(executions) == 1
     assert executions[0].id == "exec_1"
-    assert mock_client.get.call_count == 2
-    mock_client.get.assert_any_call(
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with(
         "v3/devices/dev_123/command_executions",
-        params={"order": "CREATED_AT_ASC", "limit": 50, "offset": 0},
-    )
-    mock_client.get.assert_any_call(
-        "v3/devices/dev_123/command_executions",
-        params={"order": "CREATED_AT_ASC", "limit": 50, "offset": 50},
+        params={"order": "CREATED_AT_ASC", "offset": 0},
     )
 
 
@@ -85,13 +79,11 @@ async def test_list_executions_with_site_id(commands_client, mock_client):
                     "received_at": "2023-01-01T00:00:01Z",
                 },
             }
-        ]
+        ],
+        "total_count": 1,
     }
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"executions": []}
 
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     executions = []
     async with commands_client.list_executions(site_id="site_123") as stream:
@@ -100,14 +92,10 @@ async def test_list_executions_with_site_id(commands_client, mock_client):
 
     assert len(executions) == 1
     assert executions[0].id == "exec_1"
-    assert mock_client.get.call_count == 2
-    mock_client.get.assert_any_call(
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with(
         "v3/sites/site_123/commands/executions",
-        params={"order": "CREATED_AT_ASC", "limit": 50, "offset": 0},
-    )
-    mock_client.get.assert_any_call(
-        "v3/sites/site_123/commands/executions",
-        params={"order": "CREATED_AT_ASC", "limit": 50, "offset": 50},
+        params={"order": "CREATED_AT_ASC", "offset": 0},
     )
 
 
@@ -233,13 +221,11 @@ async def test_list_executions_with_both_ids(commands_client, mock_client):
                     "received_at": "2023-01-01T00:00:01Z",
                 },
             }
-        ]
+        ],
+        "total_count": 1,
     }
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"executions": []}
 
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     executions = []
     async with commands_client.list_executions(
@@ -250,11 +236,11 @@ async def test_list_executions_with_both_ids(commands_client, mock_client):
 
     assert len(executions) == 1
     assert executions[0].id == "exec_1"
-    mock_client.get.assert_any_call(
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with(
         "v3/sites/site_123/commands/executions",
         params={
             "order": "CREATED_AT_ASC",
-            "limit": 50,
             "offset": 0,
             "device_id.in": "dev_123",
         },
@@ -282,7 +268,6 @@ async def test_list_executions_with_time_filters(commands_client, mock_client):
         "v3/devices/dev_123/command_executions",
         params={
             "order": "CREATED_AT_ASC",
-            "limit": 50,
             "offset": 0,
             "created_at.gte": created_at_gte.isoformat(),
             "created_at.lt": created_at_lt.isoformat(),
@@ -321,7 +306,6 @@ async def test_list_executions_with_state_filter(commands_client, mock_client):
         "v3/devices/dev_123/command_executions",
         params={
             "order": "CREATED_AT_ASC",
-            "limit": 50,
             "offset": 0,
             "state.in": "SUCCESS",
         },
@@ -348,7 +332,6 @@ async def test_list_executions_with_name_filter(commands_client, mock_client):
         "v3/devices/dev_123/command_executions",
         params={
             "order": "CREATED_AT_ASC",
-            "limit": 50,
             "offset": 0,
             "name.in": "ping",
         },
@@ -375,7 +358,6 @@ async def test_list_executions_with_multiple_name_filters(commands_client, mock_
         "v3/devices/dev_123/command_executions",
         params={
             "order": "CREATED_AT_ASC",
-            "limit": 50,
             "offset": 0,
             "name.in": "ping,pong",
         },

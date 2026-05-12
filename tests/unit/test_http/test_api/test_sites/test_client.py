@@ -86,14 +86,11 @@ async def test_list_sites(sites_client, mock_client):
         "sites": [
             {"id": "site_1", "name": "Site 1", "timezone": "UTC", "version": "V3"},
             {"id": "site_2", "name": "Site 2", "timezone": "UTC", "version": "V3"},
-        ]
+        ],
+        "total_count": 2,
     }
 
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"sites": []}
-
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     sites = []
     async with sites_client.list() as s_gen:
@@ -103,7 +100,8 @@ async def test_list_sites(sites_client, mock_client):
     assert len(sites) == 2
     assert sites[0].id == "site_1"
     assert sites[1].id == "site_2"
-    assert mock_client.get.call_count == 2
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with("v3/sites", params={"offset": 0})
 
 
 @pytest.mark.asyncio

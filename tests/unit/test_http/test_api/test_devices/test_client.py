@@ -82,14 +82,11 @@ async def test_list_devices(devices_client, mock_client):
     mock_response_1 = MagicMock(spec=httpx.Response)
     mock_response_1.status_code = 200
     mock_response_1.json.return_value = {
-        "devices": [create_mock_device_dto("dev_1"), create_mock_device_dto("dev_2")]
+        "devices": [create_mock_device_dto("dev_1"), create_mock_device_dto("dev_2")],
+        "total_count": 2,
     }
 
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"devices": []}
-
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     devices = []
     async with devices_client.list() as d_gen:
@@ -99,8 +96,9 @@ async def test_list_devices(devices_client, mock_client):
     assert len(devices) == 2
     assert devices[0].id == "dev_1"
     assert devices[1].id == "dev_2"
-    mock_client.get.assert_any_call(
-        "v3/devices", params={"expand": "", "limit": 50, "offset": 0}
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with(
+        "v3/devices", params={"expand": "", "offset": 0}
     )
 
 
@@ -112,14 +110,11 @@ async def test_list_devices_expand_raised_alert_names(devices_client, mock_clien
     mock_response_1.json.return_value = {
         "devices": [
             create_mock_device_dto("dev_1", raised_alert_names=["alert_1"]),
-        ]
+        ],
+        "total_count": 1,
     }
 
-    mock_response_2 = MagicMock(spec=httpx.Response)
-    mock_response_2.status_code = 200
-    mock_response_2.json.return_value = {"devices": []}
-
-    mock_client.get = AsyncMock(side_effect=[mock_response_1, mock_response_2])
+    mock_client.get = AsyncMock(return_value=mock_response_1)
 
     devices = []
     async with devices_client.list(expand_raised_alert_names=True) as d_gen:
@@ -129,8 +124,9 @@ async def test_list_devices_expand_raised_alert_names(devices_client, mock_clien
     assert len(devices) == 1
     assert devices[0].id == "dev_1"
     assert devices[0].raised_alert_names == ["alert_1"]
-    mock_client.get.assert_any_call(
-        "v3/devices", params={"expand": "raised_alert_names", "limit": 50, "offset": 0}
+    assert mock_client.get.call_count == 1
+    mock_client.get.assert_called_once_with(
+        "v3/devices", params={"expand": "raised_alert_names", "offset": 0}
     )
 
 

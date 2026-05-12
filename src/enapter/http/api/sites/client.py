@@ -1,4 +1,4 @@
-from typing import AsyncContextManager, AsyncGenerator, List
+from typing import AsyncContextManager, AsyncGenerator
 
 import httpx
 
@@ -37,19 +37,18 @@ class Client:
     def list(
         self, offset: int = 0, limit: int | None = None
     ) -> AsyncContextManager[AsyncGenerator[Site, None]]:
-        async def fetch_page(query: api.PageQuery) -> List[Site]:
-            return await self._list(offset=query.offset, limit=query.limit)
+        async def fetch(current_offset: int) -> api.Page[Site]:
+            return await self._list(offset=current_offset)
 
-        return api.paginate(fetch_page, chunk_size=50, offset=offset, limit=limit)
+        return api.paginate(fetch, offset=offset, limit=limit)
 
-    async def _list(self, offset: int, limit: int) -> List[Site]:
+    async def _list(self, offset: int) -> api.Page[Site]:
         url = "v3/sites"
-        response = await self._client.get(
-            url, params={"offset": offset, "limit": limit}
-        )
+        response = await self._client.get(url, params={"offset": offset})
         await api.check_error(response)
         payload = response.json()
-        return [Site.from_dto(dto) for dto in payload.get("sites", [])]
+        items = [Site.from_dto(dto) for dto in payload.get("sites", [])]
+        return api.Page(items=items, total_count=payload.get("total_count") or 0)
 
     async def update(
         self,
