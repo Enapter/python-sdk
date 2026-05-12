@@ -1,7 +1,8 @@
+from .pagination import Page, paginate  # isort: skip
+
 from .client import Client
 from .config import Config
 from .errors import Error, MultiError, check_error
-from .pagination import Page, paginate
 from .transport import Transport
 
 from . import devices, sites, commands, blueprints, rule_engine  # isort: skip
