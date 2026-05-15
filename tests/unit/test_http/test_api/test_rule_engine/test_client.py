@@ -136,7 +136,7 @@ async def test_list_rules(client, mock_httpx_client):
     assert rules[1].id == "rule_2"
     assert rules[1].disabled is True
     assert rules[1].state == enapter.http.api.rule_engine.RuleState.STOPPED
-    assert mock_httpx_client.get.call_count == 2
+    assert mock_httpx_client.get.call_count == 3
 
 
 @pytest.mark.asyncio
@@ -195,7 +195,7 @@ async def test_list_rules_pagination(client, mock_httpx_client):
     assert rules[0].id == "rule_0"
     assert rules[50].id == "rule_50"
 
-    assert mock_httpx_client.get.call_count == 3
+    assert mock_httpx_client.get.call_count == 4
 
 
 @pytest.mark.asyncio

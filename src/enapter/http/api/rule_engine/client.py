@@ -55,17 +55,19 @@ class Client:
         # 1. Probe request: Older gateways will reject requests with unknown parameters
         # like 'offset'. We make an initial request with offset=0 (which is omitted
         # from params) to safely check if the gateway supports pagination.
-        probe_page = await self._list_rules(site_id=site_id, offset=0)
+        rules, total_count = await self._list_rules(site_id=site_id, offset=0)
 
-        if not probe_page.items:
+        if not rules:
             return
 
         # 2. Legacy gateway fallback: If the API returns rules but omits 'total_count',
-        # we know it's an old, unpaginated rule engine. It returns all rules at once.
-        # We simulate pagination locally and return immediately to avoid making
-        # subsequent requests with offset > 0, which would result in an error.
-        if not probe_page.total_count:
-            sliced_rules = probe_page.items[offset:]
+        # our default will be 0. Since we already checked that we have rules,
+        # total_count=0 indicates an old, unpaginated rule engine.
+        # It returns all rules at once. We simulate pagination locally and return
+        # immediately to avoid making subsequent requests with offset > 0,
+        # which would result in an error.
+        if total_count == 0:
+            sliced_rules = rules[offset:]
             if limit is not None:
                 sliced_rules = sliced_rules[:limit]
 
@@ -73,27 +75,37 @@ class Client:
                 yield rule
             return
 
-        # 3. Modern gateway: The gateway returned a 'total_count', indicating it
+        # 3. Modern gateway: The gateway returned a positive 'total_count', indicating it
         # supports standard pagination parameters. We delegate to the paginate utility.
-        async def fetch(current_offset: int) -> api.Page[Rule]:
-            return await self._list_rules(site_id=site_id, offset=current_offset)
+        async def fetch(current_offset: int) -> list[Rule]:
+            page_rules, _ = await self._list_rules(
+                site_id=site_id, offset=current_offset
+            )
+            return page_rules
 
         async with api.paginate(fetch, offset=offset, limit=limit) as stream:
             async for rule in stream:
                 yield rule
 
-    async def _list_rules(self, site_id: str | None, offset: int) -> api.Page[Rule]:
+    async def _list_rules(
+        self, site_id: str | None, offset: int
+    ) -> tuple[list[Rule], int]:
         url = f"{self._url(site_id)}/rules"
         params = {}
+
+        # We must NOT send offset=0 to legacy gateways, as they actively reject
+        # unknown parameters with a fatal error.
         if offset != 0:
             params["offset"] = offset
+
         response = await self._client.get(url, params=params)
         await api.check_error(response)
 
         payload = response.json()
         rules = [Rule.from_dto(dto) for dto in payload["rules"]]
+        total_count = payload.get("total_count", 0)
 
-        return api.Page(items=rules, total_count=payload.get("total_count") or 0)
+        return rules, total_count
 
     async def get_rule(self, rule_id: str, site_id: str | None = None) -> Rule:
         """Get a single rule."""

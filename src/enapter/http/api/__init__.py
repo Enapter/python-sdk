@@ -1,8 +1,7 @@
-from .pagination import Page, paginate  # isort: skip
-
 from .client import Client
 from .config import Config
 from .errors import Error, MultiError, check_error
+from .pagination import paginate
 from .transport import Transport
 
 from . import devices, sites, commands, blueprints, rule_engine  # isort: skip
@@ -18,7 +17,6 @@ __all__ = [
     "Error",
     "MultiError",
     "check_error",
-    "Page",
     "paginate",
     "Transport",
 ]

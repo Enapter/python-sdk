@@ -35,7 +35,9 @@ class Client:
         offset: int = 0,
         limit: int | None = None,
     ) -> AsyncContextManager[AsyncGenerator[Execution, None]]:
-        async def fetch(current_offset: int) -> api.Page[Execution]:
+        """List command executions."""
+
+        async def fetch(current_offset: int) -> list[Execution]:
             return await self._list_executions(
                 device_id=device_id,
                 site_id=site_id,
@@ -59,7 +61,7 @@ class Client:
         state: ExecutionState | list[ExecutionState] | None,
         name: str | list[str] | None,
         offset: int,
-    ) -> api.Page[Execution]:
+    ) -> list[Execution]:
         params = {"order": order.value}
 
         if created_at_gte is not None:
@@ -90,8 +92,7 @@ class Client:
         response = await self._client.get(url, params={**params, "offset": offset})
         await api.check_error(response)
         payload = response.json()
-        items = [Execution.from_dto(dto) for dto in payload.get("executions", [])]
-        return api.Page(items=items, total_count=payload.get("total_count") or 0)
+        return [Execution.from_dto(dto) for dto in payload.get("executions", [])]
 
     async def execute(
         self,
