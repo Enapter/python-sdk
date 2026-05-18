@@ -43,6 +43,12 @@ class Client:
         await api.check_error(response)
         return response.content
 
+    async def download_device_profiles(self) -> bytes:
+        url = "v3/blueprints/device_profiles/download"
+        response = await self._client.get(url)
+        await api.check_error(response)
+        return response.content
+
     async def validate_file(self, path: pathlib.Path) -> None:
         with path.open("rb") as file:
             data = file.read()

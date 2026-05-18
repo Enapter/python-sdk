@@ -150,6 +150,20 @@ async def test_download_blueprint_compiled(blueprints_client, mock_client):
 
 
 @pytest.mark.asyncio
+async def test_download_device_profiles(blueprints_client, mock_client):
+    """Test downloading device profiles."""
+    mock_response = MagicMock(spec=httpx.Response)
+    mock_response.status_code = 200
+    mock_response.content = b"device profiles zip content"
+    mock_client.get = AsyncMock(return_value=mock_response)
+
+    content = await blueprints_client.download_device_profiles()
+
+    assert content == b"device profiles zip content"
+    mock_client.get.assert_called_once_with("v3/blueprints/device_profiles/download")
+
+
+@pytest.mark.asyncio
 async def test_validate_blueprint(blueprints_client, mock_client):
     """Test validating a blueprint from bytes."""
     mock_response = MagicMock(spec=httpx.Response)
