@@ -46,7 +46,7 @@ async def test_create_site(sites_client, mock_client):
 
     assert site.id == "site_123"
     assert site.name == "Test Site"
-    assert site.authorized_role == enapter.http.api.AuthorizedRole.OWNER
+    assert site.authorized_role == enapter.http.api.AccessRole.OWNER
     assert site.location.name == "Test Location"
     mock_client.post.assert_called_once_with(
         "v3/sites",
@@ -77,7 +77,7 @@ async def test_get_site(sites_client, mock_client):
     site = await sites_client.get(site_id="site_123")
 
     assert site.id == "site_123"
-    assert site.authorized_role == enapter.http.api.AuthorizedRole.OWNER
+    assert site.authorized_role == enapter.http.api.AccessRole.OWNER
     mock_client.get.assert_called_once_with("v3/sites/site_123")
 
 
@@ -118,7 +118,7 @@ async def test_list_sites(sites_client, mock_client):
 
     assert len(sites) == 2
     assert sites[0].id == "site_1"
-    assert sites[0].authorized_role == enapter.http.api.AuthorizedRole.OWNER
+    assert sites[0].authorized_role == enapter.http.api.AccessRole.OWNER
     assert sites[1].id == "site_2"
     assert mock_client.get.call_count == 2
     mock_client.get.assert_any_call("v3/sites", params={"offset": 0})
@@ -143,7 +143,7 @@ async def test_update_site(sites_client, mock_client):
     site = await sites_client.update(site_id="site_123", name="Updated Site")
 
     assert site.name == "Updated Site"
-    assert site.authorized_role == enapter.http.api.AuthorizedRole.OWNER
+    assert site.authorized_role == enapter.http.api.AccessRole.OWNER
     mock_client.patch.assert_called_once_with(
         "v3/sites/site_123",
         json={"name": "Updated Site", "timezone": None, "location": None},
@@ -176,7 +176,7 @@ def test_site_authorized_role_from_dto_and_to_dto():
     site = enapter.http.api.sites.Site.from_dto(dto)
 
     assert site.id == "site_1"
-    assert site.authorized_role == enapter.http.api.AuthorizedRole.OWNER
+    assert site.authorized_role == enapter.http.api.AccessRole.OWNER
 
     serialized = site.to_dto()
     assert serialized["authorized_role"] == "OWNER"

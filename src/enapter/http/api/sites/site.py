@@ -13,7 +13,7 @@ class Site:
     name: str
     timezone: str
     version: Literal["V3"]
-    authorized_role: api.AuthorizedRole
+    authorized_role: api.AccessRole
     location: Location | None = None
 
     @classmethod
@@ -23,7 +23,7 @@ class Site:
             name=dto["name"],
             timezone=dto["timezone"],
             version=dto["version"],
-            authorized_role=api.AuthorizedRole(dto["authorized_role"]),
+            authorized_role=api.AccessRole(dto["authorized_role"]),
             location=(
                 Location.from_dto(dto["location"])
                 if dto.get("location") is not None

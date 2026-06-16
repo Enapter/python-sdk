@@ -5,33 +5,37 @@ import pytest
 import enapter
 
 
-class TestAuthorizedRole:
-    """Tests for the AuthorizedRole enum."""
+class TestAccessRole:
+    """Tests for the AccessRole enum."""
 
     def test_all_members_exist(self):
-        """Verify all expected AuthorizedRole members are present and have correct string values."""
-        assert enapter.http.api.AuthorizedRole.READONLY.value == "READONLY"
-        assert enapter.http.api.AuthorizedRole.USER.value == "USER"
-        assert enapter.http.api.AuthorizedRole.OWNER.value == "OWNER"
-        assert enapter.http.api.AuthorizedRole.INSTALLER.value == "INSTALLER"
-        assert enapter.http.api.AuthorizedRole.SYSTEM.value == "SYSTEM"
-        assert enapter.http.api.AuthorizedRole.VENDOR.value == "VENDOR"
+        """Verify all expected AccessRole members are present and have correct string values."""
+        assert enapter.http.api.AccessRole.READONLY.value == "READONLY"
+        assert enapter.http.api.AccessRole.USER.value == "USER"
+        assert enapter.http.api.AccessRole.OWNER.value == "OWNER"
+        assert enapter.http.api.AccessRole.INSTALLER.value == "INSTALLER"
+        assert enapter.http.api.AccessRole.SYSTEM.value == "SYSTEM"
+        assert enapter.http.api.AccessRole.VENDOR.value == "VENDOR"
 
     def test_member_count(self):
         """Verify the enum has exactly 6 members."""
-        assert len(enapter.http.api.AuthorizedRole) == 6
+        assert len(enapter.http.api.AccessRole) == 6
+
+    def test_has_docstring(self):
+        """Verify the AccessRole enum carries a docstring."""
+        assert enapter.http.api.AccessRole.__doc__ is not None
 
     @pytest.mark.parametrize(
         "value,expected_member",
         [
-            ("READONLY", enapter.http.api.AuthorizedRole.READONLY),
-            ("USER", enapter.http.api.AuthorizedRole.USER),
-            ("OWNER", enapter.http.api.AuthorizedRole.OWNER),
-            ("INSTALLER", enapter.http.api.AuthorizedRole.INSTALLER),
-            ("SYSTEM", enapter.http.api.AuthorizedRole.SYSTEM),
-            ("VENDOR", enapter.http.api.AuthorizedRole.VENDOR),
+            ("READONLY", enapter.http.api.AccessRole.READONLY),
+            ("USER", enapter.http.api.AccessRole.USER),
+            ("OWNER", enapter.http.api.AccessRole.OWNER),
+            ("INSTALLER", enapter.http.api.AccessRole.INSTALLER),
+            ("SYSTEM", enapter.http.api.AccessRole.SYSTEM),
+            ("VENDOR", enapter.http.api.AccessRole.VENDOR),
         ],
     )
     def test_construct_from_string(self, value, expected_member):
-        """Verify AuthorizedRole can be constructed from string values."""
-        assert enapter.http.api.AuthorizedRole(value) is expected_member
+        """Verify AccessRole can be constructed from string values."""
+        assert enapter.http.api.AccessRole(value) is expected_member

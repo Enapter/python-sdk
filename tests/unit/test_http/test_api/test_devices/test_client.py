@@ -144,7 +144,7 @@ def test_device_to_dto():
         updated_at=datetime.datetime.fromisoformat("2023-10-10T10:00:00+00:00"),
         slug="dev-1",
         type=enapter.http.api.devices.DeviceType.STANDALONE,
-        authorized_role=enapter.http.api.AuthorizedRole.OWNER,
+        authorized_role=enapter.http.api.AccessRole.OWNER,
         raised_alert_names=["alert_1"],
     )
 
