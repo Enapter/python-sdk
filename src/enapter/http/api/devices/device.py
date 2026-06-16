@@ -2,7 +2,8 @@ import dataclasses
 import datetime
 from typing import Any, Self
 
-from .authorized_role import AuthorizedRole
+from enapter.http import api
+
 from .device_communication import DeviceCommunication
 from .device_connectivity import DeviceConnectivity
 from .device_type import DeviceType
@@ -18,7 +19,7 @@ class Device:
     updated_at: datetime.datetime
     slug: str
     type: DeviceType
-    authorized_role: AuthorizedRole
+    authorized_role: api.AuthorizedRole
     manifest: dict[str, Any] | None = None
     properties: dict[str, Any] | None = None
     connectivity: DeviceConnectivity | None = None
@@ -35,7 +36,7 @@ class Device:
             updated_at=datetime.datetime.fromisoformat(dto["updated_at"]),
             slug=dto["slug"],
             type=DeviceType(dto["type"]),
-            authorized_role=AuthorizedRole(dto["authorized_role"]),
+            authorized_role=api.AuthorizedRole(dto["authorized_role"]),
             manifest=dto.get("manifest"),
             properties=dto.get("properties"),
             connectivity=(

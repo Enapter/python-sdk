@@ -1,4 +1,3 @@
-from .authorized_role import AuthorizedRole
 from .client import Client
 from .communication_config import CommunicationConfig
 from .device import Device
@@ -11,7 +10,6 @@ from .mqtts_credentials import MQTTSCredentials
 from .time_sync_protocol import TimeSyncProtocol
 
 __all__ = [
-    "AuthorizedRole",
     "Client",
     "CommunicationConfig",
     "Device",
