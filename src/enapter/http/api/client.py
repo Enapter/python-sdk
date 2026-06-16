@@ -11,7 +11,7 @@ from enapter.http.api import (
     telemetry,
 )
 
-from .auth import Auth
+from .authentication import AuthenticationScheme
 from .config import Config
 from .transport import Transport
 
@@ -26,14 +26,14 @@ class Client:
 
     def _new_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(
-            auth=self._new_auth(),
+            auth=self._new_authentication_scheme(),
             headers=self._new_headers(),
             base_url=self._config.base_url,
             transport=self._transport,
         )
 
-    def _new_auth(self) -> Auth:
-        return Auth(token=self._config.token, user=self._config.user)
+    def _new_authentication_scheme(self) -> AuthenticationScheme:
+        return AuthenticationScheme(token=self._config.token, user=self._config.user)
 
     def _new_headers(self) -> dict[str, str]:
         headers = {}

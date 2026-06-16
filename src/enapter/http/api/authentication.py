@@ -3,7 +3,7 @@ from typing import Generator
 import httpx
 
 
-class Auth(httpx.Auth):
+class AuthenticationScheme(httpx.Auth):
 
     def __init__(self, token: str | None = None, user: str | None = None) -> None:
         self.token = token
