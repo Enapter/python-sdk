@@ -1,6 +1,8 @@
 import dataclasses
 from typing import Any, Literal, Self
 
+from enapter.http import api
+
 from .location import Location
 
 
@@ -11,6 +13,7 @@ class Site:
     name: str
     timezone: str
     version: Literal["V3"]
+    authorized_role: api.AuthorizedRole
     location: Location | None = None
 
     @classmethod
@@ -20,6 +23,7 @@ class Site:
             name=dto["name"],
             timezone=dto["timezone"],
             version=dto["version"],
+            authorized_role=api.AuthorizedRole(dto["authorized_role"]),
             location=(
                 Location.from_dto(dto["location"])
                 if dto.get("location") is not None
@@ -33,5 +37,6 @@ class Site:
             "name": self.name,
             "timezone": self.timezone,
             "version": self.version,
+            "authorized_role": self.authorized_role.value,
             "location": self.location.to_dto() if self.location is not None else None,
         }
