@@ -93,7 +93,7 @@ async def test_publish_telemetry():
 
 
 @pytest.mark.parametrize("persist_logs", [False, True])
-@pytest.mark.parametrize("log_severity,", ["debug", "info", "warning", "error"])
+@pytest.mark.parametrize("log_severity", ["debug", "info", "warning", "error"])
 async def test_publish_logs(log_severity, persist_logs) -> None:
     device = Device(log_severity=log_severity, persist_logs=persist_logs)
     mqtt_api_client = mock.AsyncMock(spec=enapter.mqtt.api.Client)
