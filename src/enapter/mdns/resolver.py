@@ -13,7 +13,7 @@ class Resolver:
         self._mdns_resolver = self._new_mdns_resolver()
 
     async def resolve(self, host: str) -> str:
-        # TODO: Resolve concurrently.
+        # NOTE: Not resolving concurrently to avoid unnecessary complexity.
         try:
             ip = await self._resolve(self._dns_resolver, host)
             self._logger.debug("%r resolved using DNS: %r", host, ip)
