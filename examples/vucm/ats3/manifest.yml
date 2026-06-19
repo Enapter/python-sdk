@@ -1,0 +1,104 @@
+blueprint_spec: "device/1.0"
+
+display_name: ATS3 stack
+
+communication_module:
+  product: ENP-VIRTUAL
+
+properties:
+  vendor:
+    display_name: Vendor
+    type: string
+  model:
+    display_name: Model
+    type: string
+
+alerts:
+  parse_error:
+    display_name: Data processing failed
+    severity: error							
+telemetry:
+  status:
+    display_name: Status
+    type: string
+    enum:
+      - ok
+      - error
+      - no_data
+  T1:
+    display_name: T1
+    type: float
+  T2:
+    display_name: T2
+    type: float
+  T3:
+    display_name: T2
+    type: float
+  Current:
+    display_name: Current
+    type: float
+  PSU:
+    display_name: Current
+    type: float
+  P1:
+    display_name: P1
+    type: float
+  P2:
+    display_name: P2
+    type: float
+  P3:
+    display_name: P3
+    type: float
+  Flow:
+    display_name: Flow
+    type: float
+  Conductivity:
+    display_name: Conductivity
+    type: float
+  MFMH2:
+    display_name: MFMH2
+    type: float
+  Theoretical_h2:
+    display_name: MFMH2
+    type: float
+  MCM02:
+    display_name: MCM02
+    type: float
+  Refilling:
+    display_name: Refilling
+    type: float
+  PC:
+    display_name: PC
+    type: float
+  C1:
+    display_name: Cell 1
+    type: float
+  C2:
+    display_name: Cell 2
+    type: float
+  C3:
+    display_name: Cell 3
+    type: float
+  C4:
+    display_name: Cell 4
+    type: float
+  C5:
+    display_name: Cell 5
+    type: float
+  C6:
+    display_name: Cell 6
+    type: float
+  C7:
+    display_name: Cell 7
+    type: float
+  C8:
+    display_name: Cell 8
+    type: float
+  C9:
+    display_name: Cell 9
+    type: float
+  C10:
+    display_name: Cell 10
+    type: float
+
+commands: {}
