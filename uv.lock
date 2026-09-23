@@ -592,9 +592,12 @@ wheels = [
 
 [[package]]
 name = "json-log-formatter"
-version = "1.1.1"
+version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e8/ef/324f4a28ed0152a32b80685b26316b604218e4ac77487ea82719c3c28bc6/json_log_formatter-1.1.1.tar.gz", hash = "sha256:0815e3b4469e5c79cf3f6dc8a0613ba6601f4a7464f85ba03655cfa6e3e17d10", size = 5896, upload-time = "2025-02-27T22:56:15.643Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/df/eb/caf193a5c77e3d9c1604dfa86fe87d9096e014303497134f23f6196a7685/json_log_formatter-1.2.1.tar.gz", hash = "sha256:1d4fd14495ad7e694aa576259ba81acaa69e6945d9d780f32ed25373d7d5ae93", size = 5936, upload-time = "2026-06-08T16:32:55.855Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c5/a1/b11bca303b81d07d5a686254ecbee35771d6fd050bdf0524a0003aeca306/json_log_formatter-1.2.1-py3-none-any.whl", hash = "sha256:1e40432466c911ba2d106a302314b1c3b0019de44c762bef94e8f23138a415a7", size = 6591, upload-time = "2026-06-08T16:32:54.614Z" },
+]
 
 [[package]]
 name = "librt"
