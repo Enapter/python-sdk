@@ -1,1 +1,1 @@
-enapter==0.24.0
+enapter==0.25.0
