@@ -3,11 +3,11 @@ default:
 
 .PHONY: install-deps
 install-deps:
-	pipenv install --dev
+	uv sync
 
 .PHONY: update-deps
 update-deps:
-	pipenv update --dev
+	uv sync --upgrade
 
 .PHONY: check
 check: lint test
@@ -17,46 +17,38 @@ lint: lint-black lint-isort lint-pyflakes lint-mypy
 
 .PHONY: lint-black
 lint-black:
-	pipenv run black --check --diff .
+	uv run black --check --diff .
 
 .PHONY: lint-isort
 lint-isort:
-	pipenv run isort --check .
+	uv run isort --check .
 
 .PHONY: lint-pyflakes
 lint-pyflakes:
-	pipenv run pyflakes .
+	uv run pyflakes src tests examples
 
 .PHONY: lint-mypy
 lint-mypy:
-	pipenv run mypy setup.py
-	pipenv run mypy tests
-	pipenv run mypy src/enapter
+	uv run mypy tests
+	uv run mypy src/enapter
 
 .PHONY: test
 test: test-unit test-integration
 
 .PHONY: test-unit
 test-unit:
-	pipenv run pytest -vv --cov --cov-report term-missing tests/unit
+	uv run pytest -vv --cov=enapter --cov-report term-missing tests/unit
 
 .PHONY: test-integration
 test-integration:
-	pipenv run pytest -vv --capture=no tests/integration
-
-.PHONY: get-pipenv
-get-pipenv:
-	curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+	uv run pytest -vv --capture=no tests/integration
 
 .PHONY: upload-to-pypi
 upload-to-pypi: dist
 ifndef PYPI_API_TOKEN
 	$(error PYPI_API_TOKEN is not defined)
 endif
-	@pipenv run twine upload \
-		--username __token__ \
-		--password $(PYPI_API_TOKEN) \
-		$</*
+	@UV_PUBLISH_TOKEN=$(PYPI_API_TOKEN) uv publish $</*
 
 dist.tar: dist
 	rm --force $@
@@ -64,7 +56,8 @@ dist.tar: dist
 
 .PHONY: dist
 dist:
-	pipenv run python setup.py bdist_wheel
+	rm -rf dist
+	uv build
 
 RE_SEMVER = [0-9]+.[0-9]+.[0-9]+(-[a-z0-9]+)?
 
@@ -74,6 +67,7 @@ ifndef V
 	$(error V is not defined)
 endif
 	sed -E -i 's/__version__ = "$(RE_SEMVER)"/__version__ = "$(V)"/g' src/enapter/__init__.py
+	uv lock
 	grep -E --files-with-matches --recursive "enapter==$(RE_SEMVER)" README.md examples \
 		| xargs -n 1 sed -E -i "s/enapter==$(RE_SEMVER)/enapter==$(V)/g"
 	git add .

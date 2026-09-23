@@ -1,0 +1,53 @@
+[project]
+name = "enapter"
+description = "Enapter Python SDK"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [
+    { name = "Roman Novatorov", email = "rnovatorov@enapter.com" },
+]
+dependencies = [
+    "aiomqtt==2.5.*",
+    "dnspython==2.8.*",
+    "json-log-formatter==1.1.*",
+    "httpx==0.28.*",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/Enapter/python-sdk"
+
+[dependency-groups]
+dev = [
+    "black",
+    "docker",
+    "isort",
+    "mypy",
+    "pyflakes",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "types-docker",
+]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "enapter.__version__" }
+
+[tool.isort]
+profile = "black"
+known_first_party = ["enapter"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

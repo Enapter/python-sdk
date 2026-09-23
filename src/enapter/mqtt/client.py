@@ -23,7 +23,7 @@ class Client(async_.Routine):
         username: str | None = None,
         password: str | None = None,
         tls_context: ssl.SSLContext | None = None,
-        task_group: asyncio.TaskGroup | None = None
+        task_group: asyncio.TaskGroup | None = None,
     ) -> None:
         super().__init__(task_group=task_group)
         self._logger = logging.LoggerAdapter(
