@@ -29,7 +29,6 @@ lint-pyflakes:
 
 .PHONY: lint-mypy
 lint-mypy:
-	pipenv run mypy setup.py
 	pipenv run mypy tests
 	pipenv run mypy src/enapter
 
@@ -64,7 +63,8 @@ dist.tar: dist
 
 .PHONY: dist
 dist:
-	pipenv run python setup.py bdist_wheel
+	rm -rf dist
+	pipenv run python -m pip wheel --no-deps --wheel-dir dist .
 
 RE_SEMVER = [0-9]+.[0-9]+.[0-9]+(-[a-z0-9]+)?
 
