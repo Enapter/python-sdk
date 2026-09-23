@@ -3,11 +3,11 @@ default:
 
 .PHONY: install-deps
 install-deps:
-	pipenv install --dev
+	uv sync
 
 .PHONY: update-deps
 update-deps:
-	pipenv update --dev
+	uv sync --upgrade
 
 .PHONY: check
 check: lint test
@@ -17,44 +17,39 @@ lint: lint-black lint-isort lint-pyflakes lint-mypy
 
 .PHONY: lint-black
 lint-black:
-	pipenv run black --check --diff .
+	uv run black --check --diff .
 
 .PHONY: lint-isort
 lint-isort:
-	pipenv run isort --check .
+	uv run isort --check .
 
 .PHONY: lint-pyflakes
 lint-pyflakes:
-	pipenv run pyflakes .
+	uv run pyflakes .
 
 .PHONY: lint-mypy
 lint-mypy:
-	pipenv run mypy tests
-	pipenv run mypy src/enapter
+	uv run mypy tests
+	uv run mypy src/enapter
 
 .PHONY: test
 test: test-unit test-integration
 
 .PHONY: test-unit
 test-unit:
-	pipenv run pytest -vv --cov --cov-report term-missing tests/unit
+	uv run pytest -vv --cov=enapter --cov-report term-missing tests/unit
 
 .PHONY: test-integration
 test-integration:
-	pipenv run pytest -vv --capture=no tests/integration
-
-.PHONY: get-pipenv
-get-pipenv:
-	curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+	uv run pytest -vv --capture=no tests/integration
 
 .PHONY: upload-to-pypi
 upload-to-pypi: dist
 ifndef PYPI_API_TOKEN
 	$(error PYPI_API_TOKEN is not defined)
 endif
-	@pipenv run twine upload \
-		--username __token__ \
-		--password $(PYPI_API_TOKEN) \
+	@uv publish \
+		--token $(PYPI_API_TOKEN) \
 		$</*
 
 dist.tar: dist
@@ -64,7 +59,7 @@ dist.tar: dist
 .PHONY: dist
 dist:
 	rm -rf dist
-	pipenv run python -m pip wheel --no-deps --wheel-dir dist .
+	uv build
 
 RE_SEMVER = [0-9]+.[0-9]+.[0-9]+(-[a-z0-9]+)?
 
