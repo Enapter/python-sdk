@@ -8,5 +8,6 @@ class AccessRole(enum.Enum):
     USER = "USER"
     OWNER = "OWNER"
     INSTALLER = "INSTALLER"
-    SYSTEM = "SYSTEM"
     VENDOR = "VENDOR"
+    # Undocumented hidden role used by the API; kept intentionally.
+    SYSTEM = "SYSTEM"
