@@ -25,7 +25,7 @@ lint-isort:
 
 .PHONY: lint-pyflakes
 lint-pyflakes:
-	uv run pyflakes .
+	uv run pyflakes src tests examples
 
 .PHONY: lint-mypy
 lint-mypy:
