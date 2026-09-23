@@ -23,7 +23,6 @@ Homepage = "https://github.com/Enapter/python-sdk"
 dev = [
     "black",
     "docker",
-    "faker",
     "isort",
     "mypy",
     "pyflakes",
