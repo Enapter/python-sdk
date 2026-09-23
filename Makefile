@@ -48,9 +48,7 @@ upload-to-pypi: dist
 ifndef PYPI_API_TOKEN
 	$(error PYPI_API_TOKEN is not defined)
 endif
-	@uv publish \
-		--token $(PYPI_API_TOKEN) \
-		$</*
+	@UV_PUBLISH_TOKEN=$(PYPI_API_TOKEN) uv publish $</*
 
 dist.tar: dist
 	rm --force $@
