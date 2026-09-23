@@ -12,17 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         python: ["3.11", "3.12", "3.13", "3.14"]
+    env:
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "${{ matrix.python }}"
-
-      - name: Install pipenv
-        run: make get-pipenv
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
         run: make install-deps
@@ -36,18 +33,10 @@ jobs:
     runs-on: "ubuntu-latest"
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.11"
-
-      - name: Install pipenv
-        run: make get-pipenv
-
-      - name: Install dependencies
-        run: make install-deps
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Publish to PyPI
         run: make upload-to-pypi
