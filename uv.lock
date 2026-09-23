@@ -473,10 +473,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiomqtt", specifier = "==2.5.*" },
-    { name = "dnspython", specifier = "==2.8.*" },
+    { name = "aiomqtt", specifier = "==2.*" },
+    { name = "dnspython", specifier = "==2.*" },
     { name = "httpx", specifier = "==0.28.*" },
-    { name = "json-log-formatter", specifier = "==1.1.*" },
+    { name = "json-log-formatter", specifier = "==1.*" },
 ]
 
 [package.metadata.requires-dev]
